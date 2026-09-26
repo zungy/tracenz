@@ -16,15 +16,6 @@ export const site = {
     macos: null as string | null,
   },
 
-  /**
-   * Endpoints the login and signup forms POST to. While an endpoint is null,
-   * the form validates input and then says sign-in isn't connected yet.
-   */
-  auth: {
-    loginEndpoint: null as string | null,
-    signupEndpoint: null as string | null,
-  },
-
   /** Shown on the Enterprise plan. Replace with a real address. */
   salesEmail: 'sales@example.com',
 };
