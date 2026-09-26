@@ -13,9 +13,11 @@ import { nav, sheetCount, sheets, site, type SheetKey } from '../config/site';
 
 interface Props {
   sheet: SheetKey | null;
+  /** Title for pages outside the numbered marketing sheets. */
+  pageTitle?: string;
 }
 
-const { sheet } = Astro.props;
+const { sheet, pageTitle } = Astro.props;
 const current = sheet ? sheets[sheet] : null;
 const built = new Date();
 const year = built.getFullYear();
@@ -52,7 +54,7 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     <div class="titleblock">
       <div class="cell cell--title">
         <p class="label">Title</p>
-        <p class="cell__title">{current ? current.title : 'Page not found'}</p>
+        <p class="cell__title">{current?.title ?? pageTitle ?? 'Page not found'}</p>
       </div>
       <div class="cell">
         <p class="label">Sheet</p>

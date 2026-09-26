@@ -1,65 +1,25 @@
 ---
-/**
- * The primary action: download the desktop app. One button, for the
- * visitor's own system when it can be told (Windows until then), and a text
- * link to the other. While a download URL in src/config/site.ts is null,
- * clicking explains that the download isn't available yet.
- */
 import Icon from './Icon.astro';
 import { site } from '../config/site';
-
 interface Props {
   class?: string;
-  /** Larger button, for the hero. */
   size?: 'md' | 'lg';
 }
-
 const { class: className, size = 'md' } = Astro.props;
-
-const systems = {
-  windows: { label: 'Windows', icon: 'brand-windows', url: site.downloads.windows },
-  macos: { label: 'macOS', icon: 'brand-apple', url: site.downloads.macos },
-} as const;
-type Os = keyof typeof systems;
-const pending = (os: Os) =>
-  systems[os].url ? undefined : `The ${systems[os].label} download isn't available yet.`;
-const order: Os[] = ['windows', 'macos'];
 ---
 
-{order.map((os) => {
-  const other: Os = os === 'windows' ? 'macos' : 'windows';
-  return (
-    <div class:list={['download', className]} data-download={os} hidden={os === 'macos'}>
-      <a
-        class:list={['btn', 'btn--primary', size === 'lg' && 'download__lg']}
-        href={systems[os].url ?? '#download'}
-        data-pending={pending(os)}
-      >
-        <Icon name={systems[os].icon} size={20} />
-        Download for {systems[os].label}
-      </a>
-      <a
-        class="download__other"
-        href={systems[other].url ?? '#download'}
-        data-pending={pending(other)}
-      >
-        Also for {systems[other].label}
-      </a>
-    </div>
-  );
-})}
-
-<script>
-  // Offer the visitor's own system first.
-  const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
-  const platform = nav.userAgentData?.platform || navigator.platform || navigator.userAgent;
-  if (/mac/i.test(platform)) {
-    for (const el of document.querySelectorAll<HTMLElement>('[data-download]')) {
-      el.hidden = el.dataset.download !== 'macos';
-    }
-  }
-</script>
-
+<div class:list={['download', className]}>
+  <a
+    class:list={['btn', 'btn--primary', size === 'lg' && 'download__lg']}
+    href={site.downloads.windows}
+  >
+    <Icon name="brand-windows" size={20} />
+    Download for Windows
+  </a>
+  <a class="download__guide" href="/download">
+    Setup guide
+  </a>
+</div>
 <style>
   .download {
     display: flex;
@@ -67,18 +27,12 @@ const order: Os[] = ['windows', 'macos'];
     align-items: center;
     gap: 0.75rem var(--sp-3);
   }
-
-  .download[hidden] {
-    display: none;
-  }
-
   .download__lg {
     --btn-h: 3.5rem;
     padding-inline: var(--sp-3) var(--sp-5);
     font-size: var(--s1);
   }
-
-  .download__other {
+  .download__guide {
     font-weight: 500;
   }
 </style>
