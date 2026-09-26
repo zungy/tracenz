@@ -16,6 +16,13 @@ dist/
 # logs
 npm-debug.log*
 
+# Desktop runtime data and packaged downloads stay outside source control
+trace-app/.data/
+trace-app/artifacts/
+trace-app/DesignRecorderAgent/
+__pycache__/
+*.pyc
+
 # OS and editor files
 .DS_Store
 .vscode/*
