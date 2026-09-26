@@ -6,8 +6,15 @@
 
 ## Try it
 
+**Shared demo login** — use on the website or in the desktop app:
+
+- Email: `nla82@uclive.ac.nz`
+- Password: `saasathon100`
+
+This account is public and its design history is shared. Create your own account for private work.
+
 1. Download and **extract the whole Windows ZIP**, then open `Trace.exe`. Quit any older Trace from its system tray first.
-2. Create an account on the website and log in inside Trace.
+2. Log in with the demo account above, or create an account on the website and log in inside Trace.
 3. Close Fusion, choose **Fusion → Install / update Fusion add-in** in Trace, then restart Fusion.
 4. Finish a modeling command and press **Ctrl + Alt + S** in Fusion to record a checkpoint and rationale. Keep Trace running.
 5. View your timeline in desktop or [on the web](https://tracenz.vercel.app/app) with the same account. In desktop, choose **Design report → Generate PDF** for a document's complete saved history.
@@ -17,10 +24,10 @@ New accounts start with their own empty history. Captures appear on the website 
 ## How it works
 
 ```text
-Fusion add-in → desktop receiver + durable upload queue
-             → Supabase Edge API → OpenAI summaries
-             → Supabase database + private image storage
-             → desktop timeline / website viewer
+Fusion → desktop receiver + upload queue → Supabase API
+                                          ├─ saved events + private screenshots
+                                          └─ OpenAI → saved summaries
+Desktop timeline + website viewer ← the same account's saved history
 ```
 
 Checkpoint captures preserve normalized engineering changes, original rationale, document metadata and a PNG viewport. Interrupted uploads retry; account ownership keeps histories separate. OpenAI and privileged database keys stay on the backend.
