@@ -1,0 +1,94 @@
+---
+import DocSheet from './DocSheet.astro';
+import Icon from '../Icon.astro';
+
+const points = [
+  {
+    icon: 'file-description',
+    text: 'An overview of parts, assemblies, materials and key dimensions',
+  },
+  { icon: 'arrows-diff', text: 'Changes grouped by revision, with before and after values' },
+  { icon: 'link', text: 'A link from every statement to the log entries behind it' },
+  { icon: 'file-export', text: 'Export to PDF, Word or Markdown' },
+];
+---
+
+<section class="section docsec" aria-labelledby="docsec-title">
+  <div class="container grid docsec__grid">
+    <div class="docsec__copy">
+      <p class="label">The design document</p>
+      <h2 id="docsec-title">Every statement traces back to a change.</h2>
+      <p class="lead">
+        Each document opens with the overall design, then lists what changed since the last
+        revision. Every point links to the log entries it was written from, so a reviewer can check
+        the source in one click.
+      </p>
+      <ul class="docsec__points">
+        {points.map((point) => (
+          <li>
+            <Icon name={point.icon} size={22} />
+            <span>{point.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="docsec__sheet">
+      <DocSheet />
+    </div>
+  </div>
+</section>
+
+<style>
+  .docsec__grid {
+    row-gap: var(--sp-8);
+    align-items: start;
+  }
+
+  .docsec__copy,
+  .docsec__sheet {
+    grid-column: 1 / -1;
+  }
+
+  .docsec__copy {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .docsec__copy h2 {
+    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  }
+
+  .docsec__points {
+    display: grid;
+    gap: 0;
+    margin-top: var(--sp-1);
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .docsec__points li {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    align-items: start;
+    padding-block: 0.875rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .docsec__points :global(.icon) {
+    color: var(--mark);
+  }
+
+  @media (min-width: 64rem) {
+    .docsec__copy {
+      grid-column: 1 / span 6;
+      position: sticky;
+      top: 6rem;
+    }
+
+    .docsec__sheet {
+      grid-column: 8 / -1;
+    }
+  }
+</style>

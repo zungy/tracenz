@@ -1,0 +1,96 @@
+---
+import Icon from '../Icon.astro';
+import { faqs } from '../../config/pricing';
+---
+
+<section class="faq grid" aria-labelledby="faq-title">
+  <div class="faq__head">
+    <p class="label">Questions</p>
+    <h2 id="faq-title">Common questions</h2>
+  </div>
+  <div class="faq__list">
+    {faqs.map((item, i) => (
+      <details name="faq" open={i === 0}>
+        <summary>
+          <span>{item.q}</span>
+          <Icon name="plus" size={20} class="faq__icon" />
+        </summary>
+        <p>{item.a}</p>
+      </details>
+    ))}
+  </div>
+</section>
+
+<style>
+  .faq {
+    row-gap: var(--sp-5);
+  }
+
+  .faq__head,
+  .faq__list {
+    grid-column: 1 / -1;
+  }
+
+  .faq__head {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+  }
+
+  .faq__head h2 {
+    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  }
+
+  .faq__list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-block: var(--sp-3);
+    font-family: var(--font-display);
+    font-size: var(--s1);
+    font-weight: 700;
+    font-stretch: 106%;
+    color: var(--text-strong);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq :global(.faq__icon) {
+    flex: none;
+    color: var(--mark);
+    transition: transform 200ms var(--ease);
+  }
+
+  details[open] :global(.faq__icon) {
+    transform: rotate(45deg);
+  }
+
+  details p {
+    max-width: 60ch;
+    padding-bottom: var(--sp-3);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 64rem) {
+    .faq__head {
+      grid-column: 1 / span 5;
+    }
+
+    .faq__list {
+      grid-column: 7 / -1;
+    }
+  }
+</style>

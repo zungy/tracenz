@@ -1,0 +1,151 @@
+---
+import Icon from '../Icon.astro';
+import { comparison, plans } from '../../config/pricing';
+---
+
+<section class="compare" aria-labelledby="compare-title">
+  <div class="compare__head">
+    <p class="label">Compare</p>
+    <h2 id="compare-title">Every plan, side by side</h2>
+  </div>
+
+  <div class="compare__scroll" role="region" aria-label="Plan comparison table" tabindex="0">
+    <table>
+      <colgroup>
+        <col class="col-feature" />
+        {plans.map((plan) => (
+          <col class:list={[plan.recommended && 'col-recommended']} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr>
+          <td></td>
+          {plans.map((plan) => (
+            <th scope="col">{plan.name}</th>
+          ))}
+        </tr>
+      </thead>
+      {comparison.map((group) => (
+        <tbody>
+          <tr class="group">
+            <th scope="rowgroup" colspan={plans.length + 1}>
+              {group.name}
+            </th>
+          </tr>
+          {group.rows.map((row) => (
+            <tr>
+              <th scope="row">{row.feature}</th>
+              {row.values.map((value) =>
+                value === true ? (
+                  <td>
+                    <Icon name="check" size={18} stroke={2} class="yes" />
+                    <span class="visually-hidden">Included</span>
+                  </td>
+                ) : value === false ? (
+                  <td>
+                    <span class="no" aria-hidden="true" />
+                    <span class="visually-hidden">Not included</span>
+                  </td>
+                ) : (
+                  <td>{value}</td>
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      ))}
+    </table>
+  </div>
+</section>
+
+<style>
+  .compare {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+
+  .compare__head {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .compare__head h2 {
+    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  }
+
+  /* position: relative keeps the absolutely positioned screen-reader labels
+     inside the scroll area; otherwise they widen the page on small screens. */
+  .compare__scroll {
+    position: relative;
+    overflow-x: auto;
+    border: 1px solid var(--line-strong);
+  }
+
+  table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+    font-size: var(--s-1);
+  }
+
+  .col-feature {
+    width: 34%;
+  }
+
+  .col-recommended {
+    background: var(--tint);
+  }
+
+  th,
+  td {
+    padding: 0.75rem var(--sp-2);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  thead th {
+    font-family: var(--font-display);
+    font-size: var(--s1);
+    font-weight: 750;
+    font-stretch: 110%;
+    color: var(--text-strong);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  tbody th[scope='row'] {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  td {
+    color: var(--text-strong);
+  }
+
+  .group th {
+    padding-top: var(--sp-3);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  tbody:last-child tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .compare :global(.yes) {
+    color: var(--mark);
+  }
+
+  /* Not included: a short hidden-line dash, the drafting mark for absent geometry */
+  .no {
+    display: inline-block;
+    width: 1.25rem;
+    border-top: 1.5px dashed var(--line-strong);
+    vertical-align: middle;
+  }
+</style>

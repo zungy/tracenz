@@ -1,0 +1,36 @@
+---
+/**
+ * Inline SVG icon from the Tabler set (https://tabler.io/icons), rendered at
+ * build time so no icon code ships to the browser.
+ */
+import { icons } from '@iconify-json/tabler';
+import { getIconData, iconToHTML, iconToSVG, replaceIDs } from '@iconify/utils';
+
+interface Props {
+  name: string;
+  size?: number;
+  stroke?: number;
+  /** Accessible name. Omit for decorative icons next to visible text. */
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 20, stroke = 1.5, label, class: className } = Astro.props;
+
+const data = getIconData(icons, name);
+if (!data) throw new Error(`Unknown Tabler icon: ${name}`);
+
+const { attributes, body } = iconToSVG(data, { width: size, height: size });
+const attrs: Record<string, string> = {
+  ...attributes,
+  class: ['icon', className].filter(Boolean).join(' '),
+  focusable: 'false',
+  ...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' }),
+};
+const svg = iconToHTML(
+  replaceIDs(body).replaceAll('stroke-width="2"', `stroke-width="${stroke}"`),
+  attrs,
+);
+---
+
+<Fragment set:html={svg} />

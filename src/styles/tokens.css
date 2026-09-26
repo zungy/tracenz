@@ -1,0 +1,191 @@
+/*
+ * Design tokens.
+ *
+ * The five palette colors are the only hues on the site; everything else is an
+ * alpha tint or a mix of them. Light theme is "Paper", dark theme is
+ * "Blueprint". Theme selection follows the system setting unless the visitor
+ * picks one in the footer, which stamps data-theme on <html>.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Palette */
+  --ink: #192c64;
+  --cobalt: #243f8f;
+  --vellum: #bdc5dd;
+  --film: #e9ebf3;
+  --paper: #ffffff;
+
+  /* Semantic colors: Paper */
+  --bg: var(--paper);
+  --bg-alt: var(--film);
+  --surface: var(--paper);
+  --text: var(--ink);
+  --text-strong: var(--ink);
+  --text-muted: rgb(25 44 100 / 0.74);
+  --line: var(--vellum);
+  --line-soft: var(--film);
+  --line-strong: rgb(25 44 100 / 0.55);
+  --accent: var(--cobalt);
+  --accent-hover: var(--ink);
+  --on-accent: var(--paper);
+  --link: var(--cobalt);
+  --mark: var(--cobalt);
+  --focus: var(--cobalt);
+  --tint: rgb(36 63 143 / 0.08);
+  --band-bg: var(--ink);
+  --band-surface: rgb(36 63 143 / 0.55);
+
+  /* Type */
+  --font-display: 'Archivo Variable', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:
+    'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, -apple-system,
+    'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    'Atkinson Hyperlegible Mono Variable', 'Atkinson Hyperlegible Mono', ui-monospace,
+    'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Type scale: ratio 2^(1/4), so every second step is x sqrt2 and every fourth doubles */
+  --s-2: 0.75rem;
+  --s-1: 0.875rem;
+  --s0: 1rem;
+  --s1: 1.189rem;
+  --s2: 1.414rem;
+  --s3: 1.682rem;
+  --s4: 2rem;
+  --s6: 2.828rem;
+  --s8: 4rem;
+  --s10: 5.657rem;
+
+  /* Spacing: an 8px unit times 1, 2, 3, 5, 8, 13 */
+  --sp-half: 0.25rem;
+  --sp-1: 0.5rem;
+  --sp-2: 1rem;
+  --sp-3: 1.5rem;
+  --sp-5: 2.5rem;
+  --sp-8: 4rem;
+  --sp-13: 6.5rem;
+
+  /* Layout */
+  --container: 80rem;
+  --gutter: 1rem;
+  --page-pad: clamp(1rem, 4vw, 2.5rem);
+  --cols: 4;
+  --section-pad: var(--sp-8);
+
+  /* Shape and motion */
+  --radius: 2px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --cols: 8;
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --cols: 16;
+    --section-pad: var(--sp-13);
+  }
+}
+
+/* Blueprint (dark), following the system setting */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: var(--ink);
+    --bg-alt: color-mix(in srgb, var(--ink) 70%, var(--cobalt));
+    --surface: color-mix(in srgb, var(--ink) 60%, var(--cobalt));
+    --text: var(--film);
+    --text-strong: var(--paper);
+    --text-muted: var(--vellum);
+    --line: rgb(189 197 221 / 0.3);
+    --line-soft: rgb(189 197 221 / 0.12);
+    --line-strong: rgb(189 197 221 / 0.55);
+    --accent: var(--film);
+    --accent-hover: var(--paper);
+    --on-accent: var(--ink);
+    --link: var(--paper);
+    --mark: var(--paper);
+    --focus: var(--paper);
+    --tint: rgb(233 235 243 / 0.08);
+    --band-bg: var(--cobalt);
+    --band-surface: rgb(25 44 100 / 0.45);
+  }
+}
+
+/* Blueprint (dark), chosen explicitly */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: var(--ink);
+  --bg-alt: color-mix(in srgb, var(--ink) 70%, var(--cobalt));
+  --surface: color-mix(in srgb, var(--ink) 60%, var(--cobalt));
+  --text: var(--film);
+  --text-strong: var(--paper);
+  --text-muted: var(--vellum);
+  --line: rgb(189 197 221 / 0.3);
+  --line-soft: rgb(189 197 221 / 0.12);
+  --line-strong: rgb(189 197 221 / 0.55);
+  --accent: var(--film);
+  --accent-hover: var(--paper);
+  --on-accent: var(--ink);
+  --link: var(--paper);
+  --mark: var(--paper);
+  --focus: var(--paper);
+  --tint: rgb(233 235 243 / 0.08);
+  --band-bg: var(--cobalt);
+  --band-surface: rgb(25 44 100 / 0.45);
+}
+
+/*
+ * Scoped schemes. A blueprint band stays dark in both themes (its ground shifts
+ * to cobalt in dark mode so it still stands apart); a paper sheet, like the
+ * document preview, stays paper in both themes.
+ */
+.scheme-blueprint {
+  color-scheme: dark;
+  --bg: var(--band-bg);
+  --bg-alt: var(--band-surface);
+  --surface: var(--band-surface);
+  --text: var(--film);
+  --text-strong: var(--paper);
+  --text-muted: var(--vellum);
+  --line: rgb(189 197 221 / 0.3);
+  --line-soft: rgb(189 197 221 / 0.14);
+  --line-strong: rgb(189 197 221 / 0.55);
+  --accent: var(--film);
+  --accent-hover: var(--paper);
+  --on-accent: var(--ink);
+  --link: var(--paper);
+  --mark: var(--paper);
+  --focus: var(--paper);
+  --tint: rgb(233 235 243 / 0.08);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.scheme-paper {
+  color-scheme: light;
+  --bg: var(--paper);
+  --bg-alt: var(--film);
+  --surface: var(--paper);
+  --text: var(--ink);
+  --text-strong: var(--ink);
+  --text-muted: rgb(25 44 100 / 0.74);
+  --line: var(--vellum);
+  --line-soft: var(--film);
+  --line-strong: rgb(25 44 100 / 0.55);
+  --accent: var(--cobalt);
+  --accent-hover: var(--ink);
+  --on-accent: var(--paper);
+  --link: var(--cobalt);
+  --mark: var(--cobalt);
+  --focus: var(--cobalt);
+  --tint: rgb(36 63 143 / 0.08);
+  background: var(--bg);
+  color: var(--text);
+}

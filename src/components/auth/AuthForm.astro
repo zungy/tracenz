@@ -1,0 +1,513 @@
+---
+/**
+ * Log in / sign up form. Validates in the browser, then posts to the endpoint
+ * in src/config/site.ts. While that endpoint is null, it says so instead of
+ * pretending to sign the visitor in.
+ */
+import Icon from '../Icon.astro';
+import LogoPlaceholder from '../LogoPlaceholder.astro';
+import { site } from '../../config/site';
+
+interface Props {
+  mode: 'login' | 'signup';
+}
+
+const { mode } = Astro.props;
+const isLogin = mode === 'login';
+const endpoint = isLogin ? site.auth.loginEndpoint : site.auth.signupEndpoint;
+const providers = ['Google', 'Microsoft'];
+---
+
+<div class="auth">
+  <nav class="tabs" aria-label="Log in or sign up">
+    <a href="/login" aria-current={isLogin ? 'page' : undefined}>
+      Log in
+    </a>
+    <a href="/signup" aria-current={isLogin ? undefined : 'page'}>
+      Sign up
+    </a>
+  </nav>
+
+  <div class="auth__intro">
+    <h1>{isLogin ? 'Log in to Trace' : 'Create your Trace account'}</h1>
+    <p>{isLogin ? 'Pick up where your log left off.' : 'Free for one project. No card needed.'}</p>
+    {!isLogin && <p class="auth__plan" data-plan-note hidden />}
+  </div>
+
+  <div class="sso">
+    {providers.map((name) => (
+      <a
+        class="btn btn--secondary btn--block"
+        href="#"
+        data-pending={`${name} sign-in isn't connected yet.`}
+      >
+        <LogoPlaceholder size={20} label="" />
+        Continue with {name}
+      </a>
+    ))}
+  </div>
+
+  <p class="divider">
+    <span>or with email</span>
+  </p>
+
+  <form
+    class="form"
+    method="post"
+    action={endpoint ?? undefined}
+    novalidate
+    data-auth-form
+    data-connected={endpoint ? 'true' : 'false'}
+    data-mode={mode}
+  >
+    {!isLogin && (
+      <div class="field">
+        <label for="name">Full name</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          required
+          data-missing="Enter your name."
+        />
+        <p class="field__error" id="name-error" hidden />
+      </div>
+    )}
+
+    <div class="field">
+      <label for="email">{isLogin ? 'Email' : 'Work email'}</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        spellcheck="false"
+        required
+        data-missing="Enter your email address."
+        data-invalid="Enter an email address like name@company.com."
+      />
+      <p class="field__error" id="email-error" hidden></p>
+    </div>
+
+    <div class="field">
+      <div class="field__label-row">
+        <label for="password">Password</label>
+        {isLogin && (
+          <a href="#" data-pending="Password reset isn't connected yet.">
+            Forgot password?
+          </a>
+        )}
+      </div>
+      <div class="field__control">
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete={isLogin ? 'current-password' : 'new-password'}
+          required
+          minlength={isLogin ? undefined : 8}
+          aria-describedby={isLogin ? undefined : 'password-hint'}
+          data-missing="Enter your password."
+          data-short="Use at least 8 characters."
+        />
+        <button
+          class="field__toggle"
+          type="button"
+          aria-label="Show password"
+          aria-controls="password"
+          aria-pressed="false"
+          data-password-toggle
+        >
+          <Icon name="eye" size={20} class="toggle-show" />
+          <Icon name="eye-off" size={20} class="toggle-hide" />
+        </button>
+      </div>
+      {!isLogin && (
+        <p class="field__hint" id="password-hint">
+          At least 8 characters.
+        </p>
+      )}
+      <p class="field__error" id="password-error" hidden></p>
+    </div>
+
+    {isLogin ? (
+      <label class="check" for="remember">
+        <input id="remember" name="remember" type="checkbox" />
+        <span>Keep me logged in</span>
+      </label>
+    ) : (
+      <div class="field">
+        <label class="check" for="terms">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
+            required
+            data-missing="Accept the terms to create an account."
+          />
+          <span>
+            I agree to the{' '}
+            <a href="#" data-pending="The terms page isn't published yet.">
+              Terms
+            </a>{' '}
+            and{' '}
+            <a href="#" data-pending="The privacy policy isn't published yet.">
+              Privacy Policy
+            </a>
+            .
+          </span>
+        </label>
+        <p class="field__error" id="terms-error" hidden />
+      </div>
+    )}
+
+    <button class="btn btn--primary btn--block" type="submit">
+      {isLogin ? 'Log in' : 'Create account'}
+    </button>
+
+    <p class="form__status" role="status" aria-live="polite" data-status></p>
+  </form>
+
+  <p class="auth__switch">
+    {isLogin ? (
+      <>
+        New to Trace? <a href="/signup">Create an account</a>
+      </>
+    ) : (
+      <>
+        Already have an account? <a href="/login">Log in</a>
+      </>
+    )}
+  </p>
+</div>
+
+<style>
+  .auth {
+    display: grid;
+    gap: var(--sp-3);
+    width: 100%;
+    max-width: 26rem;
+  }
+
+  /* Log in / Sign up switch */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tabs a {
+    padding-block: 0.75rem;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: var(--text-muted);
+    font-weight: 650;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .tabs a:hover {
+    color: var(--text-strong);
+  }
+
+  .tabs a[aria-current='page'] {
+    border-bottom-color: var(--mark);
+    color: var(--text-strong);
+  }
+
+  .auth__intro {
+    display: grid;
+    gap: var(--sp-1);
+    margin-top: var(--sp-2);
+  }
+
+  .auth__intro h1 {
+    font-size: clamp(var(--s3), 1.3rem + 1.4vw, 2.378rem);
+  }
+
+  .auth__intro p {
+    color: var(--text-muted);
+  }
+
+  .auth__plan {
+    justify-self: start;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    color: var(--text-strong);
+  }
+
+  .sso {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .sso :global(.logo-placeholder) {
+    color: var(--text-muted);
+  }
+
+  .divider {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  /* Fields */
+  .form {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .field label,
+  .field__label-row {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .field__label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .field__label-row a {
+    font-size: var(--s-1);
+    font-weight: 500;
+  }
+
+  .field__control {
+    position: relative;
+  }
+
+  input:not([type='checkbox']) {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-strong);
+    font-size: var(--s0);
+  }
+
+  input:not([type='checkbox']):hover {
+    border-color: var(--text-muted);
+  }
+
+  input:not([type='checkbox']):focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  #password {
+    padding-right: 3rem;
+  }
+
+  /* Errors use weight and an icon instead of a new hue, to stay in the palette. */
+  input[aria-invalid='true'] {
+    border: 2px solid var(--text-strong);
+  }
+
+  .field__error {
+    display: flex;
+    gap: 0.4rem;
+    align-items: start;
+    font-size: var(--s-1);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .field__error::before {
+    content: '!';
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.1rem;
+    border-radius: 50%;
+    background: var(--text-strong);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .field__error[hidden] {
+    display: none;
+  }
+
+  .field__hint {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  .field__toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-muted);
+    transform: translateY(-50%);
+  }
+
+  .field__toggle:hover {
+    color: var(--text-strong);
+  }
+
+  .field__toggle :global(.toggle-hide),
+  .field__toggle[aria-pressed='true'] :global(.toggle-show) {
+    display: none;
+  }
+
+  .field__toggle[aria-pressed='true'] :global(.toggle-hide) {
+    display: block;
+  }
+
+  /* .form raises specificity above `.field label`, which would make this bold. */
+  .form .check {
+    display: flex;
+    gap: 0.625rem;
+    align-items: start;
+    font-weight: 400;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .form .check input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.2rem;
+    accent-color: var(--accent);
+  }
+
+  .form__status:empty {
+    display: none;
+  }
+
+  .form__status {
+    padding: 0.75rem var(--sp-2);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--tint);
+    font-size: var(--s-1);
+    color: var(--text-strong);
+  }
+
+  .auth__switch {
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--line);
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  // Show or hide the password.
+  for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-password-toggle]')) {
+    const input = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (!(input instanceof HTMLInputElement)) continue;
+    toggle.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      toggle.setAttribute('aria-pressed', String(show));
+      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  }
+
+  // Note the plan chosen on the pricing page (?plan=pro or ?plan=team).
+  const planNote = document.querySelector<HTMLElement>('[data-plan-note]');
+  const plan = new URLSearchParams(location.search).get('plan');
+  const planNames: Record<string, string> = { pro: 'Pro', team: 'Team' };
+  if (planNote && plan && planNames[plan]) {
+    planNote.textContent = `Plan: ${planNames[plan]}. Change it anytime.`;
+    planNote.hidden = false;
+  }
+
+  function messageFor(input: HTMLInputElement): string {
+    const v = input.validity;
+    if (v.valueMissing) return input.dataset.missing ?? 'Fill in this field.';
+    if (v.typeMismatch) return input.dataset.invalid ?? 'Check this value.';
+    if (v.tooShort) return input.dataset.short ?? 'This is too short.';
+    return '';
+  }
+
+  function showError(input: HTMLInputElement, message: string) {
+    const error = document.getElementById(`${input.id}-error`);
+    if (!error) return;
+    const hint = input.id === 'password' ? document.getElementById('password-hint') : null;
+    const describedBy = [message ? error.id : null, hint?.id].filter(Boolean).join(' ');
+    error.textContent = message;
+    error.hidden = !message;
+    if (message) input.setAttribute('aria-invalid', 'true');
+    else input.removeAttribute('aria-invalid');
+    if (describedBy) input.setAttribute('aria-describedby', describedBy);
+    else input.removeAttribute('aria-describedby');
+  }
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-auth-form]')) {
+    const fields = [...form.querySelectorAll<HTMLInputElement>('input[required]')];
+    const status = form.querySelector<HTMLElement>('[data-status]');
+
+    // Clear an error as soon as the field becomes valid.
+    for (const input of fields) {
+      input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
+        if (input.getAttribute('aria-invalid') === 'true') showError(input, messageFor(input));
+      });
+    }
+
+    form.addEventListener('submit', (event) => {
+      let firstInvalid: HTMLInputElement | null = null;
+      for (const input of fields) {
+        const message = messageFor(input);
+        showError(input, message);
+        if (message && !firstInvalid) firstInvalid = input;
+      }
+
+      if (firstInvalid) {
+        event.preventDefault();
+        firstInvalid.focus();
+        if (status) status.textContent = '';
+        return;
+      }
+
+      if (form.dataset.connected !== 'true') {
+        event.preventDefault();
+        if (status) {
+          status.textContent =
+            form.dataset.mode === 'login'
+              ? "Sign-in isn't connected yet, so nothing was sent."
+              : "Sign-up isn't connected yet, so nothing was sent.";
+        }
+      }
+    });
+  }
+</script>

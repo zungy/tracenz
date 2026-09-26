@@ -1,0 +1,156 @@
+---
+/**
+ * Detail D: the orbital sander's 125 mm sanding pad, drawn to drafting
+ * conventions (chain lines for centerlines and the pitch circle, leaders
+ * for callouts) with the latest change marked by a revision cloud.
+ */
+import { cloudPath } from '../../scripts/revision-cloud';
+
+const cx = 210;
+const cy = 214;
+const mm = 2.08; // drawing scale, px per mm
+const pad = 62.5 * mm;
+const pitch = 42 * mm;
+const hole = 4.5 * mm;
+
+// Eight holes, equally spaced, offset from the centerlines.
+const holes = Array.from({ length: 8 }, (_, i) => {
+  const a = ((22.5 + i * 45) * Math.PI) / 180;
+  return { x: cx + pitch * Math.cos(a), y: cy + pitch * Math.sin(a) };
+});
+const called = holes[7]; // upper right
+
+// Leader for the pad diameter: aimed at the center from the upper left.
+const d = Math.SQRT1_2;
+const padTip = { x: cx - pad * d, y: cy - pad * d };
+const holeTip = {
+  x: called.x + hole * Math.cos(-Math.PI / 8 - Math.PI / 4),
+  y: called.y + hole * Math.sin(-Math.PI / 8 - Math.PI / 4),
+};
+
+// Filled arrowhead with its tip on `to`, aligned with the leader from `from`.
+function arrowhead(from: { x: number; y: number }, to: { x: number; y: number }) {
+  const len = Math.hypot(to.x - from.x, to.y - from.y);
+  const ux = (to.x - from.x) / len;
+  const uy = (to.y - from.y) / len;
+  const bx = to.x - ux * 10;
+  const by = to.y - uy * 10;
+  return `M${to.x.toFixed(1)} ${to.y.toFixed(1)}L${(bx - uy * 3.2).toFixed(1)} ${(by + ux * 3.2).toFixed(1)}L${(bx + uy * 3.2).toFixed(1)} ${(by - ux * 3.2).toFixed(1)}Z`;
+}
+const padElbow = { x: 74, y: 70 };
+
+const cloud = { x: 318, y: 58, w: 112, h: 34 };
+const cloudD = cloudPath(cloud.w, cloud.h, 10);
+const f = (n: number) => n.toFixed(1);
+---
+
+<svg class="pad" viewBox="0 0 440 420" role="img" aria-labelledby="pad-title pad-desc">
+  <title id="pad-title">Detail D: sanding pad</title>
+  <desc id="pad-desc">
+    A 125 millimetre sanding pad with eight 9 millimetre dust holes, equally spaced. The hole
+    callout is marked as changed in revision B.
+  </desc>
+
+  <!-- centerlines -->
+  <path
+    class="chain"
+    d={`M${f(cx - pad - 16)} ${cy}H${f(cx + pad + 16)}M${cx} ${f(cy - pad - 16)}V${f(cy + pad + 16)}`}
+  ></path>
+  <!-- pitch circle -->
+  <circle class="chain" cx={cx} cy={cy} r={f(pitch)}></circle>
+  <!-- pad outline -->
+  <circle class="visible" cx={cx} cy={cy} r={f(pad)}></circle>
+  <!-- holes -->
+  {holes.map((h) => (
+    <circle class="visible" cx={f(h.x)} cy={f(h.y)} r={f(hole)} />
+  ))}
+  <!-- center mark -->
+  <path class="thin" d={`M${cx - 6} ${cy}H${cx + 6}M${cx} ${cy - 6}V${cy + 6}`}></path>
+
+  <!-- pad diameter callout -->
+  <path class="thin" d={`M36 ${padElbow.y}H${padElbow.x}L${f(padTip.x)} ${f(padTip.y)}`}></path>
+  <path class="arrowhead" d={arrowhead(padElbow, padTip)}></path>
+  <text class="callout" x="36" y="62">
+    Ø125
+  </text>
+
+  <!-- hole callout, revised -->
+  <path
+    class="thin"
+    d={`M${f(holeTip.x)} ${f(holeTip.y)}L312 ${cloud.y + cloud.h / 2}H${cloud.x}`}
+  ></path>
+  <circle class="dot" cx={f(holeTip.x)} cy={f(holeTip.y)} r="2"></circle>
+  <text class="callout" x={cloud.x + 12} y={cloud.y + 22}>
+    8× Ø9 EQ SP
+  </text>
+  <path class="cloud" d={cloudD} transform={`translate(${cloud.x} ${cloud.y})`}></path>
+  <path class="tri" d={`M${cloud.x + cloud.w - 2} ${cloud.y - 20}l9 16h-18z`}></path>
+  <text class="tri-letter" x={cloud.x + cloud.w - 2} y={cloud.y - 6.5}>
+    B
+  </text>
+</svg>
+
+<style>
+  .pad {
+    width: 100%;
+    height: auto;
+  }
+
+  .pad :global(*) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .visible {
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 1.75;
+  }
+
+  .thin {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1;
+  }
+
+  .chain {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 16 4 2 4;
+  }
+
+  .arrowhead,
+  .dot {
+    fill: var(--text-muted);
+  }
+
+  .callout {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-strong);
+  }
+
+  .cloud {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tri {
+    fill: var(--bg);
+    stroke: var(--mark);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+  }
+
+  .tri-letter {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    text-anchor: middle;
+    fill: var(--mark);
+  }
+</style>

@@ -1,0 +1,112 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/atkinson-hyperlegible-next';
+import '@fontsource-variable/atkinson-hyperlegible-mono';
+import '../styles/global.css';
+
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { site, type SheetKey } from '../config/site';
+
+interface Props {
+  /** Full document title. */
+  title: string;
+  description?: string;
+  /** Which sheet of the site this page is, for the title-block footer. */
+  sheet: SheetKey | null;
+  header?: 'site' | 'auth';
+}
+
+const { title, description = site.description, sheet, header = 'site' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#192c64" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <script is:inline>
+      // Apply a saved theme before first paint so the page doesn't flash.
+      try {
+        var saved = localStorage.getItem('trace-theme');
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <Header variant={header} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer sheet={sheet} />
+    <p class="toast" role="status" aria-live="polite" data-toast></p>
+
+    <style>
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-3));
+        z-index: 60;
+        width: max-content;
+        max-width: calc(100% - 2 * var(--page-pad));
+        padding: 0.75rem var(--sp-2);
+        border-radius: var(--radius);
+        background: var(--ink);
+        color: var(--paper);
+        box-shadow: 0 8px 24px rgb(25 44 100 / 0.24);
+        font-size: var(--s-1);
+        font-weight: 550;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, 8px);
+        transition:
+          opacity 200ms var(--ease),
+          transform 200ms var(--ease);
+      }
+
+      .toast.is-visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      :global(:root[data-theme='dark']) .toast {
+        outline: 1px solid rgb(189 197 221 / 0.4);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :global(:root:not([data-theme='light'])) .toast {
+          outline: 1px solid rgb(189 197 221 / 0.4);
+        }
+      }
+    </style>
+
+    <script>
+      // Links marked data-pending (downloads without a URL yet) explain themselves
+      // instead of navigating.
+      const toast = document.querySelector<HTMLElement>('[data-toast]');
+      let timer: number | undefined;
+
+      document.addEventListener('click', (event) => {
+        const link = (event.target as HTMLElement).closest<HTMLElement>('[data-pending]');
+        if (!link || !toast) return;
+        event.preventDefault();
+        toast.textContent = link.dataset.pending ?? '';
+        toast.classList.add('is-visible');
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => toast.classList.remove('is-visible'), 4000);
+      });
+    </script>
+  </body>
+</html>

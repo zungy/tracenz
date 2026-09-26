@@ -1,0 +1,152 @@
+---
+import Base from '../layouts/Base.astro';
+import DownloadBand from '../components/DownloadBand.astro';
+import Guides from '../components/Guides.astro';
+import Icon from '../components/Icon.astro';
+import CompareTable from '../components/pricing/CompareTable.astro';
+import Faq from '../components/pricing/Faq.astro';
+import PlanCards from '../components/pricing/PlanCards.astro';
+import { site } from '../config/site';
+---
+
+<Base
+  title="Pricing · Trace"
+  description="Trace is free for one project. Pro and Team add unlimited projects, full history, more export formats and team review."
+  sheet="pricing"
+>
+  <section class="intro" aria-labelledby="pricing-title">
+    <Guides />
+    <div class="container grid intro__grid">
+      <p class="label intro__eyebrow">Plans and prices in USD</p>
+      <h1 id="pricing-title">Pricing</h1>
+      <p class="lead intro__lead">
+        Start free with one project. Pay when you need more projects, the full history or team
+        review.
+      </p>
+    </div>
+  </section>
+
+  <section class="section plans-section" aria-label="Plans">
+    <div class="container">
+      <PlanCards />
+
+      <div class="enterprise">
+        <div class="enterprise__copy">
+          <h2 class="enterprise__name">Enterprise</h2>
+          <p>
+            Single sign-on, audit log export, private deployment and a named contact for your
+            company.
+          </p>
+        </div>
+        <div class="enterprise__actions">
+          <a class="btn btn--secondary" href={`mailto:${site.salesEmail}`}>
+            <Icon name="mail" size={20} />
+            Contact sales
+          </a>
+          <p class="enterprise__email mono">{site.salesEmail}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section compare-section">
+    <div class="container">
+      <CompareTable />
+    </div>
+  </section>
+
+  <section class="section faq-section">
+    <div class="container">
+      <Faq />
+    </div>
+  </section>
+
+  <DownloadBand />
+</Base>
+
+<style>
+  .intro {
+    position: relative;
+    padding-block: var(--sp-8) var(--sp-5);
+  }
+
+  .intro__grid {
+    position: relative;
+    row-gap: var(--sp-2);
+  }
+
+  .intro__grid > * {
+    grid-column: 1 / -1;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 1.4rem + 6.4vw, var(--s10));
+    font-weight: 780;
+    font-stretch: 116%;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+  .intro__lead {
+    max-width: 44ch;
+  }
+
+  .plans-section {
+    padding-top: var(--sp-5);
+  }
+
+  .enterprise {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-3);
+    padding: var(--sp-3);
+    border: 1px dashed var(--line-strong);
+  }
+
+  .enterprise__copy {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .enterprise__name {
+    font-size: var(--s3);
+  }
+
+  .enterprise__copy p {
+    max-width: 52ch;
+    color: var(--text-muted);
+  }
+
+  .enterprise__actions {
+    display: grid;
+    gap: var(--sp-1);
+    justify-items: start;
+  }
+
+  .enterprise__email {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+    user-select: all;
+  }
+
+  .compare-section,
+  .faq-section {
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 64rem) {
+    .intro__lead {
+      grid-column: 1 / span 7;
+    }
+
+    .enterprise {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      padding: var(--sp-3) var(--sp-5);
+    }
+
+    .enterprise__actions {
+      justify-items: end;
+    }
+  }
+</style>

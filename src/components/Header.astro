@@ -1,0 +1,213 @@
+---
+import Brand from './Brand.astro';
+import Icon from './Icon.astro';
+import { nav } from '../config/site';
+
+interface Props {
+  /** "site" shows the full navigation; "auth" is a quiet header for login and signup. */
+  variant?: 'site' | 'auth';
+}
+
+const { variant = 'site' } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="header">
+  <div class="container header__inner">
+    <Brand />
+
+    {variant === 'site' ? (
+      <>
+        <nav class="header__nav" aria-label="Main">
+          <ul>
+            {nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="header__actions">
+          <a class="header__login" href="/login">
+            Log in
+          </a>
+          <a class="btn btn--primary btn--sm" href="/signup">
+            Sign up
+          </a>
+
+          <details class="menu" data-menu>
+            <summary class="menu__button" aria-label="Menu">
+              <Icon name="menu-2" size={22} class="menu__open" />
+              <Icon name="x" size={22} class="menu__close" />
+            </summary>
+            <nav class="menu__panel" aria-label="Menu">
+              <ul>
+                {nav.map((item) => (
+                  <li>
+                    <a href={item.href}>{item.label}</a>
+                  </li>
+                ))}
+                <li>
+                  <a href="/login">Log in</a>
+                </li>
+              </ul>
+            </nav>
+          </details>
+        </div>
+      </>
+    ) : (
+      <a class="header__back" href="/">
+        <Icon name="arrow-left" size={18} />
+        Back to home
+      </a>
+    )}
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: 4rem;
+  }
+
+  .header__nav {
+    display: none;
+    margin-left: var(--sp-3);
+  }
+
+  .header__nav ul {
+    display: flex;
+    gap: var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .header__nav a,
+  .header__login,
+  .header__back {
+    color: var(--text);
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .header__nav a:hover,
+  .header__login:hover,
+  .header__back:hover,
+  .header__nav a[aria-current='page'] {
+    color: var(--text-strong);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-left: auto;
+  }
+
+  .header__login {
+    display: none;
+  }
+
+  .header__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    margin-left: auto;
+    font-size: var(--s-1);
+  }
+
+  /* Mobile menu */
+  .menu__button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    color: var(--text-strong);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .menu__button::-webkit-details-marker {
+    display: none;
+  }
+
+  .menu :global(.menu__close),
+  .menu[open] :global(.menu__open) {
+    display: none;
+  }
+
+  .menu[open] :global(.menu__close) {
+    display: block;
+  }
+
+  .menu__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: var(--sp-1) var(--page-pad) var(--sp-3);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .menu__panel ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  .menu__panel a {
+    display: block;
+    padding-block: 0.75rem;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: var(--s2);
+    font-weight: 700;
+    font-stretch: 108%;
+    text-decoration: none;
+  }
+
+  @media (min-width: 64rem) {
+    .header__nav,
+    .header__login {
+      display: block;
+    }
+
+    .menu {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Close the mobile menu after choosing a link or pressing Escape.
+  for (const menu of document.querySelectorAll<HTMLDetailsElement>('[data-menu]')) {
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) menu.open = false;
+    });
+    menu.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    });
+  }
+</script>

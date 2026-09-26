@@ -1,0 +1,140 @@
+---
+import Icon from '../Icon.astro';
+import { plans } from '../../config/pricing';
+---
+
+<section class="section teaser" aria-labelledby="teaser-title">
+  <div class="container grid teaser__grid">
+    <div class="teaser__copy">
+      <p class="label">Pricing</p>
+      <h2 id="teaser-title">Free for your first project.</h2>
+      <p>Upgrade when you need more projects, the full history or team review.</p>
+      <a class="teaser__link" href="/pricing">
+        Compare plans
+        <Icon name="arrow-right" size={18} />
+      </a>
+    </div>
+
+    <ul class="teaser__plans">
+      {plans.map((plan) => (
+        <li class:list={['plan', plan.recommended && 'handles']}>
+          <p class="plan__name label">
+            {plan.name}
+            {plan.recommended && <span class="plan__badge">Recommended</span>}
+          </p>
+          <p class="plan__price">
+            <span class="num">${plan.monthly}</span>
+            <span class="plan__unit">{plan.unit}</span>
+          </p>
+          <p class="plan__summary">{plan.summary}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .teaser {
+    border-top: 1px solid var(--line);
+  }
+
+  .teaser__grid {
+    row-gap: var(--sp-5);
+    align-items: center;
+  }
+
+  .teaser__copy,
+  .teaser__plans {
+    grid-column: 1 / -1;
+  }
+
+  .teaser__copy {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+
+  .teaser__copy h2 {
+    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  }
+
+  .teaser__copy > p:not(.label) {
+    max-width: 34ch;
+    color: var(--text-muted);
+  }
+
+  .teaser__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: var(--sp-1);
+    font-weight: 650;
+  }
+
+  .teaser__plans {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+    padding: 0;
+    list-style: none;
+  }
+
+  .plan {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+    padding: var(--sp-3);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .plan__name {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-1);
+    color: var(--text-strong);
+  }
+
+  .plan__badge {
+    color: var(--mark);
+  }
+
+  .plan__price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .plan__price .num {
+    font-family: var(--font-display);
+    font-size: var(--s4);
+    font-weight: 780;
+    font-stretch: 112%;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text-strong);
+  }
+
+  .plan__unit,
+  .plan__summary {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .teaser__plans {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .teaser__copy {
+      grid-column: 1 / span 5;
+    }
+
+    .teaser__plans {
+      grid-column: 7 / -1;
+    }
+  }
+</style>

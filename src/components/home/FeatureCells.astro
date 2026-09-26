@@ -1,0 +1,129 @@
+---
+import Icon from '../Icon.astro';
+
+const features = [
+  {
+    icon: 'player-record',
+    title: 'Logs in the background',
+    text: "Trace records while you model. There's nothing to click and no notes to keep.",
+  },
+  {
+    icon: 'arrows-diff',
+    title: 'Before and after',
+    text: 'Every change keeps its old value and its new one, so you can see exactly what moved.',
+  },
+  {
+    icon: 'search',
+    title: 'Search the history',
+    text: 'Find when a part changed, what changed, and in which session.',
+  },
+  {
+    icon: 'link',
+    title: 'Linked to the source',
+    text: 'Each line of the document points to the log entries behind it.',
+  },
+  {
+    icon: 'refresh',
+    title: 'New revision on demand',
+    text: 'When the design moves on, generate the next revision. Earlier ones stay available.',
+  },
+  {
+    icon: 'users',
+    title: 'Built for review',
+    text: 'Share documents with your team and comment on individual changes. Included in Team.',
+  },
+];
+---
+
+<section class="section features" aria-labelledby="features-title">
+  <div class="container">
+    <div class="grid features__head">
+      <p class="label">Features</p>
+      <h2 id="features-title">The record keeps itself.</h2>
+    </div>
+    <ul class="features__cells">
+      {features.map((f) => (
+        <li class="cell">
+          <Icon name={f.icon} size={26} />
+          <h3>{f.title}</h3>
+          <p>{f.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .features {
+    border-top: 1px solid var(--line);
+  }
+
+  .features__head {
+    row-gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+  }
+
+  .features__head > * {
+    grid-column: 1 / -1;
+  }
+
+  .features__head h2 {
+    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  }
+
+  /* Cells share hairline rules, like the cells of a title block. */
+  .features__cells {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1px;
+    padding: 0;
+    list-style: none;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .cell {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+    padding: var(--sp-3);
+    background: var(--bg);
+  }
+
+  .cell :global(.icon) {
+    margin-bottom: var(--sp-1);
+    color: var(--mark);
+  }
+
+  .cell h3 {
+    font-size: var(--s1);
+  }
+
+  .cell p {
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .features__cells {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .features__head p {
+      grid-column: 1 / span 4;
+    }
+
+    .features__head h2 {
+      grid-column: 1 / span 10;
+    }
+
+    .features__cells {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cell {
+      padding: var(--sp-5) var(--sp-3);
+    }
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+/**
+ * Theme switch: Auto follows the system setting, Paper is light, Blueprint is dark.
+ * The choice is remembered in localStorage; see the inline script in Base.astro
+ * that applies it before first paint.
+ */
+const options = [
+  { value: 'system', label: 'Auto' },
+  { value: 'light', label: 'Paper' },
+  { value: 'dark', label: 'Blueprint' },
+];
+---
+
+<fieldset class="theme-toggle" data-theme-toggle>
+  <legend class="visually-hidden">Color theme</legend>
+  {options.map((option) => (
+    <label for={`theme-${option.value}`}>
+      <input
+        type="radio"
+        id={`theme-${option.value}`}
+        name="theme"
+        value={option.value}
+        checked={option.value === 'system'}
+      />
+      <span>{option.label}</span>
+    </label>
+  ))}
+</fieldset>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    padding: 0;
+    border: 0;
+    gap: 2px;
+  }
+
+  label {
+    position: relative;
+    cursor: pointer;
+  }
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  span {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  label:hover span {
+    color: var(--text-strong);
+  }
+
+  input:checked + span {
+    border-color: var(--line-strong);
+    color: var(--text-strong);
+    background: var(--tint);
+  }
+
+  input:focus-visible + span {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  const KEY = 'trace-theme';
+  const root = document.documentElement;
+
+  for (const group of document.querySelectorAll<HTMLElement>('[data-theme-toggle]')) {
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(KEY);
+    } catch {
+      // Storage can be unavailable (private windows, blocked site data).
+    }
+    const current = saved === 'light' || saved === 'dark' ? saved : 'system';
+
+    for (const input of group.querySelectorAll<HTMLInputElement>('input[name="theme"]')) {
+      input.checked = input.value === current;
+      input.addEventListener('change', () => {
+        try {
+          if (input.value === 'system') localStorage.removeItem(KEY);
+          else localStorage.setItem(KEY, input.value);
+        } catch {
+          // The choice still applies for this page view.
+        }
+        if (input.value === 'system') delete root.dataset.theme;
+        else root.dataset.theme = input.value;
+      });
+    }
+  }
+</script>

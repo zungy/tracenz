@@ -1,0 +1,40 @@
+---
+/**
+ * Logo lockup. The mark is a placeholder until the real logo is supplied;
+ * swap it here and every page picks it up.
+ */
+import LogoPlaceholder from './LogoPlaceholder.astro';
+
+interface Props {
+  href?: string;
+  size?: number;
+}
+
+const { href = '/', size = 28 } = Astro.props;
+---
+
+<a class="brand" href={href} aria-label="Trace home">
+  <LogoPlaceholder size={size} label="" />
+  <span class="brand__name" aria-hidden="true">
+    Trace
+  </span>
+</a>
+
+<style>
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .brand__name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-stretch: 116%;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+</style>

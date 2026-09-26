@@ -1,0 +1,274 @@
+---
+/**
+ * Plan cards with a Monthly / Yearly switch. The switch is two radio inputs;
+ * CSS :has() swaps the prices, so it works without JavaScript.
+ */
+import Icon from '../Icon.astro';
+import { plans } from '../../config/pricing';
+---
+
+<div class="plans" data-plans>
+  <fieldset class="billing">
+    <legend class="visually-hidden">Billing period</legend>
+    <input type="radio" name="billing" id="billing-monthly" value="monthly" checked />
+    <label for="billing-monthly">Monthly</label>
+    <input type="radio" name="billing" id="billing-yearly" value="yearly" />
+    <label for="billing-yearly">
+      Yearly <span class="billing__save">2 months free</span>
+    </label>
+  </fieldset>
+
+  <ul class="plans__list">
+    {plans.map((plan) => (
+      <li class:list={['card', `card--${plan.id}`, plan.recommended ? 'handles' : 'handles-hover']}>
+        <div class="card__head">
+          <h2 id={`plan-${plan.id}`} class="card__name">
+            {plan.name}
+          </h2>
+          {plan.recommended && <p class="card__badge label">Recommended</p>}
+        </div>
+        <p class="card__summary">{plan.summary}</p>
+
+        <p class="card__price">
+          <span class="card__amount num">
+            <span class="price-monthly">${plan.monthly}</span>
+            <span class="price-yearly">${plan.yearly}</span>
+          </span>
+          <span class="card__unit">{plan.unit}</span>
+        </p>
+        <p class="card__billed">
+          {plan.monthly === 0 ? (
+            'Free forever, no card needed'
+          ) : (
+            <>
+              <span class="price-monthly">Billed monthly</span>
+              <span class="price-yearly">
+                Billed yearly at <span class="num">${plan.yearly * 12}</span>
+                {plan.id === 'team' ? ' per user' : ''}
+              </span>
+            </>
+          )}
+        </p>
+
+        <a
+          class:list={['btn', 'btn--block', plan.recommended ? 'btn--primary' : 'btn--secondary']}
+          href={plan.cta.href}
+        >
+          {plan.cta.label}
+        </a>
+
+        <ul class="card__includes" aria-label={`${plan.name} includes`}>
+          {plan.includes.map((item) => (
+            <li>
+              <Icon name="check" size={18} stroke={2} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .plans {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  /* Billing switch */
+  .billing {
+    display: inline-flex;
+    justify-self: start;
+    padding: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+  }
+
+  .billing input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .billing label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding-inline: var(--sp-2);
+    border-radius: 1px;
+    font-weight: 650;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .billing input:checked + label {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .billing input:focus-visible + label {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .billing__save {
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  /* Price swap */
+  .price-yearly {
+    display: none;
+  }
+
+  .plans:has(#billing-yearly:checked) .price-monthly {
+    display: none;
+  }
+
+  .plans:has(#billing-yearly:checked) .price-yearly {
+    display: inline;
+  }
+
+  /* Cards */
+  .plans__list {
+    display: grid;
+    gap: var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--sp-2);
+  }
+
+  .card__name {
+    font-size: var(--s3);
+  }
+
+  .card__badge {
+    color: var(--mark);
+  }
+
+  .card__summary {
+    color: var(--text-muted);
+  }
+
+  .card__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: var(--sp-1);
+  }
+
+  .card__amount {
+    font-family: var(--font-display);
+    font-size: var(--s8);
+    font-weight: 780;
+    font-stretch: 112%;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--text-strong);
+  }
+
+  .card__unit,
+  .card__billed {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  .card__billed {
+    margin-bottom: var(--sp-1);
+  }
+
+  .card__includes {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    margin-top: var(--sp-2);
+    padding: var(--sp-3) 0 0;
+    border-top: 1px dashed var(--line);
+    list-style: none;
+  }
+
+  .card__includes li {
+    display: grid;
+    grid-template-columns: 1.125rem minmax(0, 1fr);
+    gap: 0.625rem;
+    align-items: start;
+  }
+
+  .card__includes :global(.icon) {
+    margin-top: 0.2rem;
+    color: var(--mark);
+  }
+
+  /* Hovering or tabbing into another plan moves the selection to it. */
+  .plans__list:has(.handles-hover:is(:hover, :focus-within)) .handles {
+    outline-color: transparent;
+  }
+
+  .plans__list:has(.handles-hover:is(:hover, :focus-within)) .handles::after {
+    opacity: 0;
+  }
+
+  @media (min-width: 40rem) and (max-width: 63.99rem) {
+    .card {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-5);
+    }
+
+    .card > :not(.card__includes) {
+      grid-column: 1;
+    }
+
+    .card__includes {
+      grid-column: 2;
+      grid-row: 1 / span 6;
+      margin-top: 0;
+      padding: 0 0 0 var(--sp-3);
+      border-top: 0;
+      border-left: 1px dashed var(--line);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .plans__list {
+      grid-template-columns: repeat(16, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: stretch;
+    }
+
+    .card--free {
+      grid-column: 1 / span 5;
+    }
+
+    .card--pro {
+      grid-column: 6 / span 6;
+    }
+
+    .card--team {
+      grid-column: 12 / span 5;
+    }
+
+    .card {
+      padding: var(--sp-5) var(--sp-3);
+    }
+  }
+</style>

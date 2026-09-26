@@ -1,0 +1,97 @@
+---
+/**
+ * Closing band on the home and pricing pages: download the app, or sign up
+ * first. Blueprint in both themes.
+ */
+import DownloadLink from './DownloadLink.astro';
+import Guides from './Guides.astro';
+---
+
+<section id="download" class="band scheme-blueprint" aria-labelledby="download-title">
+  <Guides />
+  <div class="container grid band__grid">
+    <div class="band__copy">
+      <p class="label">Download</p>
+      <h2 id="download-title">Put Trace next to your CAD tool.</h2>
+      <p class="band__text">
+        Install the desktop app, sign in and open a project. Logging starts on its own.
+      </p>
+    </div>
+    <div class="band__actions">
+      <DownloadLink os="windows" />
+      <DownloadLink os="macos" variant="secondary" />
+      <p class="band__note">
+        New to Trace? <a href="/signup">Create a free account</a> first.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    position: relative;
+    padding-block: var(--sp-8);
+  }
+
+  .band__grid {
+    position: relative;
+    row-gap: var(--sp-5);
+    align-items: end;
+  }
+
+  .band__copy,
+  .band__actions {
+    grid-column: 1 / -1;
+  }
+
+  .band__copy {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .band__copy h2 {
+    font-size: clamp(var(--s4), 1.2rem + 3vw, 3.364rem);
+    font-stretch: 114%;
+  }
+
+  .band__text {
+    max-width: 40ch;
+    font-size: var(--s1);
+    color: var(--text-muted);
+  }
+
+  .band__actions {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .band__note {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .band__actions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .band__note {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .band {
+      padding-block: var(--sp-13);
+    }
+
+    .band__copy {
+      grid-column: 1 / span 8;
+    }
+
+    .band__actions {
+      grid-column: 10 / -1;
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
