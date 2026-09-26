@@ -9,7 +9,7 @@ import { site } from '../config/site';
   description="Capture design decisions in Autodesk Fusion and view the same history in Trace desktop and on the web."
   sheet={null}
 >
-  <section class="download-page container" data-row>
+  <section class="download-page" data-row>
     <div class="download-intro">
       <p class="mono eyebrow">TRACE DESKTOP / WINDOWS</p>
       <h1>
@@ -76,7 +76,11 @@ import { site } from '../config/site';
   .download-page {
     display: grid;
     gap: var(--sp-8);
+    margin-inline: var(--page-pad);
     padding-block: var(--section-pad);
+  }
+  .download-page > * {
+    min-width: 0;
   }
   .download-intro {
     display: grid;
@@ -102,7 +106,7 @@ import { site } from '../config/site';
   .setup {
     border: 1px solid var(--line-strong);
     background: var(--surface);
-    padding: var(--sp-4);
+    padding: var(--sp-3);
   }
   .setup h2 {
     font-size: var(--s3);
@@ -135,7 +139,9 @@ import { site } from '../config/site';
   }
   @media (min-width: 64rem) {
     .download-page {
-      grid-template-columns: 1fr 1fr;
+      margin-inline: calc(var(--mat-x) + var(--rule-heavy));
+      padding-inline: var(--pad);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: start;
     }
   }
