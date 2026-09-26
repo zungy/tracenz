@@ -1,0 +1,10 @@
+**
+!Dockerfile
+!package.json
+!server/
+!server/**
+!public/
+!public/**
+!desktop/
+!desktop/bridge.cjs
+!desktop/backend-url.cjs
