@@ -1,0 +1,4 @@
+{
+  "signupUrl": "https://tracenz.vercel.app/signup",
+  "authRedirectUrl": "https://tracenz.vercel.app/login?confirmed=1"
+}

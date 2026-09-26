@@ -1,0 +1,26 @@
+{
+  "name": "trace-desktop",
+  "version": "0.7.0",
+  "private": true,
+  "description": "Engineering memory for Autodesk Fusion",
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "node node_modules/electron/cli.js .",
+    "server": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test test/*.test.js",
+    "demo:send": "node scripts/send-demo.js",
+    "check": "node scripts/check.js",
+    "package:windows": "node scripts/package-windows.js",
+    "test:desktop": "node scripts/desktop-smoke.js",
+    "test:fusion": "python -m unittest discover -s test -p test_fusion_transport.py"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "electron": "44.4.5",
+    "prettier": "^3.9.9"
+  }
+}
