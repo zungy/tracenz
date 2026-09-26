@@ -166,10 +166,9 @@ Connecting the repository deploys every push automatically.
 
 Vercel deploys one branch to production and every other branch and pull request as a preview,
 each with its own URL. For production it uses `main` if there is one, then `master`, then the
-repository's default branch. This repository has a single branch for now,
-`claude/amazing-goodall-sb0vfn`, so that is what goes live. Once the work is merged into `main`,
-point production at it: in the project, open **Settings → Environments → Production → Branch
-Tracking**, enter `main` and save.
+repository's default branch, so here it picks `main`. If the Vercel project was set up before
+`main` existed, point production at it: in the project, open **Settings → Environments →
+Production → Branch Tracking**, enter `main` and save.
 
 #### From the command line
 
