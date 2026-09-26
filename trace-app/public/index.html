@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'"
+    />
+    <title>Trace — Engineering memory</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./app.js" type="module"></script>
+  </head>
+  <body class="account-gate">
+    <div class="shell">
+      <aside class="sidebar">
+        <a href="#timeline" class="brand" aria-label="Trace home">
+          <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
+            <path d="M4 4h20v20H4zM4 14h20M14 4v20M4 24 24 4" />
+          </svg>
+          <span>Trace</span>
+        </a>
+        <div class="nav-label">DESIGN RECORD</div>
+        <nav aria-label="Main navigation">
+          <button class="nav-item active" data-page="timeline">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            Timeline <span class="nav-count" id="nav-count">0</span>
+          </button>
+          <button class="nav-item" data-page="documents">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 3h9l5 5v13H5zM14 3v6h5M8 13h8M8 17h6" />
+            </svg>
+            Documents
+          </button>
+          <button class="nav-item" data-page="connection">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m9 14 6-6M8 17l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0M16 7l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"
+                transform="scale(.95)"
+              />
+            </svg>
+            Fusion
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5 21v-3a7 7 0 0 1 14 0v3" />
+          </svg>
+          <div class="account-copy">
+            <strong id="account-name">Your account</strong
+            ><small id="account-mode">Trace cloud</small>
+          </div>
+          <button
+            id="sign-out"
+            class="icon-button"
+            title="Sign out"
+            aria-label="Sign out"
+            hidden
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 4H4v16h5M9 12h12m-4-4 4 4-4 4" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+      <main>
+        <header class="topbar">
+          <div class="breadcrumb">
+            Trace <span>/</span><strong id="breadcrumb-page">Timeline</strong>
+          </div>
+          <div class="topbar-status">
+            <span class="status-dot" id="connection-dot"></span
+            ><span id="connection-label">Connecting…</span>
+          </div>
+        </header>
+        <div id="global-error" class="global-error" role="alert" hidden></div>
+        <div id="sync-warning" class="global-error" role="status" hidden></div>
+        <section id="timeline-page" class="page">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">01 / DESIGN RECORD</div>
+              <h1>Design timeline</h1>
+              <p>The changes, decisions, and context behind your work.</p>
+            </div>
+            <div class="heading-actions">
+              <button
+                class="button secondary"
+                id="design-report"
+                data-design-report
+                disabled
+              >
+                Design report
+              </button>
+              <button class="button secondary" id="refresh">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5" /></svg
+                ><span>Refresh</span>
+              </button>
+              <button class="button primary" id="import">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 4v12m-4-4 4 4 4-4M4 17v4h16v-4" /></svg
+                >Import checkpoint
+              </button>
+            </div>
+          </div>
+          <div class="stats" aria-label="Design history overview">
+            <div>
+              <span class="stat-label">CHECKPOINTS</span
+              ><strong id="stat-events">0</strong
+              ><small>Captured design changes</small>
+            </div>
+            <div>
+              <span class="stat-label">DOCUMENTS</span
+              ><strong id="stat-documents">0</strong
+              ><small>Connected design histories</small>
+            </div>
+            <div>
+              <span class="stat-label">SUMMARIES READY</span
+              ><strong id="stat-complete">0</strong
+              ><small id="summary-caption">Engineering context</small>
+            </div>
+            <div class="stat-status">
+              <span class="stat-label">LATEST ACTIVITY</span
+              ><strong class="stat-time" id="stat-latest">—</strong
+              ><small id="latest-caption">No checkpoints yet</small>
+            </div>
+          </div>
+          <div class="timeline-layout">
+            <section class="history-panel" aria-label="Checkpoint history">
+              <div class="panel-title">
+                <h2>Recent activity</h2>
+                <span class="subtle" id="result-count">All checkpoints</span>
+              </div>
+              <div class="filters">
+                <label class="search"
+                  ><svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="10.5" cy="10.5" r="6.5" />
+                    <path d="m16 16 5 5" /></svg
+                  ><input
+                    id="search"
+                    type="search"
+                    placeholder="Search changes, decisions…"
+                    aria-label="Search checkpoints"
+                /></label>
+                <div class="filter-row">
+                  <select id="document-filter" aria-label="Filter by document">
+                    <option value="">All documents</option>
+                  </select>
+                </div>
+              </div>
+              <div
+                id="timeline-list"
+                class="timeline-list"
+                aria-live="polite"
+              ></div>
+              <button class="button load-more" id="load-more" hidden>
+                Load earlier checkpoints ↓
+              </button>
+            </section>
+            <section
+              id="detail-panel"
+              class="detail-panel"
+              aria-label="Selected checkpoint"
+            >
+              <div class="detail-empty">
+                <span class="empty-symbol" aria-hidden="true">+</span>
+                <h2>A place for the details.</h2>
+                <p>
+                  Select a checkpoint to see the changes,<br />your reasoning,
+                  and the captured viewport.
+                </p>
+              </div>
+            </section>
+          </div>
+        </section>
+        <section id="documents-page" class="page" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">02 / CONNECTED DESIGNS</div>
+              <h1>Documents</h1>
+              <p>
+                Follow each design from its first checkpoint to the latest
+                change.
+              </p>
+            </div>
+          </div>
+          <div id="document-grid" class="document-grid"></div>
+        </section>
+        <section id="connection-page" class="page" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">03 / CAD CONNECTION</div>
+              <h1>Fusion</h1>
+              <p>Capture in Fusion. Find the full story in Trace.</p>
+            </div>
+            <span class="pill">Autodesk Fusion</span>
+          </div>
+          <div class="settings-grid">
+            <section class="settings-card">
+              <span class="step">01 / CONNECT</span>
+              <h2>Connect Autodesk Fusion</h2>
+              <p>
+                Install the Trace add-in, then reopen Fusion. Your checkpoints
+                will connect to this account automatically.
+              </p>
+              <button id="install-fusion" class="button primary">
+                Install / update Fusion add-in
+              </button>
+              <p id="fusion-status" class="info-strip" role="status">
+                Checking Fusion connection…
+              </p>
+              <p>
+                <strong>Ctrl + Alt + S</strong> records a checkpoint while
+                Fusion is active. Finish your current modeling command, then add
+                your rationale.
+              </p>
+              <p id="shortcut-status" class="small" role="status"></p>
+              <p class="small">
+                Close Fusion before installing or updating the add-in. Existing
+                settings are preserved.
+              </p>
+            </section>
+            <section class="settings-card" id="forwarding-settings" hidden>
+              <span class="step">02 / SYNC</span>
+              <h2>Your checkpoints, connected</h2>
+              <p>
+                Keep Trace running while you design. New captures upload to your
+                account, and interrupted uploads resume when the connection
+                returns.
+              </p>
+              <p id="forwarding-status" class="info-strip" role="status"></p>
+              <div class="connection-actions">
+                <button id="forwarding-resume" class="button primary" hidden>
+                  Reconnect Fusion uploads</button
+                ><button id="forwarding-retry" class="button secondary">
+                  Retry uploads
+                </button>
+              </div>
+              <p class="small">
+                Closing the window keeps Trace running in the system tray.
+                Signing out stops uploads to your account.
+              </p>
+            </section>
+          </div>
+        </section>
+        <footer>
+          <span>TRACE / ENGINEERING MEMORY</span><span id="app-version">TRACE / 0.7.0</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="login-dialog" aria-labelledby="auth-title">
+      <div class="auth-story">
+        <div class="auth-brand">
+          <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
+            <path d="M4 4h20v20H4zM4 14h20M14 4v20M4 24 24 4" /></svg
+          ><span>Trace</span>
+        </div>
+        <div class="auth-statement">
+          <span class="eyebrow">ENGINEERING MEMORY</span>
+          <h1>Your design.<br />Its history.</h1>
+          <p>The decisions behind the model,<br />kept with the work.</p>
+        </div>
+        <div class="auth-titleblock">
+          <span>TRACE DESKTOP</span><span>FOR AUTODESK FUSION</span>
+        </div>
+      </div>
+      <div class="auth-panel">
+        <div class="auth-sheet-label">ACCOUNT / LOG IN</div>
+        <form id="login-form">
+          <h2 id="auth-title">Log in to Trace</h2>
+          <p class="auth-intro">Pick up where your design left off.</p>
+          <label for="email">Email</label
+          ><input
+            id="email"
+            type="email"
+            autocomplete="username"
+            spellcheck="false"
+            required
+          />
+          <label for="password">Password</label
+          ><input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <div id="login-error" class="form-error" role="alert"></div>
+          <button class="button primary" type="submit">
+            Log in <span aria-hidden="true">→</span>
+          </button>
+          <p id="auth-message" class="auth-notice" role="status">
+            Checking your connection…
+          </p>
+          <button class="button secondary" id="auth-retry" type="button" hidden>
+            Retry connection
+          </button>
+          <div class="signup-row">
+            <span>New to Trace?</span
+            ><button class="text-button" id="auth-toggle" type="button">
+              Create an account <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </form>
+        <p class="auth-footnote">
+          Sign up on the website, then log in here with the same account.
+        </p>
+      </div>
+    </dialog>
+    <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" id="confirm-cancel">Cancel</button
+        ><button class="button danger" id="confirm-ok">
+          Delete checkpoint
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      id="report-dialog"
+      aria-labelledby="report-title"
+      aria-describedby="report-description"
+    >
+      <div class="eyebrow">DESIGN DOCUMENT / PDF</div>
+      <h2 id="report-title">Full design report</h2>
+      <div class="report-document">
+        <strong id="report-document-name"></strong>
+        <span id="report-checkpoint-count"></span>
+      </div>
+      <p id="report-description">
+        An engineering report of this design’s recorded history: overview, key
+        decisions, design changes and supporting evidence. Every saved
+        checkpoint is included, regardless of your timeline search.
+      </p>
+      <ul class="report-contents">
+        <li>Overview and decisions with checkpoint references</li>
+        <li>Complete change history and original rationale</li>
+        <li>Captured screenshots and recorded dimensions</li>
+      </ul>
+      <p class="report-note">
+        Upload any waiting Fusion checkpoints first. The report reflects the
+        history saved to your account when generation starts.
+      </p>
+      <p
+        id="report-status"
+        class="report-status"
+        role="status"
+        aria-live="polite"
+      ></p>
+      <div id="report-error" class="form-error" role="alert"></div>
+      <div class="dialog-actions">
+        <button class="button secondary" id="report-close">Close</button>
+        <button class="button primary" id="report-generate">
+          Generate PDF
+        </button>
+      </div>
+    </dialog>
+    <dialog id="image-dialog">
+      <button
+        class="icon-button image-close"
+        id="close-image"
+        aria-label="Close viewport"
+      >
+        ×</button
+      ><img id="large-image" alt="Expanded CAD viewport" />
+    </dialog>
+    <input id="browser-import" type="file" accept=".json" hidden />
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>
