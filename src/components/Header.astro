@@ -1,6 +1,7 @@
 ---
 import Brand from './Brand.astro';
 import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { nav } from '../config/site';
 
 interface Props {
@@ -31,6 +32,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </nav>
 
         <div class="header__actions">
+          <div class="header__view">
+            <ThemeToggle id="header" />
+          </div>
           <a class="header__login" href="/login">
             Log in
           </a>
@@ -54,15 +58,24 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
                   <a href="/login">Log in</a>
                 </li>
               </ul>
+              <div class="menu__view">
+                <span class="label">View</span>
+                <ThemeToggle id="menu" />
+              </div>
             </nav>
           </details>
         </div>
       </>
     ) : (
-      <a class="header__back" href="/">
-        <Icon name="arrow-left" size={18} />
-        Back to home
-      </a>
+      <div class="header__actions">
+        <div class="header__view">
+          <ThemeToggle id="header" />
+        </div>
+        <a class="header__back" href="/">
+          <Icon name="arrow-left" size={18} />
+          Back to home
+        </a>
+      </div>
     )}
   </div>
 </header>
@@ -70,7 +83,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 <style>
   .header {
     position: sticky;
-    top: env(safe-area-inset-top, 0px);
+    top: calc(env(safe-area-inset-top, 0px) + var(--frame));
     z-index: 50;
     background: var(--bg);
     border-bottom: 1px solid var(--line);
@@ -99,7 +112,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   .header__login,
   .header__back {
     color: var(--text);
-    font-weight: 550;
+    font-weight: 500;
     text-decoration: none;
   }
 
@@ -120,7 +133,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     margin-left: auto;
   }
 
-  .header__login {
+  .header__login,
+  .header__view {
     display: none;
   }
 
@@ -128,8 +142,14 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     display: inline-flex;
     align-items: center;
     gap: var(--sp-1);
-    margin-left: auto;
     font-size: var(--s-1);
+  }
+
+  .menu__view {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--sp-2);
   }
 
   /* Mobile menu */
@@ -187,8 +207,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 
   @media (min-width: 64rem) {
     .header__nav,
-    .header__login {
+    .header__login,
+    .header__view {
       display: block;
+    }
+
+    .header__view {
+      margin-right: var(--sp-1);
     }
 
     .menu {

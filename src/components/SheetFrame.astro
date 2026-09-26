@@ -1,0 +1,113 @@
+---
+/**
+ * Drawing-sheet border on desktop: a margin in the page color with a 1px ink
+ * border line, zone numbers across the top and zone letters down both sides,
+ * as on an engineering drawing. It stays put while the page scrolls under it.
+ */
+const numbers = Array.from({ length: 8 }, (_, i) => i + 1);
+const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+---
+
+<div class="frame" aria-hidden="true">
+  <div class="zones zones--top">
+    {numbers.map((n) => (
+      <span>{n}</span>
+    ))}
+  </div>
+  <div class="zones zones--left">
+    {letters.map((l) => (
+      <span>{l}</span>
+    ))}
+  </div>
+  <div class="zones zones--right">
+    {letters.map((l) => (
+      <span>{l}</span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .frame {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .frame {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: block;
+      border: var(--frame) solid var(--bg);
+      box-shadow: inset 0 0 0 1px var(--text-strong);
+      pointer-events: none;
+    }
+  }
+
+  .zones {
+    position: absolute;
+    display: grid;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1;
+    color: var(--text-muted);
+  }
+
+  .zones span {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .zones--top {
+    top: calc(var(--frame) * -1);
+    left: 0;
+    right: 0;
+    height: var(--frame);
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  /* Short division ticks between zones, meeting the border line. */
+  .zones--top span + span::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    height: 0.5rem;
+    background: var(--text-strong);
+  }
+
+  .zones--left,
+  .zones--right {
+    top: 0;
+    bottom: 0;
+    width: var(--frame);
+    grid-template-rows: repeat(6, 1fr);
+  }
+
+  .zones--left {
+    left: calc(var(--frame) * -1);
+  }
+
+  .zones--right {
+    right: calc(var(--frame) * -1);
+  }
+
+  .zones--left span + span::before,
+  .zones--right span + span::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 0.5rem;
+    height: 1px;
+    background: var(--text-strong);
+  }
+
+  .zones--left span + span::before {
+    right: 0;
+  }
+
+  .zones--right span + span::before {
+    left: 0;
+  }
+</style>

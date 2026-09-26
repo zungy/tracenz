@@ -1,22 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import DownloadBand from '../components/DownloadBand.astro';
-import DocumentSection from '../components/home/DocumentSection.astro';
-import FeatureCells from '../components/home/FeatureCells.astro';
 import Hero from '../components/home/Hero.astro';
-import HowItWorks from '../components/home/HowItWorks.astro';
-import PricingTeaser from '../components/home/PricingTeaser.astro';
-import QuietBand from '../components/home/QuietBand.astro';
-import WorksWith from '../components/home/WorksWith.astro';
+import PlansTable from '../components/home/PlansTable.astro';
+import Problem from '../components/home/Problem.astro';
+import Walkthrough from '../components/home/Walkthrough.astro';
 ---
 
 <Base title="Trace · Design documents from your CAD history" sheet="home">
   <Hero />
-  <WorksWith />
-  <HowItWorks />
-  <QuietBand />
-  <DocumentSection />
-  <FeatureCells />
-  <PricingTeaser />
+  <Problem />
+  <Walkthrough />
+  <PlansTable />
   <DownloadBand />
 </Base>

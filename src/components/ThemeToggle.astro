@@ -1,26 +1,31 @@
 ---
 /**
- * Theme switch: Auto follows the system setting, Paper is light, Blueprint is dark.
- * The choice is remembered in localStorage; see the inline script in Base.astro
- * that applies it before first paint.
+ * Paper / Blueprint switch. Until the visitor picks one, the site follows the
+ * system setting and the switch shows whichever is in effect. A choice is
+ * remembered in localStorage and applied before first paint (see Base.astro).
  */
+interface Props {
+  /** Unique per instance on a page, e.g. "header" or "menu". */
+  id: string;
+}
+
+const { id } = Astro.props;
 const options = [
-  { value: 'system', label: 'Auto' },
   { value: 'light', label: 'Paper' },
   { value: 'dark', label: 'Blueprint' },
 ];
 ---
 
 <fieldset class="theme-toggle" data-theme-toggle>
-  <legend class="visually-hidden">Color theme</legend>
+  <legend class="visually-hidden">View</legend>
   {options.map((option) => (
-    <label for={`theme-${option.value}`}>
+    <label for={`theme-${id}-${option.value}`}>
       <input
         type="radio"
-        id={`theme-${option.value}`}
-        name="theme"
+        id={`theme-${id}-${option.value}`}
+        name={`theme-${id}`}
         value={option.value}
-        checked={option.value === 'system'}
+        checked={option.value === 'light'}
       />
       <span>{option.label}</span>
     </label>
@@ -30,9 +35,9 @@ const options = [
 <style>
   .theme-toggle {
     display: inline-flex;
-    padding: 0;
-    border: 0;
-    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
   }
 
   label {
@@ -50,12 +55,12 @@ const options = [
 
   span {
     display: block;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid transparent;
-    border-radius: var(--radius);
+    padding: 0.3rem 0.55rem;
+    border-radius: 1px;
     font-family: var(--font-mono);
     font-size: var(--s-2);
-    letter-spacing: 0.04em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: var(--text-muted);
   }
 
@@ -64,9 +69,8 @@ const options = [
   }
 
   input:checked + span {
-    border-color: var(--line-strong);
-    color: var(--text-strong);
-    background: var(--tint);
+    background: var(--text-strong);
+    color: var(--bg);
   }
 
   input:focus-visible + span {
@@ -78,28 +82,34 @@ const options = [
 <script>
   const KEY = 'trace-theme';
   const root = document.documentElement;
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-theme-toggle]')];
+  const inputs = groups.flatMap((g) => [
+    ...g.querySelectorAll<HTMLInputElement>('input[type="radio"]'),
+  ]);
 
-  for (const group of document.querySelectorAll<HTMLElement>('[data-theme-toggle]')) {
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(KEY);
-    } catch {
-      // Storage can be unavailable (private windows, blocked site data).
-    }
-    const current = saved === 'light' || saved === 'dark' ? saved : 'system';
-
-    for (const input of group.querySelectorAll<HTMLInputElement>('input[name="theme"]')) {
-      input.checked = input.value === current;
-      input.addEventListener('change', () => {
-        try {
-          if (input.value === 'system') localStorage.removeItem(KEY);
-          else localStorage.setItem(KEY, input.value);
-        } catch {
-          // The choice still applies for this page view.
-        }
-        if (input.value === 'system') delete root.dataset.theme;
-        else root.dataset.theme = input.value;
-      });
-    }
+  function effectiveTheme(): 'light' | 'dark' {
+    const set = root.dataset.theme;
+    if (set === 'light' || set === 'dark') return set;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
+
+  function sync() {
+    const current = effectiveTheme();
+    for (const input of inputs) input.checked = input.value === current;
+  }
+
+  for (const input of inputs) {
+    input.addEventListener('change', () => {
+      root.dataset.theme = input.value;
+      try {
+        localStorage.setItem(KEY, input.value);
+      } catch {
+        // Storage can be unavailable; the choice still applies to this page view.
+      }
+      sync();
+    });
+  }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
+  sync();
 </script>

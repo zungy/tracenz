@@ -1,6 +1,5 @@
 ---
 import AuthForm from './AuthForm.astro';
-import Icon from '../Icon.astro';
 import PadDrawing from './PadDrawing.astro';
 
 interface Props {
@@ -31,10 +30,10 @@ const { mode } = Astro.props;
           </span>{' '}
           <span class="panel__change num">
             <span class="visually-hidden">from </span>
-            <del>Ø8</del>
-            <Icon name="arrow-narrow-right" size={14} />
+            <del class="old-value">Ø8</del>
+            <span aria-hidden="true">→</span>
             <span class="visually-hidden"> to </span>
-            <ins>Ø9</ins>
+            <ins class="new-value">Ø9</ins>
           </span>
         </div>
         <p class="panel__caption">
@@ -133,16 +132,6 @@ const { mode } = Astro.props;
     align-items: center;
     gap: 0.3rem;
     font-family: var(--font-mono);
-  }
-
-  .panel__change del {
-    color: var(--text-muted);
-  }
-
-  .panel__change ins {
-    text-decoration: none;
-    font-weight: 600;
-    color: var(--text-strong);
   }
 
   .panel__caption {

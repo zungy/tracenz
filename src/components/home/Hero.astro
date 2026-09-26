@@ -1,51 +1,47 @@
 ---
 import DownloadLink from '../DownloadLink.astro';
-import Guides from '../Guides.astro';
-import TraceDemo from './TraceDemo.astro';
+import SanderElevation from '../drawings/SanderElevation.astro';
+import DocCard from './DocCard.astro';
+import LogPanel from './LogPanel.astro';
 import { cloudPath } from '../../scripts/revision-cloud';
 import { site } from '../../config/site';
 
 // Server-rendered cloud for a typical box; the client redraws it to the exact size.
-const fallbackCloud = cloudPath(600, 130, 22);
+const fallbackCloud = cloudPath(560, 130, 22);
 ---
 
 <section class="hero" aria-labelledby="hero-title" data-hero>
-  <Guides />
-
   <div class="container">
-    <div class="grid hero__grid">
-      <p class="label hero__eyebrow">For mechanical and product design teams</p>
-
+    <div class="grid hero__top">
       <h1 id="hero-title" class="hero__title">
         <span class="hero__line">Model the part.</span>
+        <span class="hero__line">Trace writes the</span>
         <span class="hero__line">
-          Trace writes the{' '}
           <span class="revmark" data-revmark>
-            design doc
+            design doc.
             <svg
               class="revmark__cloud"
-              viewBox="0 0 600 130"
+              viewBox="0 0 560 130"
               preserveAspectRatio="none"
               aria-hidden="true"
             >
               <path d={fallbackCloud} pathLength="1"></path>
             </svg>
-            <span class="revmark__tag" aria-hidden="true">
+            <span class="rev-tag revmark__tag" aria-hidden="true">
               <svg viewBox="0 0 24 21">
-                <path d="M12 1.8 22.4 19.5H1.6Z"></path>
+                <path d="M12 1 23 20H1Z"></path>
               </svg>
               <span>B</span>
             </span>
           </span>
-          .
         </span>
       </h1>
 
-      <div class="hero__copy">
+      <div class="hero__intro">
         <p class="lead">
           Trace records every change you make in CAD, from a sketch dimension to a new material. Its
-          AI reads that history and writes a design document with the overall design and the changes
-          that shaped it.
+          AI turns that history into a design document that covers the overall design and every
+          change that shaped it.
         </p>
         <div class="hero__actions">
           <a class="btn btn--primary" href="/signup">
@@ -66,15 +62,33 @@ const fallbackCloud = cloudPath(600, 130, 22);
           .
         </p>
       </div>
-
-      <div class="hero__demo">
-        <TraceDemo />
-      </div>
     </div>
+
+    <figure class="figure" data-trace-figure>
+      <div class="grid figure__grid">
+        <div class="figure__drawing">
+          <SanderElevation id="hero-elev" />
+          <p class="figure__view mono">Half section · scale 1:2</p>
+        </div>
+        <div class="figure__log">
+          <LogPanel />
+        </div>
+        <div class="figure__doc">
+          <DocCard />
+        </div>
+      </div>
+      <svg class="trace" aria-hidden="true" data-trace-svg>
+        <path class="trace__path" pathLength="1"></path>
+        <g class="trace__nodes"></g>
+      </svg>
+      <figcaption class="figure__caption mono">
+        <span>Fig. 1</span> Change 09:12, traced from the model through the log into the document.
+      </figcaption>
+    </figure>
   </div>
 </section>
 <script is:inline>
-  // Start the demo while the page parses, so the finished state never flashes first.
+  // Start the sequence while the page parses, so the finished state never flashes first.
   (function () {
     var hero = document.currentScript.previousElementSibling;
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -85,45 +99,40 @@ const fallbackCloud = cloudPath(600, 130, 22);
 
 <style>
   .hero {
-    --play: 1800ms;
-    position: relative;
-    padding-block: var(--sp-8);
-    border-bottom: 1px solid var(--line);
+    --play: 1500ms;
+    padding-block: var(--sp-5) var(--sp-8);
+    border-bottom: 1px solid var(--line-strong);
   }
 
-  .hero__grid {
-    position: relative;
-    row-gap: var(--sp-3);
+  .hero__top {
+    row-gap: var(--sp-5);
+    align-items: end;
   }
 
-  .hero__eyebrow,
   .hero__title,
-  .hero__copy,
-  .hero__demo {
+  .hero__intro {
     grid-column: 1 / -1;
   }
 
   .hero__title {
-    font-size: clamp(2.25rem, 1.1rem + 4.6vw, 4.757rem);
+    font-size: clamp(2.5rem, 1.1rem + 4.7vw, 5rem);
     font-weight: 780;
     font-stretch: 112%;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
   }
 
   .hero__line {
     display: block;
   }
 
-  .hero__copy {
+  .hero__intro {
     display: grid;
-    align-content: start;
     gap: var(--sp-3);
-    padding-top: var(--sp-2);
   }
 
-  .hero__copy .lead {
-    max-width: 38ch;
+  .hero__intro .lead {
+    max-width: 40ch;
   }
 
   .hero__actions {
@@ -137,47 +146,129 @@ const fallbackCloud = cloudPath(600, 130, 22);
     color: var(--text-muted);
   }
 
-  .hero__demo {
-    margin-top: var(--sp-3);
+  /* Figure: drawing, log and document, joined by the trace line */
+  .figure {
+    position: relative;
+    margin-top: var(--sp-8);
+  }
+
+  .figure__grid {
+    row-gap: var(--sp-5);
+    align-items: start;
+  }
+
+  .figure__drawing,
+  .figure__log,
+  .figure__doc {
+    grid-column: 1 / -1;
+  }
+
+  .figure__drawing {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .figure__view {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .figure__caption {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: var(--sp-5);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--s-2);
+    color: var(--text-muted);
+  }
+
+  .figure__caption span {
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+
+  .trace {
+    display: none;
+  }
+
+  @media (min-width: 40rem) {
+    .figure__log {
+      grid-column: 1 / span 4;
+    }
+
+    .figure__doc {
+      grid-column: 5 / -1;
+    }
   }
 
   @media (min-width: 64rem) {
     .hero {
-      padding-block: var(--sp-8) var(--sp-13);
-    }
-
-    .hero__eyebrow {
-      grid-column: 1 / span 8;
+      padding-block: var(--sp-8);
     }
 
     .hero__title {
-      grid-column: 1 / -1;
+      grid-column: 1 / span 10;
     }
 
-    .hero__copy {
+    .hero__intro {
+      grid-column: 11 / -1;
+      padding-bottom: 0.5rem;
+    }
+
+    .figure__drawing {
       grid-column: 1 / span 6;
     }
 
-    .hero__demo {
-      grid-column: 8 / -1;
-      margin-top: 0;
-      padding-top: var(--sp-2);
+    .figure__log {
+      grid-column: 7 / span 5;
+    }
+
+    .figure__doc {
+      grid-column: 12 / -1;
+    }
+
+    .trace {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
     }
   }
 
-  /* Revision cloud and delta tag around "design doc" */
+  .trace__path {
+    fill: none;
+    stroke: var(--change);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .trace :global(.trace__node) {
+    fill: var(--change);
+  }
+
+  /* Revision cloud and tag around "design doc." */
   .revmark {
     position: relative;
+    z-index: 0;
     display: inline-block;
-    margin-inline: 0.12em 0.2em;
     white-space: nowrap;
   }
 
   .revmark__cloud {
     position: absolute;
     top: -0.1em;
-    left: -0.2em;
-    width: calc(100% + 0.4em);
+    left: -0.16em;
+    z-index: -1;
+    width: calc(100% + 0.32em);
     max-width: none;
     height: calc(100% + 0.2em);
     overflow: visible;
@@ -185,8 +276,8 @@ const fallbackCloud = cloudPath(600, 130, 22);
   }
 
   .revmark__cloud path {
-    fill: none;
-    stroke: var(--mark);
+    fill: var(--change-fill);
+    stroke: var(--change);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -195,54 +286,59 @@ const fallbackCloud = cloudPath(600, 130, 22);
     stroke-dashoffset: 0;
   }
 
-  /* Sized in the headline's em; only the letter is set small. */
   .revmark__tag {
     position: absolute;
-    top: -0.36em;
-    left: calc(100% + 0.04em);
-    display: grid;
-    place-items: center;
-    width: max(0.46em, 1.75rem);
+    top: 0.02em;
+    left: calc(100% + 0.22em);
+    width: max(0.44em, 1.75rem);
+    height: auto;
     aspect-ratio: 24 / 21;
   }
 
-  .revmark__tag svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    fill: var(--bg);
-    stroke: var(--mark);
-    stroke-width: 1.5;
-    stroke-linejoin: round;
-    overflow: visible;
+  .revmark__tag span {
+    top: 0.3em;
+    font-size: max(0.14em, 0.625rem);
+    letter-spacing: 0;
   }
 
-  .revmark__tag span {
-    position: relative;
-    top: 0.3em;
-    font-family: var(--font-mono);
-    font-size: max(0.16em, 0.625rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0;
-    color: var(--mark);
+  /* Sequence: log, document, trace line, then the revision mark. */
+  .hero.is-playing .trace__path {
+    animation: draw 700ms var(--ease) both;
+    animation-delay: calc(var(--play) + 1300ms);
+  }
+
+  .hero.is-playing .trace :global(.trace__node) {
+    animation: node-in 200ms var(--ease) both;
+    animation-delay: calc(var(--play) + 1300ms);
   }
 
   .hero.is-playing .revmark__cloud path {
-    animation: draw 800ms var(--ease) both;
-    animation-delay: calc(var(--play) + 1000ms);
+    animation:
+      draw 800ms var(--ease) both,
+      fill-in 400ms var(--ease) both;
+    animation-delay: calc(var(--play) + 2000ms), calc(var(--play) + 2600ms);
   }
 
   .hero.is-playing .revmark__tag {
     animation: tag-in 320ms var(--ease) both;
-    animation-delay: calc(var(--play) + 1700ms);
+    animation-delay: calc(var(--play) + 2700ms);
   }
 
   @keyframes draw {
     from {
       stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes fill-in {
+    from {
+      fill-opacity: 0;
+    }
+  }
+
+  @keyframes node-in {
+    from {
+      opacity: 0;
     }
   }
 
@@ -257,7 +353,7 @@ const fallbackCloud = cloudPath(600, 130, 22);
 <script>
   import { cloudPath } from '../../scripts/revision-cloud';
 
-  // Redraw the revision cloud to the word's real size so the scallops stay round.
+  // Redraw the revision cloud to the phrase's real size so the scallops stay round.
   for (const mark of document.querySelectorAll<HTMLElement>('[data-revmark]')) {
     const svg = mark.querySelector<SVGSVGElement>('.revmark__cloud');
     const path = svg?.querySelector('path');
@@ -277,9 +373,61 @@ const fallbackCloud = cloudPath(600, 130, 22);
     document.fonts?.ready.then(draw);
   }
 
+  // The trace line: from the drawing's callout into log row 09:12, and out of
+  // that row into document item 2.1. Routed with right angles through the gutters.
+  for (const figure of document.querySelectorAll<HTMLElement>('[data-trace-figure]')) {
+    const svg = figure.querySelector<SVGSVGElement>('[data-trace-svg]');
+    const path = svg?.querySelector('path');
+    const nodes = svg?.querySelector('g');
+    const source = figure.querySelector('[data-trace="source"]');
+    const row = figure.querySelector('[data-trace="log"]');
+    const item = figure.querySelector('[data-trace="doc"]');
+    if (!svg || !path || !nodes || !source || !row || !item) continue;
+
+    const layout = () => {
+      if (getComputedStyle(svg).display === 'none') return;
+      const box = figure.getBoundingClientRect();
+      const rel = (r: DOMRect) => ({
+        left: r.left - box.left,
+        right: r.right - box.left,
+        mid: r.top - box.top + r.height / 2,
+      });
+      const s = rel(source.getBoundingClientRect());
+      const l = rel(row.getBoundingClientRect());
+      const d = rel(item.getBoundingClientRect());
+      const logBox = rel((row.closest('.log') ?? row).getBoundingClientRect());
+      const docBox = rel((item.closest('.doc') ?? item).getBoundingClientRect());
+      const gap1 = (s.right + logBox.left) / 2 + 4;
+      const gap2 = (logBox.right + docBox.left) / 2;
+      const f = (n: number) => n.toFixed(1);
+
+      svg.setAttribute('viewBox', `0 0 ${f(box.width)} ${f(box.height)}`);
+      path.setAttribute(
+        'd',
+        `M${f(s.right + 2)} ${f(s.mid)} H${f(gap1)} V${f(l.mid)} H${f(l.left)}` +
+          ` M${f(l.right)} ${f(l.mid)} H${f(gap2)} V${f(d.mid)} H${f(docBox.left + 1)}`,
+      );
+      const squares = [
+        [s.right + 2, s.mid],
+        [l.left, l.mid],
+        [l.right, l.mid],
+        [docBox.left + 1, d.mid],
+      ];
+      nodes.innerHTML = squares
+        .map(
+          ([x, y]) =>
+            `<rect class="trace__node" x="${f(x - 3)}" y="${f(y - 3)}" width="6" height="6"></rect>`,
+        )
+        .join('');
+    };
+
+    layout();
+    new ResizeObserver(layout).observe(figure);
+    document.fonts?.ready.then(layout);
+  }
+
   // The revision tag is the last step. Once it lands, drop the playing state so
-  // later layout changes (like crossing a breakpoint) can't restart anything.
-  // Replay restarts the whole sequence: log, document, then the revision mark.
+  // later layout changes can't restart anything. Replay restarts the sequence.
   for (const hero of document.querySelectorAll<HTMLElement>('[data-hero]')) {
     hero.querySelector('.revmark__tag')?.addEventListener('animationend', () => {
       hero.classList.remove('is-playing');

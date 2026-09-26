@@ -1,21 +1,17 @@
 ---
 /**
- * Placeholder for a logo that hasn't been supplied yet. Drawn with the
- * hidden-line dash of a technical drawing so it reads as "to be added".
- * Replace usages with the real artwork when it exists.
+ * Placeholder for the Trace logo until the real artwork is supplied: a plain
+ * solid mark that holds the logo's place without pretending to be one.
+ * Replace this component's output with the real logo.
  */
 interface Props {
   size?: number;
-  /** Width-to-height ratio, for wordmark-shaped slots. */
-  ratio?: number;
   /** Accessible name. Pass an empty string when surrounding text names it. */
   label?: string;
   class?: string;
 }
 
-const { size = 28, ratio = 1, label = 'Logo placeholder', class: className } = Astro.props;
-const w = Math.round(size * ratio);
-const h = size;
+const { size = 24, label = 'Logo placeholder', class: className } = Astro.props;
 const a11y = label
   ? { role: 'img' as const, 'aria-label': label }
   : { 'aria-hidden': 'true' as const };
@@ -23,33 +19,17 @@ const a11y = label
 
 <svg
   class:list={['logo-placeholder', className]}
-  width={w}
-  height={h}
-  viewBox={`0 0 ${w} ${h}`}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
   {...a11y}
 >
-  <rect
-    x="0.75"
-    y="0.75"
-    width={w - 1.5}
-    height={h - 1.5}
-    rx="2"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-dasharray="4 3"
-  ></rect>
-  <path
-    d={`M0.75 0.75 L${w - 0.75} ${h - 0.75} M${w - 0.75} 0.75 L0.75 ${h - 0.75}`}
-    stroke="currentColor"
-    stroke-width="1"
-    opacity="0.55"
-  ></path>
+  <rect width="24" height="24" rx="2" fill="currentColor"></rect>
 </svg>
 
 <style>
   .logo-placeholder {
     flex: none;
-    color: var(--line-strong);
+    color: var(--text-strong);
   }
 </style>

@@ -1,0 +1,158 @@
+---
+/**
+ * The design document Trace writes, as a sheet of paper in both themes.
+ * Item 2.1 is the statement the hero traces back to the log.
+ */
+const changes = [
+  { id: '2.1', text: 'Motor mount wall thickened from 2.0 to 2.5 mm.', ref: '09:12', traced: true },
+  { id: '2.2', text: 'Housing material changed from ABS to PC-ABS.', ref: '10:20' },
+  { id: '2.3', text: 'Dust extraction moved from 6 to 8 holes, each Ø9.', ref: '10:24' },
+];
+---
+
+<article class="doc scheme-paper stacked" aria-label="Design document written by Trace">
+  <header class="doc__head">
+    <p class="doc__kind mono">Design document</p>
+    <span class="rev-tag" role="img" aria-label="Revision B">
+      <svg viewBox="0 0 24 21" aria-hidden="true">
+        <path d="M12 1 23 20H1Z"></path>
+      </svg>
+      <span aria-hidden="true">B</span>
+    </span>
+  </header>
+  <p class="doc__title">Orbital sander housing</p>
+  <p class="doc__meta mono num">Rev B · 2026-09-22 · from 71 changes</p>
+
+  <div class="doc__section doc__line" style="--i: 0">
+    <p class="doc__heading">
+      <span class="mono">1</span> Overview
+    </p>
+    <p>
+      Two-piece PC-ABS housing around a 125 mm orbital pad. The motor sits on a bracket mated to the
+      housing boss.
+    </p>
+  </div>
+
+  <div class="doc__section">
+    <p class="doc__heading doc__line" style="--i: 1">
+      <span class="mono">2</span> Changes since Rev A
+    </p>
+    <ol class="doc__changes">
+      {changes.map((c, i) => (
+        <li
+          class:list={['doc__line', c.traced && 'is-traced']}
+          style={`--i: ${i + 2}`}
+          data-trace={c.traced ? 'doc' : undefined}
+        >
+          <span class="doc__id mono num">{c.id}</span> <span>{c.text}</span>{' '}
+          <span class="doc__ref mono num">
+            <span class="visually-hidden">From log entry </span>↳ {c.ref}
+          </span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</article>
+
+<style>
+  .doc {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.625rem;
+    padding: var(--sp-3) var(--sp-3) var(--sp-3);
+    border: 1px solid var(--line-strong);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .doc__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .doc__kind {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .doc__title {
+    font-family: var(--font-display);
+    font-size: var(--s2);
+    font-weight: 760;
+    font-stretch: 108%;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    word-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+
+  .doc__meta {
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+  }
+
+  .doc__section {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .doc__heading {
+    display: flex;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .doc__heading .mono {
+    color: var(--text-muted);
+  }
+
+  .doc__changes {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .doc__changes li {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    padding: 0.2rem 0.375rem;
+    margin-inline: -0.375rem;
+  }
+
+  .doc__changes li.is-traced {
+    background: var(--tint);
+    box-shadow: inset 2px 0 0 var(--change);
+  }
+
+  .doc__id,
+  .doc__ref {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+  }
+
+  .doc__ref {
+    color: var(--change);
+  }
+
+  :global(.hero.is-playing) .doc__line {
+    animation: write 380ms var(--ease) both;
+    animation-delay: calc(var(--play) + 150ms + var(--i) * 110ms);
+  }
+
+  @keyframes write {
+    from {
+      opacity: 0.14;
+      transform: translateY(4px);
+    }
+  }
+</style>

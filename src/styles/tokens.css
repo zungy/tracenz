@@ -2,9 +2,9 @@
  * Design tokens.
  *
  * The five palette colors are the only hues on the site; everything else is an
- * alpha tint or a mix of them. Light theme is "Paper", dark theme is
- * "Blueprint". Theme selection follows the system setting unless the visitor
- * picks one in the footer, which stamps data-theme on <html>.
+ * alpha tint or a mix of them. Ink carries text and actions. Cobalt is kept for
+ * one meaning: change (revision clouds, delta tags, new values, trace lines).
+ * Light theme is "Paper", dark theme is "Blueprint".
  */
 
 :root {
@@ -23,28 +23,30 @@
   --surface: var(--paper);
   --text: var(--ink);
   --text-strong: var(--ink);
-  --text-muted: rgb(25 44 100 / 0.74);
+  --text-muted: rgb(25 44 100 / 0.8);
+  --text-faint: rgb(25 44 100 / 0.66);
   --line: var(--vellum);
   --line-soft: var(--film);
   --line-strong: rgb(25 44 100 / 0.55);
-  --accent: var(--cobalt);
-  --accent-hover: var(--ink);
+  --accent: var(--ink);
+  --accent-hover: var(--cobalt);
   --on-accent: var(--paper);
-  --link: var(--cobalt);
-  --mark: var(--cobalt);
+  --link: var(--ink);
+  --change: var(--cobalt);
+  --change-fill: var(--film);
+  --on-change: var(--paper);
+  --mark: var(--change);
   --focus: var(--cobalt);
-  --tint: rgb(36 63 143 / 0.08);
+  --tint: rgb(36 63 143 / 0.07);
   --band-bg: var(--ink);
   --band-surface: rgb(36 63 143 / 0.55);
 
   /* Type */
   --font-display: 'Archivo Variable', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --font-body:
-    'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, -apple-system,
-    'Segoe UI', Roboto, sans-serif;
-  --font-mono:
-    'Atkinson Hyperlegible Mono Variable', 'Atkinson Hyperlegible Mono', ui-monospace,
-    'SFMono-Regular', Menlo, Consolas, monospace;
+    'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   /* Type scale: ratio 2^(1/4), so every second step is x sqrt2 and every fourth doubles */
   --s-2: 0.75rem;
@@ -67,7 +69,8 @@
   --sp-8: 4rem;
   --sp-13: 6.5rem;
 
-  /* Layout */
+  /* Layout. --frame is the margin of the drawing-sheet border (desktop only). */
+  --frame: 0px;
   --container: 80rem;
   --gutter: 1rem;
   --page-pad: clamp(1rem, 4vw, 2.5rem);
@@ -89,7 +92,9 @@
 @media (min-width: 64rem) {
   :root {
     --cols: 16;
-    --section-pad: var(--sp-13);
+    --frame: 1.5rem;
+    --page-pad: calc(var(--frame) + 2.5rem);
+    --section-pad: 5.5rem;
   }
 }
 
@@ -103,6 +108,7 @@
     --text: var(--film);
     --text-strong: var(--paper);
     --text-muted: var(--vellum);
+    --text-faint: rgb(189 197 221 / 0.78);
     --line: rgb(189 197 221 / 0.3);
     --line-soft: rgb(189 197 221 / 0.12);
     --line-strong: rgb(189 197 221 / 0.55);
@@ -110,7 +116,10 @@
     --accent-hover: var(--paper);
     --on-accent: var(--ink);
     --link: var(--paper);
-    --mark: var(--paper);
+    --change: var(--paper);
+    --change-fill: rgb(233 235 243 / 0.12);
+    --on-change: var(--ink);
+    --mark: var(--change);
     --focus: var(--paper);
     --tint: rgb(233 235 243 / 0.08);
     --band-bg: var(--cobalt);
@@ -127,6 +136,7 @@
   --text: var(--film);
   --text-strong: var(--paper);
   --text-muted: var(--vellum);
+  --text-faint: rgb(189 197 221 / 0.78);
   --line: rgb(189 197 221 / 0.3);
   --line-soft: rgb(189 197 221 / 0.12);
   --line-strong: rgb(189 197 221 / 0.55);
@@ -134,7 +144,10 @@
   --accent-hover: var(--paper);
   --on-accent: var(--ink);
   --link: var(--paper);
-  --mark: var(--paper);
+  --change: var(--paper);
+  --change-fill: rgb(233 235 243 / 0.12);
+  --on-change: var(--ink);
+  --mark: var(--change);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
   --band-bg: var(--cobalt);
@@ -143,7 +156,7 @@
 
 /*
  * Scoped schemes. A blueprint band stays dark in both themes (its ground shifts
- * to cobalt in dark mode so it still stands apart); a paper sheet, like the
+ * to cobalt in dark mode so it still stands apart); a paper sheet, like a
  * document preview, stays paper in both themes.
  */
 .scheme-blueprint {
@@ -154,6 +167,7 @@
   --text: var(--film);
   --text-strong: var(--paper);
   --text-muted: var(--vellum);
+  --text-faint: rgb(189 197 221 / 0.78);
   --line: rgb(189 197 221 / 0.3);
   --line-soft: rgb(189 197 221 / 0.14);
   --line-strong: rgb(189 197 221 / 0.55);
@@ -161,7 +175,10 @@
   --accent-hover: var(--paper);
   --on-accent: var(--ink);
   --link: var(--paper);
-  --mark: var(--paper);
+  --change: var(--paper);
+  --change-fill: rgb(233 235 243 / 0.12);
+  --on-change: var(--ink);
+  --mark: var(--change);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
   background: var(--bg);
@@ -175,17 +192,21 @@
   --surface: var(--paper);
   --text: var(--ink);
   --text-strong: var(--ink);
-  --text-muted: rgb(25 44 100 / 0.74);
+  --text-muted: rgb(25 44 100 / 0.8);
+  --text-faint: rgb(25 44 100 / 0.66);
   --line: var(--vellum);
   --line-soft: var(--film);
   --line-strong: rgb(25 44 100 / 0.55);
-  --accent: var(--cobalt);
-  --accent-hover: var(--ink);
+  --accent: var(--ink);
+  --accent-hover: var(--cobalt);
   --on-accent: var(--paper);
-  --link: var(--cobalt);
-  --mark: var(--cobalt);
+  --link: var(--ink);
+  --change: var(--cobalt);
+  --change-fill: var(--film);
+  --on-change: var(--paper);
+  --mark: var(--change);
   --focus: var(--cobalt);
-  --tint: rgb(36 63 143 / 0.08);
+  --tint: rgb(36 63 143 / 0.07);
   background: var(--bg);
   color: var(--text);
 }

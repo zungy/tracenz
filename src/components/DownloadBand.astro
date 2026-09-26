@@ -1,40 +1,78 @@
 ---
 /**
- * Closing band on the home and pricing pages: download the app, or sign up
- * first. Blueprint in both themes.
+ * Closing band on the home and pricing pages: download the app for the
+ * visitor's system, or sign up first. A blueprint sheet in both themes.
  */
-import DownloadLink from './DownloadLink.astro';
-import Guides from './Guides.astro';
+import Icon from './Icon.astro';
+import { site } from '../config/site';
+
+const platforms = {
+  windows: { label: 'Windows', icon: 'brand-windows', url: site.downloads.windows },
+  macos: { label: 'macOS', icon: 'brand-apple', url: site.downloads.macos },
+} as const;
+type Os = keyof typeof platforms;
+const pending = (os: Os) =>
+  platforms[os].url ? undefined : `The ${platforms[os].label} download isn't available yet.`;
 ---
 
 <section id="download" class="band scheme-blueprint" aria-labelledby="download-title">
-  <Guides />
   <div class="container grid band__grid">
     <div class="band__copy">
-      <p class="label">Download</p>
+      <p class="label">Desktop app · Windows and macOS</p>
       <h2 id="download-title">Put Trace next to your CAD tool.</h2>
       <p class="band__text">
-        Install the desktop app, sign in and open a project. Logging starts on its own.
+        Install the app, sign in and open a project. Logging starts on its own.
       </p>
     </div>
-    <div class="band__actions">
-      <DownloadLink os="windows" />
-      <DownloadLink os="macos" variant="secondary" />
-      <p class="band__note">
-        New to Trace? <a href="/signup">Create a free account</a> first.
-      </p>
-    </div>
+
+    {(['windows', 'macos'] as Os[]).map((os) => {
+      const other: Os = os === 'windows' ? 'macos' : 'windows';
+      return (
+        <div class="band__actions" data-os={os} hidden={os === 'macos'}>
+          <a
+            class="btn btn--primary band__download"
+            href={platforms[os].url ?? '#download'}
+            data-pending={pending(os)}
+          >
+            <Icon name={platforms[os].icon} size={20} />
+            Download for {platforms[os].label}
+          </a>
+          <p class="band__other">
+            <a href={platforms[other].url ?? '#download'} data-pending={pending(other)}>
+              Download for {platforms[other].label}
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a href="/signup">Create a free account</a>
+          </p>
+        </div>
+      );
+    })}
   </div>
 </section>
 
+<script>
+  // Offer the visitor's own system first.
+  const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
+  const platform = nav.userAgentData?.platform || navigator.platform || navigator.userAgent;
+  if (/mac/i.test(platform)) {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-os]')) {
+      el.hidden = el.dataset.os !== 'macos';
+    }
+  }
+</script>
+
 <style>
+  /* Blueprint sheet: a square grid of 32px, four 8px units per square. */
   .band {
-    position: relative;
     padding-block: var(--sp-8);
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center -1px;
   }
 
   .band__grid {
-    position: relative;
     row-gap: var(--sp-5);
     align-items: end;
   }
@@ -57,27 +95,28 @@ import Guides from './Guides.astro';
   .band__text {
     max-width: 40ch;
     font-size: var(--s1);
-    color: var(--text-muted);
+    color: var(--text);
   }
 
   .band__actions {
     display: grid;
+    justify-items: start;
     gap: var(--sp-2);
   }
 
-  .band__note {
-    font-size: var(--s-1);
-    color: var(--text-muted);
+  .band__actions[hidden] {
+    display: none;
   }
 
-  @media (min-width: 40rem) {
-    .band__actions {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .band__download {
+    --btn-h: 3.5rem;
+    min-width: 17.5rem;
+    font-size: var(--s1);
+  }
 
-    .band__note {
-      grid-column: 1 / -1;
-    }
+  .band__other {
+    font-size: var(--s-1);
+    color: var(--text-muted);
   }
 
   @media (min-width: 64rem) {
@@ -86,12 +125,11 @@ import Guides from './Guides.astro';
     }
 
     .band__copy {
-      grid-column: 1 / span 8;
+      grid-column: 1 / span 9;
     }
 
     .band__actions {
-      grid-column: 10 / -1;
-      grid-template-columns: minmax(0, 1fr);
+      grid-column: 11 / -1;
     }
   }
 </style>

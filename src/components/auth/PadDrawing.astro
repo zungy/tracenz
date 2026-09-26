@@ -132,7 +132,7 @@ const f = (n: number) => n.toFixed(1);
   }
 
   .cloud {
-    fill: none;
+    fill: var(--change-fill);
     stroke: var(--mark);
     stroke-width: 1.5;
     stroke-linecap: round;
@@ -140,17 +140,14 @@ const f = (n: number) => n.toFixed(1);
   }
 
   .tri {
-    fill: var(--bg);
-    stroke: var(--mark);
-    stroke-width: 1.25;
-    stroke-linejoin: round;
+    fill: var(--change);
   }
 
   .tri-letter {
     font-family: var(--font-mono);
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 600;
     text-anchor: middle;
-    fill: var(--mark);
+    fill: var(--on-change);
   }
 </style>

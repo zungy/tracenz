@@ -1,0 +1,137 @@
+---
+/**
+ * Detail C: the lower corner of the housing shell in section, with the
+ * material note revised from ABS to PC-ABS.
+ */
+---
+
+<svg class="drawing" viewBox="0 0 320 220" role="img" aria-labelledby="matl-title">
+  <title id="matl-title">
+    Section through the housing shell with the material note changed from ABS to PC-ABS.
+  </title>
+  <defs>
+    <pattern
+      id="matl-hatch"
+      width="7"
+      height="7"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <line x1="0" y1="0" x2="0" y2="7" class="hatch"></line>
+    </pattern>
+  </defs>
+
+  <!-- Shell wall curving into the skirt, with a lip at the bottom -->
+  <path
+    class="cut"
+    fill="url(#matl-hatch)"
+    d="M52 20 C58 70 70 110 70 150 V188 H112 V172 H90 V150 C90 106 78 66 72 20 Z"
+  ></path>
+  <path class="break" d="M46 20 l6 -5 l10 10 l10 -10 l6 5"></path>
+  <path class="thin" d="M112 188 H150 M112 172 H150"></path>
+  <path class="break" d="M150 166 l-5 6 l10 10 l-10 10 l5 6"></path>
+
+  <!-- Leader to the material note -->
+  <path class="leader" d="M84 118 L150 74 H176"></path>
+  <circle class="dot" cx="84" cy="118" r="2"></circle>
+
+  <g transform="translate(176 48)">
+    <text class="label" x="0" y="0">
+      MATERIAL
+    </text>
+    <text class="old" x="0" y="30">
+      ABS
+    </text>
+    <path class="strike" d="M-1 25.5H29"></path>
+    <rect class="chip" x="36" y="13" width="66" height="22" rx="1"></rect>
+    <text class="new" x="69" y="29" text-anchor="middle">
+      PC-ABS
+    </text>
+    <path class="tag" d="M116 13l10.5 18h-21z"></path>
+    <text class="tag-letter" x="116" y="28" text-anchor="middle">
+      B
+    </text>
+    <text class="label" x="0" y="60">
+      WALL 2.5 NOM.
+    </text>
+  </g>
+</svg>
+
+<style>
+  .drawing {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .drawing :global(*) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .cut {
+    stroke: var(--text-strong);
+    stroke-width: 1.75;
+    stroke-linejoin: round;
+  }
+
+  .hatch {
+    stroke: var(--text-muted);
+    stroke-width: 0.8;
+  }
+
+  .break,
+  .thin {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  .leader {
+    fill: none;
+    stroke: var(--change);
+    stroke-width: 1;
+  }
+
+  .dot {
+    fill: var(--change);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    fill: var(--text-muted);
+  }
+
+  .old {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    fill: var(--text-faint);
+  }
+
+  .strike {
+    stroke: var(--text-faint);
+    stroke-width: 1.25;
+  }
+
+  .chip,
+  .tag {
+    fill: var(--change);
+  }
+
+  .new {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--on-change);
+  }
+
+  .tag-letter {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--on-change);
+  }
+</style>
