@@ -1,7 +1,6 @@
 ---
 import Brand from './Brand.astro';
 import Icon from './Icon.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import { nav } from '../config/site';
 
 interface Props {
@@ -34,9 +33,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </nav>
 
         <div class="header__actions">
-          <div class="header__view">
-            <ThemeToggle id="header" compact />
-          </div>
           <a class="header__login" href="/login">
             Log in
           </a>
@@ -60,19 +56,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
                   <a href="/login">Log in</a>
                 </li>
               </ul>
-              <div class="menu__view">
-                <span class="label">View</span>
-                <ThemeToggle id="menu" />
-              </div>
             </nav>
           </details>
         </div>
       </>
     ) : (
       <div class="header__actions">
-        <div class="header__view">
-          <ThemeToggle id="header" compact />
-        </div>
         <a class="header__back" href="/">
           <Icon name="arrow-left" size={18} />
           Back to home
@@ -135,8 +124,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     margin-left: auto;
   }
 
-  .header__login,
-  .header__view {
+  .header__login {
     display: none;
   }
 
@@ -145,13 +133,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     align-items: center;
     gap: var(--sp-1);
     font-size: var(--s-1);
-  }
-
-  .menu__view {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: var(--sp-2);
   }
 
   /* Mobile menu */
@@ -236,19 +217,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       padding-inline: var(--pad);
     }
 
-    .header__login,
-    .header__view {
+    .header__login {
       display: block;
     }
 
     .menu {
-      display: none;
-    }
-  }
-
-  /* Narrow desktops: the site header leaves the view switch to the footer. */
-  @media (min-width: 64rem) and (max-width: 79.99rem) {
-    .header__actions:has(.header__login) .header__view {
       display: none;
     }
   }

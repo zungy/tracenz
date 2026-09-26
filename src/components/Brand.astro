@@ -1,20 +1,17 @@
 ---
-/**
- * Logo lockup. The mark is a placeholder until the real logo is supplied;
- * swap it here and every page picks it up.
- */
-import LogoPlaceholder from './LogoPlaceholder.astro';
+/** Trace logo lockup, matching the desktop app. */
+import TraceMark from './LogoPlaceholder.astro';
 
 interface Props {
   href?: string;
   size?: number;
 }
 
-const { href = '/', size = 22 } = Astro.props;
+const { href = '/', size = 28 } = Astro.props;
 ---
 
 <a class="brand" href={href} aria-label="Trace home">
-  <LogoPlaceholder size={size} label="" />
+  <TraceMark size={size} label="" />
   <span class="brand__name" aria-hidden="true">
     Trace
   </span>

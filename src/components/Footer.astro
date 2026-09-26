@@ -3,12 +3,11 @@
  * Footer laid out as the sheet's title block. Every cell holds something
  * true: the page's title and sheet number, when the site was last built,
  * who drew it, the site's drawing number; the sheet row moves between the
- * site's three sheets, and the view cell switches Paper and Blueprint. On
+ * site's three sheets. On
  * desktop the block sits in the bottom-right corner of the sheet border and
  * shares its lines, and the left column keeps to the block's rows.
  */
 import Brand from './Brand.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import { nav, sheetCount, sheets, site, type SheetKey } from '../config/site';
 
 interface Props {
@@ -89,12 +88,6 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
         </ul>
       </nav>
 
-      <div class="cell cell--view">
-        <p class="label" aria-hidden="true">
-          View
-        </p>
-        <ThemeToggle id="footer" />
-      </div>
       <div class="cell cell--copy">
         <p class="num">© {year} Trace</p>
       </div>
@@ -235,14 +228,8 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     color: inherit;
   }
 
-  .cell--view {
-    grid-column: span 2;
-    grid-template-columns: auto auto;
-    justify-content: space-between;
-    align-items: center;
-  }
-
   .cell--copy {
+    grid-column: 1 / -1;
     align-content: center;
     font-size: var(--s-2);
     color: var(--text-muted);

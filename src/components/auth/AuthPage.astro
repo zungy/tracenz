@@ -1,6 +1,6 @@
 ---
 /**
- * Log in and sign up share one sheet: the form, and beside it a blueprint
+ * Log in and sign up share one sheet: the form, and beside it a Paper
  * panel with the housing from the home page, cut open where revision B
  * changed it, over the log entry that recorded the change. On desktop both
  * are cells between the header's and the footer's rules: the form in zones
@@ -22,8 +22,7 @@ const { mode } = Astro.props;
       <AuthForm mode={mode} />
     </div>
 
-    <aside class="panel scheme-blueprint" aria-label="Example from the change log">
-      <div class="cyanotype" aria-hidden="true"></div>
+    <aside class="panel scheme-paper" aria-label="Example from the change log">
       <p class="panel__label mono">
         <span>Housing, Rev B</span>
         <span>Quarter section</span>
@@ -31,7 +30,6 @@ const { mode } = Astro.props;
       <ModelView
         class="panel__model"
         alt="The sander housing with a quarter cut away. The motor mount wall inside, which changed in revision B, is drawn in red."
-        tone="dark"
         intro
       />
       <div class="panel__foot">

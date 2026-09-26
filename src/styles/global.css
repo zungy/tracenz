@@ -414,22 +414,6 @@ samp,
 }
 
 /*
- * Blueprint paper: a photographed cyanotype sheet laid in soft light over a
- * blueprint ground, so only its fibre and the unevenness of the coating
- * come through. The parent sets position and isolation.
- */
-.cyanotype {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url('/textures/cyanotype.webp') center / cover;
-  filter: grayscale(1) brightness(1.75) contrast(2.4);
-  mix-blend-mode: soft-light;
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/*
  * CAD-style selection handles: eight squares on the corners and edge
  * midpoints, the way a CAD tool marks the selected object. `.handles` is
  * always selected; `.handles-hover` shows the handles on hover or focus.

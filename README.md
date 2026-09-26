@@ -97,7 +97,7 @@ accounts or cloud data.
 ## Windows downloads
 
 `site.downloads.windows` in `src/config/site.ts` points to the GitHub release asset. The current
-release is `desktop-v0.6.1`, with asset `Trace-desktop-v0.6.1-Windows-x64.zip`. Publish that exact
+release is `desktop-v0.6.2`, with asset `Trace-desktop-v0.6.2-Windows-x64.zip`. Publish that exact
 asset before making its download link live. For later releases, publish the new asset, update the
 URL and version shown on `/download`, then deploy the website.
 
@@ -107,7 +107,7 @@ macOS builds or install desktop updates automatically.
 
 ## Remaining marketing content
 
-The design system, logo placeholders and illustrative housing remain from the original site.
+The Paper design system and illustrative housing remain from the original site. The logo mark matches Trace desktop.
 Review sales email (`salesEmail` in `src/config/site.ts`), pricing/FAQ (`src/config/pricing.ts`),
 product claims and the footer trademark line before a general release. Google/Microsoft login,
 password-reset controls and links to unpublished legal pages are intentionally absent from the
@@ -118,20 +118,19 @@ account form; only working email/password controls are presented.
 Each page is treated as a sheet in a drawing set. On desktop an ISO-style border with zone
 numbers runs around the whole page (`SheetFrame.astro`), each section is one of the sheet's rows,
 lettered A, B, C down the margins, and the footer is the sheet's title block: it names the sheet,
-links the three sheets and holds the Paper / Blueprint switch. Drawings follow drafting
+links the three sheets. Drawings follow drafting
 conventions: ISO line weights, centre lines, hatched sections, dimensions, leaders, revision
 clouds and revision triangles.
 
 - **Color:** the five palette colors, defined in `src/styles/tokens.css`: Ink `#192C64`,
   Cobalt `#243F8F`, Vellum `#BDC5DD`, Film `#E9EBF3`, Paper `#FFFFFF`. The page is a light film
   tint so paper-white panels sit on it; other tints are alpha versions of the palette. One extra
-  color, redline (`#D2401F`, `#FF7A59` on dark), marks what changed in revision B: its revision
+  color, redline (`#D2401F`), marks what changed in revision B: its revision
   clouds, delta tags, the trace line and the changed part in the render. It is never used for
   text or buttons.
-- **Themes:** "Paper" (light) and "Blueprint" (dark). They follow the system setting, and
-  visitors can override it in the header and the footer's title block. Components use semantic
-  tokens (`--bg`, `--text`, `--accent`, ...) so both themes stay in sync. `.scheme-blueprint`
-  and `.scheme-paper` pin a section to one theme.
+- **Theme:** Paper throughout, including account pages and download panels. Semantic tokens
+  (`--bg`, `--text`, `--accent`, ...) keep the design consistent. System dark mode and older
+  saved theme preferences do not change the appearance.
 - **Type:** Barlow Semi Condensed for headings and Barlow for text, both drawn after DIN 1451,
   the standard lettering of German engineering drawings; IBM Plex Mono, with its dotted zero,
   for values, log entries, part numbers and labels. Fonts are self-hosted through Fontsource.
@@ -164,10 +163,8 @@ shows the part is derived from it:
 
 ## Generated images
 
-Two textures were made with an image generation model and then graded to the palette:
-`public/textures/matcap-grey.webp`, the material sphere the render samples, and
-`public/textures/cyanotype.webp`, the blueprint paper under the download band and the account
-panel (`.cyanotype` in `src/styles/global.css`). No generated image shows the product.
+The material sphere sampled by the render, `public/textures/matcap-grey.webp`, was made
+with an image generation model and graded to the palette. No generated image shows the product.
 
 ## Sample document
 

@@ -1,15 +1,14 @@
 ---
 /**
- * Closing band on the home and pricing pages, printed on blueprint paper
- * (see .cyanotype). The download sits on the left; on the right, Trace
+ * Closing Paper band on the home and pricing pages.
+ * The download sits on the left; on the right, Trace
  * docked in a CAD window with the document it has written.
  */
 import CadWindow from './CadWindow.astro';
 import DownloadButtons from './DownloadButtons.astro';
 ---
 
-<section id="download" class="band scheme-blueprint" aria-labelledby="download-title" data-row>
-  <div class="cyanotype" aria-hidden="true"></div>
+<section id="download" class="band scheme-paper" aria-labelledby="download-title" data-row>
   <div class="container grid band__grid">
     <div class="band__copy pad">
       <h2 id="download-title" class="title">
@@ -61,11 +60,7 @@ import DownloadButtons from './DownloadButtons.astro';
     line-height: 1.6;
   }
 
-  /* Solid paper buttons on the blueprint. */
   .band__copy :global(.band__buttons) {
-    --accent: var(--paper);
-    --accent-hover: var(--film);
-    --on-accent: var(--ink);
     margin-top: var(--sp-1);
   }
 
