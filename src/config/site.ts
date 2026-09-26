@@ -12,7 +12,8 @@ export const site = {
    * buttons explain that the download isn't available yet.
    */
   downloads: {
-    windows: null as string | null,
+    windows:
+      'https://github.com/zungy/tracenz/releases/download/desktop-v0.6.1/Trace-desktop-v0.6.1-Windows-x64.zip',
     macos: null as string | null,
   },
 
@@ -23,7 +24,7 @@ export const site = {
 export const nav = [
   { label: 'How it works', href: '/#how-it-works' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Download', href: '/#download' },
+  { label: 'Download', href: '/download' },
 ];
 
 /**
