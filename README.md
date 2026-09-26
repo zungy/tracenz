@@ -37,7 +37,7 @@ npm run format    # format with Prettier
 | Trace logo                     | `src/components/LogoPlaceholder.astro` and `public/favicon.svg`                                                                                           |
 | Google / Microsoft sign-in     | `src/components/auth/AuthForm.astro` (logo slots and links)                                                                                               |
 | Download URLs                  | `downloads` in `src/config/site.ts`                                                                                                                       |
-| Log in / sign up endpoints     | `auth` in `src/config/site.ts`; forms POST there once set                                                                                                 |
+| Supabase Auth                  | `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` locally and Vercel project settings                                           |
 | Sales email                    | `salesEmail` in `src/config/site.ts`                                                                                                                      |
 | Plans, prices, FAQ             | `src/config/pricing.ts`                                                                                                                                   |
 | Terms, privacy, password reset | Links in `src/components/auth/AuthForm.astro`                                                                                                             |
@@ -46,8 +46,15 @@ npm run format    # format with Prettier
 | Trademark line                 | Footer (`src/components/Footer.astro`); have it checked                                                                                                   |
 | Site drawing number            | `TR-WEB-01` in the footer's title block                                                                                                                   |
 
-Until a download URL or auth endpoint is set, the buttons and forms still work as UI but tell
-the visitor that the download or sign-in isn't available yet, instead of linking nowhere.
+Copy `.env.example` to `.env.local` for local development and fill in the Supabase project's URL and
+publishable key. Set the same variables in Vercel for each deployment environment you use. The
+sign-up form stores the full name in Supabase Auth user metadata and requires email confirmation
+when that option is enabled in Supabase; login uses the user's email and password. Configure the
+Supabase Auth redirect allow list to include `http://localhost:4321/**` and the website's deployed
+origin (plus preview origins if you test sign-up on Vercel previews).
+
+Until a download URL is set, its buttons explain that downloads are not available yet. Google and
+Microsoft sign-in remain placeholders until their providers are configured.
 
 All copy is a first draft, and the example project (an orbital sander housing, its log and
 its design document TR-0142) is illustrative.
