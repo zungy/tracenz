@@ -26,26 +26,18 @@ const { title, description = site.description, sheet, header = 'site' } = Astro.
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f4f5f9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#192c64" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f4f5f9" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <script is:inline>
-      // Apply a saved theme before first paint so the page doesn't flash.
-      try {
-        var saved = localStorage.getItem('trace-theme');
-        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
-      } catch (e) {}
-    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">
@@ -84,16 +76,6 @@ const { title, description = site.description, sheet, header = 'site' } = Astro.
       .toast.is-visible {
         opacity: 1;
         transform: translate(-50%, 0);
-      }
-
-      :global(:root[data-theme='dark']) .toast {
-        outline: 1px solid rgb(189 197 221 / 0.4);
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :global(:root:not([data-theme='light'])) .toast {
-          outline: 1px solid rgb(189 197 221 / 0.4);
-        }
       }
     </style>
 
