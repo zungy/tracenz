@@ -16,51 +16,22 @@ interface Props {
   anchors?: boolean;
   /** Sweep the section plane in when the hero plays. */
   intro?: boolean;
-  /**
-   * Which theme's colours to draw in: the page's, or always light (inside
-   * the CAD window) or always dark (on a blueprint panel).
-   */
-  tone?: 'auto' | 'light' | 'dark';
+  /** Compatibility for CAD views; every model now uses the Paper palette. */
+  tone?: 'light';
   class?: string;
 }
 
-const {
-  alt,
-  view = 'hero',
-  anchors = false,
-  intro = false,
-  tone = 'auto',
-  class: className,
-} = Astro.props;
-const stills =
-  view === 'cad'
-    ? { light: '/renders/cad-light.webp', dark: '/renders/cad-light.webp' }
-    : { light: '/renders/housing-light.webp', dark: '/renders/housing-dark.webp' };
+const { alt, view = 'hero', anchors = false, intro = false, class: className } = Astro.props;
+const still = view === 'cad' ? '/renders/cad-light.webp' : '/renders/housing-light.webp';
 ---
 
 <div
-  class:list={['model', tone !== 'auto' && `model--${tone}`, className]}
+  class:list={['model', className]}
   data-model
   data-view={view}
   data-intro={intro ? '' : undefined}
 >
-  <img
-    class="model__still model__still--light"
-    src={stills.light}
-    alt={alt}
-    width="1040"
-    height="750"
-    decoding="async"
-  />
-  <img
-    class="model__still model__still--dark"
-    src={stills.dark}
-    alt=""
-    aria-hidden="true"
-    width="1040"
-    height="750"
-    decoding="async"
-  />
+  <img class="model__still" src={still} alt={alt} width="1040" height="750" decoding="async" />
   <canvas class="model__canvas" aria-hidden="true"></canvas>
   {anchors && (
     <>
@@ -115,10 +86,6 @@ const stills =
     max-width: none;
   }
 
-  .model__still--dark {
-    display: none;
-  }
-
   .model__canvas {
     opacity: 0;
   }
@@ -138,52 +105,6 @@ const stills =
     height: 6px;
     margin: -3px 0 0 -3px;
     pointer-events: none;
-  }
-
-  /* Blueprint colours: on a dark panel, or when the page is dark. */
-  .model--dark,
-  :global(:root[data-theme='dark']) .model:not(.model--light) {
-    --model-outline: var(--film);
-    --model-crease: var(--ink);
-    --model-cap: var(--film);
-    --model-shade-0: var(--cobalt);
-    --model-shade-1: #6d7fb8;
-    --model-shade-2: var(--vellum);
-    --model-shade-3: var(--film);
-    --model-gain: 1.08;
-    --model-shadow: #0b1433;
-  }
-
-  .model--dark .model__still--light,
-  :global(:root[data-theme='dark']) .model:not(.model--light) .model__still--light {
-    display: none;
-  }
-
-  .model--dark .model__still--dark,
-  :global(:root[data-theme='dark']) .model:not(.model--light) .model__still--dark {
-    display: block;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .model:not(.model--light) {
-      --model-outline: var(--film);
-      --model-crease: var(--ink);
-      --model-cap: var(--film);
-      --model-shade-0: var(--cobalt);
-      --model-shade-1: #6d7fb8;
-      --model-shade-2: var(--vellum);
-      --model-shade-3: var(--film);
-      --model-gain: 1.08;
-      --model-shadow: #0b1433;
-    }
-
-    :global(:root:not([data-theme='light'])) .model:not(.model--light) .model__still--light {
-      display: none;
-    }
-
-    :global(:root:not([data-theme='light'])) .model:not(.model--light) .model__still--dark {
-      display: block;
-    }
   }
 </style>
 
@@ -214,13 +135,6 @@ const stills =
       : [0, 0, 0];
   }
 
-  function isDark() {
-    const set = document.documentElement.dataset.theme;
-    if (set === 'dark') return true;
-    if (set === 'light') return false;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-
   function loadImage(src: string) {
     return new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
@@ -236,9 +150,6 @@ const stills =
     const base = cameras[root.dataset.view === 'cad' ? 'cad' : 'hero'];
     const cam: Camera = { ...base, target: [...base.target] as Camera['target'] };
     const cutaway = root.dataset.view !== 'cad';
-    const dark = () =>
-      root.classList.contains('model--dark') ||
-      (!root.classList.contains('model--light') && isDark());
 
     // Anchors follow the camera, WebGL or not: the still shows the same view.
     const placeAnchors = () => {
@@ -293,7 +204,7 @@ const stills =
     gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
     const u = (name: string) => gl.getUniformLocation(program, name);
 
-    const textures: Partial<Record<'light' | 'dark', WebGLTexture>> = {};
+    let matcap: WebGLTexture | null = null;
     const upload = (img: HTMLImageElement) => {
       const tex = gl.createTexture()!;
       gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -313,8 +224,7 @@ const stills =
 
     const draw = () => {
       frame = 0;
-      const tex = textures[dark() ? 'dark' : 'light'];
-      if (!tex) return;
+      if (!matcap) return;
       cam.azimuth = view.az;
       cam.elevation = view.el;
       const { eye } = basis(cam);
@@ -334,14 +244,14 @@ const stills =
       gl.uniform3f(u('uHatch'), ...rgb(style.getPropertyValue('--model-hatch')));
       gl.uniform3f(u('uChange'), ...rgb(style.getPropertyValue('--model-change')));
       gl.uniform3f(u('uShadowColor'), ...rgb(style.getPropertyValue('--model-shadow')));
-      gl.uniform1f(u('uShadow'), dark() ? 0.45 : 0.14);
+      gl.uniform1f(u('uShadow'), 0.14);
       gl.uniform1f(u('uMatcapGain'), parseFloat(style.getPropertyValue('--model-gain')) || 1);
       gl.uniform3f(u('uShade0'), ...rgb(style.getPropertyValue('--model-shade-0')));
       gl.uniform3f(u('uShade1'), ...rgb(style.getPropertyValue('--model-shade-1')));
       gl.uniform3f(u('uShade2'), ...rgb(style.getPropertyValue('--model-shade-2')));
       gl.uniform3f(u('uShade3'), ...rgb(style.getPropertyValue('--model-shade-3')));
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.bindTexture(gl.TEXTURE_2D, matcap);
       gl.uniform1i(u('uMatcap'), 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (view.az !== base.azimuth || view.el !== base.elevation) placeAnchors();
@@ -406,16 +316,9 @@ const stills =
       request();
     });
 
-    const themeObserver = new MutationObserver(request);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', request);
-
     loadImage('/textures/matcap-grey.webp')
       .then((img) => {
-        textures.light = textures.dark = upload(img);
+        matcap = upload(img);
         resize();
         intro();
       })

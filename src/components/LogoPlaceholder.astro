@@ -1,9 +1,5 @@
 ---
-/**
- * Placeholder for the Trace logo until the real artwork is supplied: a plain
- * solid mark that holds the logo's place without pretending to be one.
- * Replace this component's output with the real logo.
- */
+/** Trace's square/grid/diagonal mark, shared with the desktop app. */
 interface Props {
   size?: number;
   /** Accessible name. Pass an empty string when surrounding text names it. */
@@ -11,24 +7,29 @@ interface Props {
   class?: string;
 }
 
-const { size = 24, label = 'Logo placeholder', class: className } = Astro.props;
+const { size = 24, label = 'Trace', class: className } = Astro.props;
 const a11y = label
   ? { role: 'img' as const, 'aria-label': label }
   : { 'aria-hidden': 'true' as const };
 ---
 
 <svg
-  class:list={['logo-placeholder', className]}
+  class:list={['trace-mark', className]}
   width={size}
   height={size}
-  viewBox="0 0 24 24"
+  viewBox="0 0 28 28"
   {...a11y}
 >
-  <rect width="24" height="24" rx="2" fill="currentColor"></rect>
+  <path
+    d="M4 4h20v20H4zM4 14h20M14 4v20M4 24 24 4"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.3"
+  ></path>
 </svg>
 
 <style>
-  .logo-placeholder {
+  .trace-mark {
     flex: none;
     color: var(--text-strong);
   }
