@@ -13,7 +13,7 @@ export const site = {
    */
   downloads: {
     windows:
-      'https://github.com/zungy/tracenz/releases/download/desktop-v0.6.2/Trace-desktop-v0.6.2-Windows-x64.zip',
+      'https://github.com/zungy/tracenz/releases/download/desktop-v0.7.0/Trace-desktop-v0.7.0-Windows-x64.zip',
     macos: null as string | null,
   },
 
