@@ -1,34 +1,63 @@
 ---
 /**
- * Plan cards with a Monthly / Yearly switch. The switch is two radio inputs;
- * CSS :has() swaps the prices, so it works without JavaScript.
+ * Plans as a band of cells on the zone lines: a key in zones 1 and 2 with
+ * the Monthly / Yearly switch and what every plan includes, then Free, Pro
+ * and Team, two zones each. On desktop the cells share their rules and
+ * their rows, so prices, buttons and lists line up across the band, and the
+ * rule over the lists runs from zone line to zone line. The recommended
+ * plan carries CAD selection handles, which move to another plan on hover
+ * or focus.
+ *
+ * The switch is two radio inputs and CSS :has() swaps the prices, so it
+ * works without JavaScript.
  */
 import Icon from '../Icon.astro';
-import { plans } from '../../config/pricing';
+import { everyPlan, plans } from '../../config/pricing';
 ---
 
 <div class="plans" data-plans>
-  <fieldset class="billing">
-    <legend class="visually-hidden">Billing period</legend>
-    <input type="radio" name="billing" id="billing-monthly" value="monthly" checked />
-    <label for="billing-monthly">Monthly</label>
-    <input type="radio" name="billing" id="billing-yearly" value="yearly" />
-    <label for="billing-yearly">
-      Yearly <span class="billing__save">2 months free</span>
-    </label>
-  </fieldset>
+  <div class="grid plans__band">
+    <div class="cell key">
+      <fieldset class="billing">
+        <legend class="visually-hidden">Billing period</legend>
+        <input type="radio" name="billing" id="billing-monthly" value="monthly" checked />
+        <label for="billing-monthly">Monthly</label>
+        <input type="radio" name="billing" id="billing-yearly" value="yearly" />
+        <label for="billing-yearly">Yearly</label>
+      </fieldset>
+      <p class="key__note">Prices in USD. Yearly billing costs ten months.</p>
+      <div class="key__every">
+        <h2 id="every-plan" class="key__title">
+          In every plan
+        </h2>
+        <ul class="list" aria-labelledby="every-plan">
+          {everyPlan.map((item) => (
+            <li>
+              <Icon name="check" size={18} stroke={2} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
 
-  <ul class="plans__list">
     {plans.map((plan) => (
-      <li class:list={['card', `card--${plan.id}`, plan.recommended ? 'handles' : 'handles-hover']}>
+      <article
+        class:list={[
+          'cell',
+          'card',
+          `card--${plan.id}`,
+          plan.recommended ? 'handles' : 'handles-hover',
+        ]}
+        aria-labelledby={`plan-${plan.id}`}
+      >
         <div class="card__head">
           <h2 id={`plan-${plan.id}`} class="card__name">
             {plan.name}
           </h2>
-          {plan.recommended && <p class="card__badge label">Recommended</p>}
+          {plan.recommended && <p class="card__tag mono">Recommended</p>}
         </div>
         <p class="card__summary">{plan.summary}</p>
-
         <p class="card__price">
           <span class="card__amount num">
             <span class="price-monthly">${plan.monthly}</span>
@@ -49,15 +78,13 @@ import { plans } from '../../config/pricing';
             </>
           )}
         </p>
-
         <a
           class:list={['btn', 'btn--block', plan.recommended ? 'btn--primary' : 'btn--secondary']}
           href={plan.cta.href}
         >
           {plan.cta.label}
         </a>
-
-        <ul class="card__includes" aria-label={`${plan.name} includes`}>
+        <ul class="list card__includes" aria-label={`${plan.name} includes`}>
           {plan.includes.map((item) => (
             <li>
               <Icon name="check" size={18} stroke={2} />
@@ -65,23 +92,34 @@ import { plans } from '../../config/pricing';
             </li>
           ))}
         </ul>
-      </li>
+      </article>
     ))}
-  </ul>
+  </div>
 </div>
 
 <style>
-  .plans {
-    display: grid;
-    gap: var(--sp-5);
+  .plans__band {
+    row-gap: var(--sp-3);
   }
 
-  /* Billing switch */
+  .cell {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  /* Key: the billing switch, and what every plan includes */
+  .key {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--sp-2);
+    padding-bottom: var(--sp-2);
+  }
+
   .billing {
     display: inline-flex;
-    justify-self: start;
     padding: 3px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--text-strong);
     border-radius: var(--radius);
   }
 
@@ -92,20 +130,23 @@ import { plans } from '../../config/pricing';
   }
 
   .billing label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 2.5rem;
+    display: grid;
+    place-items: center;
+    min-height: 2.25rem;
     padding-inline: var(--sp-2);
     border-radius: 1px;
-    font-weight: 650;
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
     color: var(--text-muted);
     cursor: pointer;
   }
 
   .billing input:checked + label {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--text-strong);
+    color: var(--bg);
   }
 
   .billing input:focus-visible + label {
@@ -113,11 +154,27 @@ import { plans } from '../../config/pricing';
     outline-offset: 2px;
   }
 
-  .billing__save {
-    font-family: var(--font-mono);
-    font-size: var(--s-2);
-    font-weight: 500;
-    letter-spacing: 0.04em;
+  .key__note {
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  .key__every {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .key__title,
+  .card__name {
+    font-family: var(--font-body);
+    font-size: var(--s1);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  .key__title {
+    font-size: var(--s0);
   }
 
   /* Price swap */
@@ -133,20 +190,33 @@ import { plans } from '../../config/pricing';
     display: inline;
   }
 
-  /* Cards */
-  .plans__list {
+  /* Lists */
+  .list {
     display: grid;
-    gap: var(--sp-3);
+    align-content: start;
+    gap: 0.625rem;
     padding: 0;
     list-style: none;
   }
 
+  .list li {
+    display: grid;
+    grid-template-columns: 1.125rem minmax(0, 1fr);
+    gap: 0.625rem;
+    align-items: start;
+  }
+
+  .list :global(.icon) {
+    margin-top: 0.2rem;
+    color: var(--text-strong);
+  }
+
+  /* Plans */
   .card {
     display: grid;
     align-content: start;
-    gap: var(--sp-2);
     padding: var(--sp-3);
-    border: 1px solid var(--line);
+    border: var(--rule) solid var(--line-strong);
     background: var(--surface);
   }
 
@@ -157,15 +227,19 @@ import { plans } from '../../config/pricing';
     gap: var(--sp-2);
   }
 
-  .card__name {
-    font-size: var(--s3);
-  }
-
-  .card__badge {
+  .card__tag {
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--select);
+    font-size: var(--s-2);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
     color: var(--select);
   }
 
   .card__summary {
+    margin-top: 0.25rem;
     color: var(--text-muted);
   }
 
@@ -174,7 +248,7 @@ import { plans } from '../../config/pricing';
     flex-wrap: wrap;
     align-items: baseline;
     gap: 0.5rem;
-    margin-top: var(--sp-1);
+    margin-top: var(--sp-3);
   }
 
   .card__amount {
@@ -182,7 +256,7 @@ import { plans } from '../../config/pricing';
     font-size: var(--s8);
     font-weight: var(--display-weight);
     line-height: 1;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.02em;
     color: var(--text-strong);
   }
 
@@ -193,37 +267,25 @@ import { plans } from '../../config/pricing';
   }
 
   .card__billed {
-    margin-bottom: var(--sp-1);
+    margin-top: 0.375rem;
+  }
+
+  .card .btn {
+    margin-top: var(--sp-3);
   }
 
   .card__includes {
-    display: grid;
-    align-content: start;
-    gap: 0.6rem;
-    margin-top: var(--sp-2);
-    padding: var(--sp-3) 0 0;
-    border-top: 1px dashed var(--line);
-    list-style: none;
-  }
-
-  .card__includes li {
-    display: grid;
-    grid-template-columns: 1.125rem minmax(0, 1fr);
-    gap: 0.625rem;
-    align-items: start;
-  }
-
-  .card__includes :global(.icon) {
-    margin-top: 0.2rem;
-    color: var(--text-strong);
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--line);
   }
 
   /* Hovering or tabbing into another plan moves the selection to it. */
-  .plans__list:has(.handles-hover:is(:hover, :focus-within)) .handles {
+  .plans__band:has(.handles-hover:is(:hover, :focus-within)) .handles {
     outline-color: transparent;
   }
 
-  .plans__list:has(.handles-hover:is(:hover, :focus-within)) .handles::after {
+  .plans__band:has(.handles-hover:is(:hover, :focus-within)) .handles::after {
     opacity: 0;
   }
 
@@ -243,31 +305,72 @@ import { plans } from '../../config/pricing';
       margin-top: 0;
       padding: 0 0 0 var(--sp-3);
       border-top: 0;
-      border-left: 1px dashed var(--line);
+      border-left: 1px solid var(--line);
     }
   }
 
+  /*
+   * Desktop: every cell spans the band's six rows as a subgrid, so the
+   * heads, prices, buttons and lists of all four cells sit on shared lines.
+   */
   @media (min-width: 64rem) {
-    .plans__list {
-      grid-template-columns: repeat(16, minmax(0, 1fr));
-      column-gap: var(--gutter);
-      align-items: stretch;
+    .plans__band {
+      grid-template-rows: repeat(6, auto);
+      row-gap: 0;
+      border-block: var(--rule) solid var(--text-strong);
     }
 
-    .card--free {
-      grid-column: 1 / span 5;
+    .cell {
+      grid-row: 1 / span 6;
+      display: grid;
+      grid-template-rows: subgrid;
+      align-content: stretch;
+      padding: var(--sp-5) var(--pad);
     }
 
-    .card--pro {
-      grid-column: 6 / span 6;
+    .key {
+      grid-column: 1 / span 2;
+      row-gap: 0;
     }
 
-    .card--team {
-      grid-column: 12 / span 5;
+    .key .billing {
+      grid-row: 1;
+      align-self: start;
+    }
+
+    .key__note {
+      grid-row: 2 / span 3;
+      margin-top: var(--sp-2);
+    }
+
+    .key__every {
+      grid-row: 6;
+      justify-self: stretch;
     }
 
     .card {
-      padding: var(--sp-5) var(--sp-3);
+      border: 0;
+      border-left: var(--rule) solid var(--text-strong);
+    }
+
+    .card--free {
+      grid-column: 3 / span 2;
+    }
+
+    .card--pro {
+      grid-column: 5 / span 2;
+    }
+
+    .card--team {
+      grid-column: 7 / span 2;
+    }
+
+    /* The rule over the lists runs across the band, zone line to zone line. */
+    .key__every,
+    .card__includes {
+      margin: var(--sp-5) calc(var(--pad) * -1) 0;
+      padding: var(--sp-3) var(--pad) 0;
+      border-top: 1px solid var(--line);
     }
   }
 </style>

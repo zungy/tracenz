@@ -1,0 +1,424 @@
+---
+/**
+ * Live render of the housing (see src/lib/model-shader.ts), drawn in WebGL
+ * over a still of its finished state. The still is what visitors see without
+ * WebGL, and before the first frame; it was rendered by the same shader.
+ *
+ * With `anchors`, the component places an invisible anchor on each change's
+ * cut face (data-source="wall" and so on), where the hero's trace line
+ * starts. It listens for a `trace:active` event to highlight a change.
+ */
+interface Props {
+  /** Describes the render for screen readers; empty when it is decorative. */
+  alt: string;
+  /** Which camera: the hero's cutaway, or the CAD window's whole part. */
+  view?: 'hero' | 'cad';
+  anchors?: boolean;
+  /** Sweep the section plane in when the hero plays. */
+  intro?: boolean;
+  /**
+   * Which theme's colours to draw in: the page's, or always light (inside
+   * the CAD window) or always dark (on a blueprint panel).
+   */
+  tone?: 'auto' | 'light' | 'dark';
+  class?: string;
+}
+
+const {
+  alt,
+  view = 'hero',
+  anchors = false,
+  intro = false,
+  tone = 'auto',
+  class: className,
+} = Astro.props;
+const stills =
+  view === 'cad'
+    ? { light: '/renders/cad-light.webp', dark: '/renders/cad-light.webp' }
+    : { light: '/renders/housing-light.webp', dark: '/renders/housing-dark.webp' };
+---
+
+<div
+  class:list={['model', tone !== 'auto' && `model--${tone}`, className]}
+  data-model
+  data-view={view}
+  data-intro={intro ? '' : undefined}
+>
+  <img
+    class="model__still model__still--light"
+    src={stills.light}
+    alt={alt}
+    width="1040"
+    height="750"
+    decoding="async"
+  />
+  <img
+    class="model__still model__still--dark"
+    src={stills.dark}
+    alt=""
+    aria-hidden="true"
+    width="1040"
+    height="750"
+    decoding="async"
+  />
+  <canvas class="model__canvas" aria-hidden="true"></canvas>
+  {anchors && (
+    <>
+      <span class="model__anchor" data-source="wall" data-at="wall" />
+      <span class="model__anchor" data-source="material" data-at="material" />
+      <span class="model__anchor" data-source="bearing" data-at="bearing" />
+    </>
+  )}
+</div>
+{intro && <script is:inline>
+  // The intro opens the part from whole, so its finished still mustn't
+  // show first. Where WebGL2 will draw the intro, hide the still from the
+  // first paint; the script below brings it back if drawing fails.
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    try {
+      var gl = document.createElement('canvas').getContext('webgl2');
+      if (!gl) return;
+      var lose = gl.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+      root.classList.add('is-waiting');
+    } catch (e) {}
+  })();
+</script>}
+
+<style>
+  /* Colours the shader reads: edges, cut faces, and a four-stop ramp for the material. */
+  .model {
+    --model-crease: var(--ink);
+    --model-outline: var(--ink);
+    --model-cap: var(--paper);
+    --model-hatch: var(--ink);
+    --model-change: var(--redline);
+    --model-shade-0: #6a769e;
+    --model-shade-1: var(--vellum);
+    --model-shade-2: var(--film);
+    --model-shade-3: var(--paper);
+    --model-gain: 1.08;
+    --model-shadow: var(--ink);
+    position: relative;
+    aspect-ratio: 1040 / 750;
+    width: 100%;
+  }
+
+  .model__still,
+  .model__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .model__still--dark {
+    display: none;
+  }
+
+  .model__canvas {
+    opacity: 0;
+  }
+
+  .model.is-live .model__canvas {
+    opacity: 1;
+  }
+
+  .model.is-live .model__still,
+  .model.is-waiting .model__still {
+    visibility: hidden;
+  }
+
+  .model__anchor {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    pointer-events: none;
+  }
+
+  /* Blueprint colours: on a dark panel, or when the page is dark. */
+  .model--dark,
+  :global(:root[data-theme='dark']) .model:not(.model--light) {
+    --model-outline: var(--film);
+    --model-crease: var(--ink);
+    --model-cap: var(--film);
+    --model-shade-0: var(--cobalt);
+    --model-shade-1: #6d7fb8;
+    --model-shade-2: var(--vellum);
+    --model-shade-3: var(--film);
+    --model-gain: 1.08;
+    --model-shadow: #0b1433;
+  }
+
+  .model--dark .model__still--light,
+  :global(:root[data-theme='dark']) .model:not(.model--light) .model__still--light {
+    display: none;
+  }
+
+  .model--dark .model__still--dark,
+  :global(:root[data-theme='dark']) .model:not(.model--light) .model__still--dark {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .model:not(.model--light) {
+      --model-outline: var(--film);
+      --model-crease: var(--ink);
+      --model-cap: var(--film);
+      --model-shade-0: var(--cobalt);
+      --model-shade-1: #6d7fb8;
+      --model-shade-2: var(--vellum);
+      --model-shade-3: var(--film);
+      --model-gain: 1.08;
+      --model-shadow: #0b1433;
+    }
+
+    :global(:root:not([data-theme='light'])) .model:not(.model--light) .model__still--light {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .model:not(.model--light) .model__still--dark {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+  import {
+    activeIds,
+    anchors,
+    basis,
+    cameras,
+    fragmentSource,
+    project,
+    vertexSource,
+    type Camera,
+  } from '../lib/model-shader';
+
+  type Key = keyof typeof activeIds;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const probe = document.createElement('canvas').getContext('2d');
+
+  function rgb(value: string): [number, number, number] {
+    if (!probe) return [0, 0, 0];
+    probe.fillStyle = '#000';
+    probe.fillStyle = value.trim();
+    const hex = probe.fillStyle as string;
+    const m = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    return m
+      ? ([1, 2, 3].map((i) => parseInt(m[i], 16) / 255) as [number, number, number])
+      : [0, 0, 0];
+  }
+
+  function isDark() {
+    const set = document.documentElement.dataset.theme;
+    if (set === 'dark') return true;
+    if (set === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function loadImage(src: string) {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-model]')) setup(root);
+
+  function setup(root: HTMLElement) {
+    const base = cameras[root.dataset.view === 'cad' ? 'cad' : 'hero'];
+    const cam: Camera = { ...base, target: [...base.target] as Camera['target'] };
+    const cutaway = root.dataset.view !== 'cad';
+    const dark = () =>
+      root.classList.contains('model--dark') ||
+      (!root.classList.contains('model--light') && isDark());
+
+    // Anchors follow the camera, WebGL or not: the still shows the same view.
+    const placeAnchors = () => {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      for (const a of root.querySelectorAll<HTMLElement>('[data-at]')) {
+        const key = a.dataset.at as keyof typeof anchors;
+        const p = project(cam, anchors[key], w, h);
+        a.style.left = `${p.x.toFixed(1)}px`;
+        a.style.top = `${p.y.toFixed(1)}px`;
+      }
+      root.dispatchEvent(new CustomEvent('model:anchors', { bubbles: true }));
+    };
+    placeAnchors();
+    new ResizeObserver(placeAnchors).observe(root);
+
+    const canvas = root.querySelector<HTMLCanvasElement>('.model__canvas');
+    const gl = canvas?.getContext('webgl2', {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      preserveDrawingBuffer: true,
+    });
+    const fail = () => root.classList.remove('is-waiting');
+    if (!canvas || !gl) return fail();
+    // Show the still after all if the first frame is slow to come.
+    const waited = window.setTimeout(fail, 4000);
+
+    const compile = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        throw new Error(gl.getShaderInfoLog(s) ?? '');
+      return s;
+    };
+    const program = gl.createProgram()!;
+    try {
+      gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSource));
+      gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSource));
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return fail();
+    } catch {
+      return fail();
+    }
+    gl.useProgram(program);
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const pos = gl.getAttribLocation(program, 'aPos');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+    const u = (name: string) => gl.getUniformLocation(program, name);
+
+    const textures: Partial<Record<'light' | 'dark', WebGLTexture>> = {};
+    const upload = (img: HTMLImageElement) => {
+      const tex = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      return tex;
+    };
+
+    const view = { az: cam.azimuth, el: cam.elevation, toAz: cam.azimuth, toEl: cam.elevation };
+    let cut = 0;
+    let active: Key = 'wall';
+    let frame = 0;
+
+    const draw = () => {
+      frame = 0;
+      const tex = textures[dark() ? 'dark' : 'light'];
+      if (!tex) return;
+      cam.azimuth = view.az;
+      cam.elevation = view.el;
+      const { eye } = basis(cam);
+      const style = getComputedStyle(root);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(u('uRes'), canvas.width, canvas.height);
+      gl.uniform3f(u('uEye'), eye[0], eye[1], eye[2]);
+      gl.uniform3f(u('uTarget'), ...cam.target);
+      gl.uniform1f(u('uHalf'), cam.half);
+      gl.uniform1f(u('uCut'), cutaway ? cut : 1000);
+      gl.uniform1i(u('uActive'), activeIds[active]);
+      gl.uniform3f(u('uCrease'), ...rgb(style.getPropertyValue('--model-crease')));
+      gl.uniform3f(u('uOutline'), ...rgb(style.getPropertyValue('--model-outline')));
+      gl.uniform3f(u('uCap'), ...rgb(style.getPropertyValue('--model-cap')));
+      gl.uniform3f(u('uHatch'), ...rgb(style.getPropertyValue('--model-hatch')));
+      gl.uniform3f(u('uChange'), ...rgb(style.getPropertyValue('--model-change')));
+      gl.uniform3f(u('uShadowColor'), ...rgb(style.getPropertyValue('--model-shadow')));
+      gl.uniform1f(u('uShadow'), dark() ? 0.45 : 0.14);
+      gl.uniform1f(u('uMatcapGain'), parseFloat(style.getPropertyValue('--model-gain')) || 1);
+      gl.uniform3f(u('uShade0'), ...rgb(style.getPropertyValue('--model-shade-0')));
+      gl.uniform3f(u('uShade1'), ...rgb(style.getPropertyValue('--model-shade-1')));
+      gl.uniform3f(u('uShade2'), ...rgb(style.getPropertyValue('--model-shade-2')));
+      gl.uniform3f(u('uShade3'), ...rgb(style.getPropertyValue('--model-shade-3')));
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(u('uMatcap'), 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      if (view.az !== base.azimuth || view.el !== base.elevation) placeAnchors();
+      root.classList.add('is-live');
+      root.classList.remove('is-waiting');
+      window.clearTimeout(waited);
+    };
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(draw);
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(root.clientWidth * dpr);
+      canvas.height = Math.round(root.clientHeight * dpr);
+      request();
+    };
+    new ResizeObserver(resize).observe(root);
+
+    // Section plane sweeps in when the hero plays: from outside the part to the axis.
+    const intro = () => {
+      if (reduced || !root.hasAttribute('data-intro')) return;
+      const start = performance.now() + 300;
+      const tick = (now: number) => {
+        const k = Math.min(Math.max((now - start) / 1300, 0), 1);
+        cut = 80 * Math.pow(1 - k, 3);
+        draw();
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      cut = 80;
+      requestAnimationFrame(tick);
+    };
+
+    // A little parallax: the view follows the pointer by a few degrees.
+    const settle = () => {
+      view.az += (view.toAz - view.az) * 0.18;
+      view.el += (view.toEl - view.el) * 0.18;
+      draw();
+      if (Math.abs(view.toAz - view.az) + Math.abs(view.toEl - view.el) > 0.05) {
+        requestAnimationFrame(settle);
+      }
+    };
+    if (!reduced) {
+      root.addEventListener('pointermove', (event) => {
+        const box = root.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5;
+        const y = (event.clientY - box.top) / box.height - 0.5;
+        view.toAz = base.azimuth + x * 16;
+        view.toEl = base.elevation - y * 8;
+        requestAnimationFrame(settle);
+      });
+      root.addEventListener('pointerleave', () => {
+        view.toAz = base.azimuth;
+        view.toEl = base.elevation;
+        requestAnimationFrame(settle);
+      });
+    }
+
+    root.closest('[data-trace-figure]')?.addEventListener('trace:active', (event) => {
+      const key = (event as CustomEvent<string>).detail;
+      active = key in activeIds ? (key as Key) : 'none';
+      request();
+    });
+
+    const themeObserver = new MutationObserver(request);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', request);
+
+    loadImage('/textures/matcap-grey.webp')
+      .then((img) => {
+        textures.light = textures.dark = upload(img);
+        resize();
+        intro();
+      })
+      .catch(fail);
+  }
+</script>

@@ -1,0 +1,111 @@
+---
+/**
+ * Fig. 1 of the design document: the housing in front elevation, half
+ * section, at 1:2.5. The left half is the exterior, with the dust port; the
+ * right half is cut through the axis. Every outline comes from the shared
+ * model in src/lib/sander.ts, so it matches the render and detail A.
+ *
+ * At this scale the 2.5 mm walls are 1 mm on paper, so the cut material is
+ * blacked in, as ISO 128 allows for thin sections. Detail A repeats the
+ * motor mount wall at 1:1, hatched.
+ */
+import { G, H, radiusAt, sectionLoops, silhouette } from '../../lib/sander';
+import { P, View, f } from '../../lib/drafting';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const v = new View(0.4);
+
+const sil = silhouette(0.5);
+const exterior = `M${sil.map(([r, y]) => P(-r, y)).join('L')}`;
+const base = `M${P(-G.fan.hr, 0)}L${P(0, 0)}`;
+const cut = sectionLoops()
+  .map((loop) => `M${loop.map(([x, y]) => P(x, y)).join('L')}Z`)
+  .join('');
+
+// Dust port, seen from the side: outline, its bore as hidden lines, centerline.
+const { port } = G;
+const top = port.y + port.ro;
+const bottom = port.y - port.ro;
+const portOutline =
+  `M${P(-radiusAt(top), top)}L${P(port.x0, top)}L${P(port.x0, bottom)}` +
+  `L${P(-radiusAt(bottom + 0.5), bottom)}`;
+const portHidden =
+  `M${P(port.x0, port.y + port.ri)}L${P(-radiusAt(port.y + port.ri) + 1, port.y + port.ri)}` +
+  `M${P(port.x0, port.y - port.ri)}L${P(-G.fan.hr + 1, port.y - port.ri)}`;
+const portAxis = `M${P(port.x0 - v.p(1.5), port.y)}L${P(-G.fan.hr + 6, port.y)}`;
+const axis = `M${P(0, -v.p(2))}L${P(0, H + v.p(2))}`;
+
+// Dimensions: overall height and the diameter at the rim.
+const height = v.dim({ x: -G.fan.hr, y: 0 }, { x: 0, y: H }, 'v', port.x0 - v.p(6), '124');
+const rim = v.dim({ x: -G.fan.hr, y: 0 }, { x: G.fan.hr, y: 0 }, 'h', -v.p(6.5), 'Ø124');
+
+// Detail A: the motor mount wall where it meets the shell.
+export const detailA = { x: 24, y: 38, r: 28 };
+const labelAt = { x: detailA.x + detailA.r * 0.72, y: detailA.y + detailA.r * 0.72 };
+
+// Box around everything, in model millimetres.
+const vb = { x0: -118, x1: 72, y0: -21, y1: 131 };
+const viewBox = `${vb.x0} ${-vb.y1} ${vb.x1 - vb.x0} ${vb.y1 - vb.y0}`;
+const paperWidth = (vb.x1 - vb.x0) * v.scale;
+---
+
+<svg
+  class="dwg"
+  viewBox={viewBox}
+  style={`--paper-w: ${f(paperWidth)}`}
+  role="img"
+  aria-labelledby={`${id}-title`}
+>
+  <title id={`${id}-title`}>
+    Housing, front elevation in half section at 1:2.5: 124 millimetres tall and 124 across the
+    rim, with the dust port on the left and the motor mount wall inside. Circle A marks detail A.
+  </title>
+
+  <path class="chain" d={axis}></path>
+  <path class="chain" d={portAxis}></path>
+  <path class="hidden" d={portHidden}></path>
+
+  <path class="thick" d={exterior}></path>
+  <path class="thick" d={base}></path>
+  <path class="thick" d={portOutline}></path>
+  <path class="cut cut--solid" d={cut} fill-rule="evenodd"></path>
+
+  <g class="dims">
+    <path class="thin" d={height.lines + rim.lines}></path>
+    <path class="arrow" d={height.arrows + rim.arrows}></path>
+    <text
+      class="dim"
+      x={f(height.text.x)}
+      y={f(-height.text.y)}
+      transform={`rotate(-90 ${f(height.text.x)} ${f(-height.text.y)})`}
+      text-anchor="middle"
+      font-size={f(v.text)}
+    >
+      {height.text.value}
+    </text>
+    <text
+      class="dim halo"
+      x={f(-G.fan.hr / 2)}
+      y={f(-rim.text.y)}
+      text-anchor="middle"
+      font-size={f(v.text)}
+    >
+      {rim.text.value}
+    </text>
+  </g>
+
+  <!-- Detail A boundary and its letter -->
+  <circle class="thin" cx={f(detailA.x)} cy={f(-detailA.y)} r={f(detailA.r)}></circle>
+  <text
+    class="dim"
+    x={f(labelAt.x + v.p(1.2))}
+    y={f(-labelAt.y - v.p(1.2))}
+    font-size={f(v.text * 1.15)}
+  >
+    A
+  </text>
+</svg>

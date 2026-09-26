@@ -1,189 +1,153 @@
 ---
 /**
- * The deliverable: page 1 of the design document Trace writes, drawn at
- * reduced scale like a view on a sheet. Balloons with notes point at three
- * parts of it, and detail D repeats the change table's source column at
- * actual size.
+ * The deliverable: the design document Trace writes, set as an A4 sheet at
+ * about four-fifths scale, so its text still reads. Numbered notes on the
+ * right point at three parts of it with drafting leaders: a short shoulder
+ * from the balloon, then a straight run to a dot on the part. The same page
+ * is offered as a PDF.
  *
- * Note targets and the detail are given in page pixels (see DocPage). On
- * desktop the page spans six columns and the detail the last six, so both
- * compute the same page scale from their own width.
+ * The leaders are drawn by a small script from the notes and the page's
+ * data-target elements; without it the notes stand on their own.
  */
 import DocPage from './DocPage.astro';
 
 const notes = [
   {
+    target: 'revs',
     title: 'Revision history',
-    text: 'Each revision is listed with its date and what changed. Earlier revisions stay on record.',
-    x: 721,
-    y: 187,
+    text: 'Each revision is listed with its date and what changed. Earlier ones stay on record.',
   },
   {
+    target: 'sources',
     title: 'Sources',
     text: 'Every change cites the log entries it came from, so a reviewer can check it against the model.',
-    x: 718,
-    y: 533,
   },
   {
+    target: 'signoff',
     title: 'Sign-off',
     text: 'Reviewers check and approve the document in Trace. Review is part of the Team plan.',
-    x: 718,
-    y: 1008,
   },
 ];
-
-// Detail D, in page pixels: its center and radius.
-const detail = { x: 585, y: 562, r: 195 };
 ---
 
-<section id="how-it-works" class="section spread" aria-labelledby="spread-title">
-  <div class="container">
-    <div class="grid spread__head">
-      <h2 id="spread-title">Design intent gets lost between revisions. Trace writes it down.</h2>
-      <p class="spread__lead">
-        This is the design document Trace wrote for the housing after an afternoon of changes: the
-        overall design first, then every change since the last revision, each tied to its source.
+<section id="how-it-works" class="section spread" aria-labelledby="spread-title" data-row>
+  <div class="container grid spread__grid" data-leaders>
+    <div class="spread__text pad">
+      <h2 id="spread-title" class="title">
+        Every statement cites the change behind it.
+      </h2>
+      <p class="lead spread__lead">
+        Trace writes the overview and the changes since the last revision, links each one to the log
+        entries it came from, and leaves room for review and sign-off.
       </p>
     </div>
 
-    <figure class="grid docfig" style={`--dx: ${detail.x}; --dy: ${detail.y}; --dr: ${detail.r}`}>
-      <div class="docfig__sheet">
-        <article class="docfig__page scheme-paper" aria-label="Design document TR-0142, page 1">
+    <figure class="spread__sheet pad">
+      <div class="spread__page">
+        <article class="scheme-paper" aria-label="Design document TR-0142, sheet 1">
           <DocPage id="doc" />
         </article>
-
-        <svg class="docfig__region" aria-hidden="true" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="49.5"></circle>
-        </svg>
-        <span class="docfig__region-label mono" aria-hidden="true">
-          D
-        </span>
-
-        <ol class="docfig__notes">
-          {notes.map((note, i) => (
-            <li class="note" style={`--tx: ${note.x}; --ty: ${note.y}`}>
-              <span class="note__balloon mono" aria-hidden="true">
-                {i + 1}
-              </span>
-              <p>
-                <strong>{note.title}.</strong> {note.text}
-              </p>
-            </li>
-          ))}
-        </ol>
       </div>
-
-      <div class="docfig__detail" aria-hidden="true">
-        <div class="lens">
-          <div class="lens__page scheme-paper" inert>
-            <DocPage id="doc-detail" />
-          </div>
-        </div>
-        <p class="lens__label mono">
-          Detail D <span>Actual size</span>
-        </p>
-      </div>
-
-      <figcaption class="docfig__caption">
+      <figcaption class="spread__caption">
         <span class="mono">Fig. 2</span>
-        <span>Design document TR-0142, Rev B, page 1 of 3, as Trace wrote it.</span>
+        <span>Design document TR-0142, Rev B, as Trace wrote it. Shown at 80%.</span>
       </figcaption>
     </figure>
+
+    <div class="spread__notes pad">
+      <ol class="notes">
+        {notes.map((note, i) => (
+          <li class="note" data-note={note.target}>
+            <span class="note__balloon mono" aria-hidden="true">
+              {i + 1}
+            </span>
+            <p>
+              <strong>{note.title}.</strong> {note.text}
+            </p>
+          </li>
+        ))}
+      </ol>
+      <a class="spread__pdf" href="/samples/TR-0142-rev-b.pdf" download>
+        <span>Download this document</span>
+        <span class="mono">PDF · A4 · 1 sheet</span>
+      </a>
+    </div>
+
+    <svg class="leaders" aria-hidden="true" data-leaders-svg></svg>
   </div>
 </section>
 
 <style>
   .spread {
-    border-top: 1px solid var(--line-strong);
+    border-top: var(--rule) solid var(--text-strong);
   }
 
-  .spread__head {
-    row-gap: var(--sp-3);
-    align-items: end;
-  }
-
-  .spread__head h2,
-  .spread__lead {
-    grid-column: 1 / -1;
-  }
-
-  .spread__head h2 {
-    font-size: clamp(var(--s4), 1.2rem + 2.4vw, 3.25rem);
-    line-height: 1.05;
-  }
-
-  .spread__lead {
-    max-width: 46ch;
-    color: var(--text);
-  }
-
-  /* Figure */
-  .docfig {
-    row-gap: var(--sp-5);
-    margin-top: var(--sp-8);
-  }
-
-  .docfig__sheet,
-  .docfig__detail,
-  .docfig__caption {
-    grid-column: 1 / -1;
-  }
-
-  /* Both are size containers; one page pixel is 1/794 of their width. */
-  .docfig__sheet,
-  .docfig__detail {
-    --u: calc(100cqi / 794);
+  .spread__grid {
     position: relative;
+    row-gap: var(--sp-5);
+  }
+
+  .spread__text,
+  .spread__sheet,
+  .spread__notes {
+    grid-column: 1 / -1;
+  }
+
+  .spread__text {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-3);
+  }
+
+  .spread__lead {
+    max-width: 40ch;
+  }
+
+  /* The page is a size container; one page pixel is 1/794 of its width. */
+  .spread__sheet {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .spread__page {
+    --u: calc(100cqi / 794);
     container-type: inline-size;
   }
 
-  .docfig__page {
+  .spread__page article {
     display: block;
     width: 100%;
     aspect-ratio: 794 / 1123;
     overflow: hidden;
-    outline: 1px solid var(--text-strong);
+    outline: var(--rule) solid var(--text-strong);
   }
 
-  /* Detail D's boundary on the page: a thin chain circle. */
-  .docfig__region {
-    position: absolute;
-    left: calc((var(--dx) - var(--dr)) * var(--u));
-    top: calc((var(--dy) - var(--dr)) * var(--u));
-    width: calc(var(--dr) * 2 * var(--u));
-    height: calc(var(--dr) * 2 * var(--u));
-    overflow: visible;
-    pointer-events: none;
-  }
-
-  /* Drawn on the page, which is paper in both themes, so always in cobalt. */
-  .docfig__region circle {
-    fill: none;
-    stroke: var(--cobalt);
-    stroke-width: 1.25;
-    stroke-dasharray: 16 3 3 3;
-    vector-effect: non-scaling-stroke;
-  }
-
-  /* The letter breaks the circle line on its right, in the page margin. */
-  .docfig__region-label {
-    position: absolute;
-    left: calc((var(--dx) + var(--dr)) * var(--u));
-    top: calc(var(--dy) * var(--u));
-    padding: 0.125rem 0.25rem;
-    background: var(--paper);
+  .spread__caption {
+    display: flex;
+    gap: 0.75rem;
     font-size: var(--s-1);
-    font-weight: 600;
-    line-height: 1;
-    color: var(--cobalt);
-    transform: translate(-50%, -50%);
+    color: var(--text-muted);
   }
 
-  /* Notes, each opened by a balloon */
-  .docfig__notes {
+  .spread__caption .mono {
+    flex: none;
+    font-size: var(--s-2);
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--text-strong);
+  }
+
+  .spread__notes {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-5);
+  }
+
+  .notes {
     display: grid;
     gap: var(--sp-3);
-    margin: var(--sp-5) 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
@@ -191,13 +155,13 @@ const detail = { x: 585, y: 562, r: 195 };
   .note {
     display: grid;
     grid-template-columns: 1.75rem minmax(0, 1fr);
-    gap: 0.875rem;
+    gap: 1rem;
     align-items: start;
   }
 
   .note p {
-    max-width: 36ch;
-    font-size: var(--s-1);
+    max-width: 38ch;
+    font-size: var(--s0);
     line-height: 1.5;
     color: var(--text-muted);
   }
@@ -220,134 +184,173 @@ const detail = { x: 585, y: 562, r: 195 };
     color: var(--text-strong);
   }
 
-  /* Detail view: the same page at actual size, seen through a circle. */
-  .docfig__detail {
-    display: grid;
-    justify-items: center;
-    align-content: start;
-    gap: var(--sp-2);
-  }
-
-  .lens {
-    --r: min(calc(var(--dr) * 1px), 50cqi);
-    position: relative;
-    width: calc(var(--r) * 2);
-    height: calc(var(--r) * 2);
-    overflow: hidden;
-    border: 1.5px solid var(--select);
-    border-radius: 50%;
-    background: var(--paper);
-  }
-
-  .lens__page {
-    --u: 1px;
-    position: absolute;
-    left: calc(var(--r) - var(--dx) * 1px);
-    top: calc(var(--r) - var(--dy) * 1px);
-  }
-
-  .lens__label {
-    display: flex;
-    gap: 0.75rem;
-    font-size: var(--s-2);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .spread__pdf {
+    display: inline-grid;
+    justify-self: start;
+    gap: 0.125rem;
+    padding: 0.75rem 1.25rem 0.75rem 1rem;
+    border: var(--rule) solid var(--text-strong);
+    border-radius: var(--radius);
     color: var(--text-strong);
+    font-weight: 600;
+    text-decoration: none;
   }
 
-  .lens__label span {
+  .spread__pdf .mono {
+    font-size: var(--s-2);
     font-weight: 500;
     color: var(--text-muted);
   }
 
-  .docfig__caption {
-    display: flex;
-    gap: 0.75rem;
-    font-size: var(--s-1);
-    color: var(--text-muted);
+  .spread__pdf:hover {
+    background: var(--tint);
   }
 
-  .docfig__caption .mono {
-    flex: none;
-    font-size: var(--s-2);
-    font-weight: 600;
-    line-height: 1.75;
-    color: var(--text-strong);
+  .leaders {
+    display: none;
   }
 
+  /*
+   * Desktop: the page holds zones 1 to 4. The heading and the notes take
+   * zones 5 to 8, each note lower down the column than the one before, with
+   * its leader running left to the part it describes.
+   */
   @media (min-width: 64rem) {
-    .spread__head h2 {
-      grid-column: 1 / span 10;
+    .spread__grid {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
     }
 
-    .spread__lead {
-      grid-column: 11 / -1;
-      padding-bottom: 0.3rem;
+    .spread__sheet {
+      grid-column: 1 / span 4;
+      grid-row: 1 / span 2;
     }
 
-    .docfig__sheet {
-      grid-column: 1 / span 6;
+    .spread__text {
+      grid-column: 5 / -1;
+      grid-row: 1;
     }
 
-    .docfig__detail {
-      grid-column: 11 / -1;
+    .spread__notes {
+      grid-column: 5 / span 3;
+      grid-row: 2;
+      position: relative;
     }
 
-    /* The detail sits level with its boundary on the page. */
-    .lens {
-      margin-top: calc(var(--dy) * var(--u) - var(--r));
+    /* Placed by the script, each level with its target where there is room. */
+    .spread__notes.is-placed .notes {
+      display: block;
     }
 
-    /*
-     * Notes hang in the four columns right of the page, each level with the
-     * point it describes. The column is four units and three gutters, taken
-     * from the six-column sheet: unit = (100cqi - 5 gutters + edge) / 6.
-     */
-    .docfig__notes {
+    .spread__notes.is-placed .note {
       position: absolute;
-      top: 0;
-      bottom: 0;
-      left: calc(100% + var(--gutter));
-      width: calc((100cqi - 5 * var(--gutter) + var(--edge)) * 4 / 6 + 3 * var(--gutter));
-      margin: 0;
+      left: var(--pad);
+      right: var(--pad);
     }
 
-    .note {
+    .spread__notes.is-placed .spread__pdf {
       position: absolute;
-      top: calc(var(--ty) * var(--u) - 0.875rem);
-      left: 0;
-      right: 0;
+      left: var(--pad);
     }
 
-    /* Leader from the balloon to a dot on the page */
-    .note::before,
-    .note::after {
-      content: '';
+    .leaders {
       position: absolute;
-      top: 0.875rem;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      overflow: visible;
       pointer-events: none;
     }
 
-    /* Over the sheet the leader takes the theme's ink; over the page, always ink. */
-    .note::before {
-      right: 100%;
-      width: calc(100cqi + var(--gutter) - var(--tx) * var(--u));
-      height: 1px;
-      background: linear-gradient(
-        to left,
-        var(--text-strong) var(--gutter),
-        var(--ink) var(--gutter)
-      );
+    .leaders :global(path) {
+      fill: none;
+      stroke: var(--text-strong);
+      stroke-width: 1;
     }
 
-    .note::after {
-      left: calc(var(--tx) * var(--u) - 100cqi - var(--gutter) - 3px);
-      width: 7px;
-      height: 7px;
-      margin-top: -3px;
-      border-radius: 50%;
-      background: var(--ink);
+    .leaders :global(.leader--page) {
+      stroke: var(--ink);
+    }
+
+    .leaders :global(circle) {
+      fill: var(--ink);
     }
   }
 </style>
+
+<script>
+  // Leaders: from each note's balloon, a short shoulder to the left, then a
+  // straight run to a dot on the part of the page it describes.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-leaders]')) {
+    const svg = root.querySelector<SVGSVGElement>('[data-leaders-svg]');
+    const page = root.querySelector<HTMLElement>('.spread__page');
+    if (!svg || !page) continue;
+
+    const column = root.querySelector<HTMLElement>('.spread__notes');
+    const pdf = root.querySelector<HTMLElement>('.spread__pdf');
+
+    // Each note goes level with its target, but never above the notes'
+    // column or closer than a gap to the note before it.
+    const place = () => {
+      if (!column) return;
+      if (getComputedStyle(svg).display === 'none') {
+        column.classList.remove('is-placed');
+        for (const note of column.querySelectorAll<HTMLElement>('[data-note]')) note.style.top = '';
+        if (pdf) pdf.style.top = '';
+        return;
+      }
+      column.classList.add('is-placed');
+      const top = column.getBoundingClientRect().top;
+      let floor = 32;
+      for (const note of column.querySelectorAll<HTMLElement>('[data-note]')) {
+        const target = page.querySelector<HTMLElement>(`[data-target="${note.dataset.note}"]`);
+        const balloon = note.querySelector<HTMLElement>('.note__balloon');
+        if (!target || !balloon) continue;
+        const t = target.getBoundingClientRect();
+        const want = t.top - top + Math.min(t.height / 2, 14) - balloon.offsetHeight / 2;
+        const y = Math.max(want, floor);
+        note.style.top = `${y}px`;
+        floor = y + note.offsetHeight + 24;
+      }
+      if (pdf) {
+        const pageBottom = page.getBoundingClientRect().bottom - top;
+        pdf.style.top = `${Math.max(floor + 16, pageBottom - pdf.offsetHeight)}px`;
+      }
+    };
+
+    const draw = () => {
+      place();
+      if (getComputedStyle(svg).display === 'none') return;
+      const box = root.getBoundingClientRect();
+      const pageBox = page.getBoundingClientRect();
+      const f = (n: number) => n.toFixed(1);
+      let out = '';
+      for (const note of root.querySelectorAll<HTMLElement>('[data-note]')) {
+        const target = page.querySelector<HTMLElement>(`[data-target="${note.dataset.note}"]`);
+        const balloon = note.querySelector<HTMLElement>('.note__balloon');
+        if (!target || !balloon) continue;
+        const b = balloon.getBoundingClientRect();
+        const t = target.getBoundingClientRect();
+        const start = { x: b.left - box.left, y: b.top - box.top + b.height / 2 };
+        const shoulder = start.x - 20;
+        const end = { x: t.right - box.left - 10, y: t.top - box.top + Math.min(t.height / 2, 14) };
+        const edge = pageBox.right - box.left;
+        // The run crosses the page's edge; beyond it the line takes the page's ink.
+        const k = (edge - shoulder) / (end.x - shoulder);
+        const cross = { x: edge, y: start.y + (end.y - start.y) * k };
+        out +=
+          `<path d="M${f(start.x)} ${f(start.y)} H${f(shoulder)} L${f(cross.x)} ${f(cross.y)}"></path>` +
+          `<path class="leader--page" d="M${f(cross.x)} ${f(cross.y)} L${f(end.x)} ${f(end.y)}"></path>` +
+          `<circle cx="${f(end.x)}" cy="${f(end.y)}" r="3"></circle>`;
+      }
+      svg.setAttribute('viewBox', `0 0 ${f(box.width)} ${f(box.height)}`);
+      svg.innerHTML = out;
+    };
+
+    draw();
+    new ResizeObserver(draw).observe(root);
+    document.fonts?.ready.then(draw);
+  }
+</script>

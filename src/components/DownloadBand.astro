@@ -1,52 +1,42 @@
 ---
 /**
- * Closing band on the home and pricing pages: a blueprint sheet with the
- * download on the left and, on the right, a line drawing of Trace docked
- * next to the model it is logging.
+ * Closing band on the home and pricing pages, printed on blueprint paper
+ * (see .cyanotype). The download sits on the left; on the right, Trace
+ * docked in a CAD window with the document it has written.
  */
+import CadWindow from './CadWindow.astro';
 import DownloadButtons from './DownloadButtons.astro';
-import AppSketch from './drawings/AppSketch.astro';
 ---
 
-<section id="download" class="band scheme-blueprint" aria-labelledby="download-title">
+<section id="download" class="band scheme-blueprint" aria-labelledby="download-title" data-row>
+  <div class="cyanotype" aria-hidden="true"></div>
   <div class="container grid band__grid">
-    <div class="band__copy">
-      <h2 id="download-title">Put Trace next to Autodesk Fusion.</h2>
+    <div class="band__copy pad">
+      <h2 id="download-title" class="title">
+        Put Trace next to Autodesk Fusion.
+      </h2>
       <p class="band__text">
-        Install the desktop app, sign in and open a project. Trace logs from the first change, and
-        writes the document when you ask for it.
+        Install the desktop app, sign in and pick the projects to log. Trace records from the first
+        change and writes the document when you ask for it.
       </p>
       <DownloadButtons class="band__buttons" />
       <p class="band__small">
         Free for one project. Needs a Trace account: <a href="/signup">create one</a> or{' '}
-        <a href="/login">log in</a>.
+        <a href="/login">log in</a>. Only the projects you choose are logged.
       </p>
     </div>
 
-    <figure class="band__drawing">
-      <AppSketch />
-    </figure>
+    <div class="band__shot pad">
+      <CadWindow />
+    </div>
   </div>
 </section>
 
 <style>
-  /*
-   * Blueprint ground with a fine square grid: 16px squares, every fifth line
-   * heavier, both faint enough to stay behind the drawing.
-   */
   .band {
+    position: relative;
+    isolation: isolate;
     padding-block: var(--section-pad);
-    background-image:
-      linear-gradient(rgb(233 235 243 / 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(233 235 243 / 0.1) 1px, transparent 1px),
-      linear-gradient(rgb(233 235 243 / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(233 235 243 / 0.05) 1px, transparent 1px);
-    background-size:
-      80px 80px,
-      80px 80px,
-      16px 16px,
-      16px 16px;
-    background-position: center -1px;
   }
 
   .band__grid {
@@ -55,7 +45,7 @@ import AppSketch from './drawings/AppSketch.astro';
   }
 
   .band__copy,
-  .band__drawing {
+  .band__shot {
     grid-column: 1 / -1;
   }
 
@@ -65,14 +55,10 @@ import AppSketch from './drawings/AppSketch.astro';
     gap: var(--sp-3);
   }
 
-  .band__copy h2 {
-    font-size: clamp(var(--s4), 1.2rem + 2.4vw, 3.25rem);
-  }
-
   .band__text {
     max-width: 40ch;
     font-size: var(--s1);
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   /* Solid paper buttons on the blueprint. */
@@ -80,26 +66,22 @@ import AppSketch from './drawings/AppSketch.astro';
     --accent: var(--paper);
     --accent-hover: var(--film);
     --on-accent: var(--ink);
-    max-width: 26rem;
     margin-top: var(--sp-1);
   }
 
   .band__small {
+    max-width: 44ch;
     font-size: var(--s-1);
     color: var(--text-muted);
   }
 
-  .band__drawing {
-    margin: 0;
-  }
-
   @media (min-width: 64rem) {
     .band__copy {
-      grid-column: 1 / span 6;
+      grid-column: 1 / span 3;
     }
 
-    .band__drawing {
-      grid-column: 8 / -1;
+    .band__shot {
+      grid-column: 4 / -1;
     }
   }
 </style>

@@ -54,20 +54,3 @@ export function cloudAround(
   run(side, x, y + height, 0, -1);
   return d;
 }
-
-/**
- * Cloud that fits inside a width × height box: the arcs' outer edges touch
- * the box, as when a cloud is sized to the element it surrounds.
- */
-export function cloudPath(width: number, height: number, scallop: number): string {
-  const r = scallop * RADIUS;
-  const bulge = r - Math.sqrt(Math.max(r * r - (scallop / 2) ** 2, 0));
-  const inset = bulge + 1;
-  return cloudAround(
-    inset,
-    inset,
-    Math.max(width - inset * 2, 1),
-    Math.max(height - inset * 2, 1),
-    scallop,
-  );
-}

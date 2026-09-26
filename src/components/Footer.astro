@@ -1,10 +1,11 @@
 ---
 /**
- * Footer laid out as a drawing's title block, and every cell does a job: the
- * title and sheet number say where you are, the sheet row moves between the
+ * Footer laid out as the sheet's title block. Every cell holds something
+ * true: the page's title and sheet number, when the site was last built,
+ * who drew it, the site's drawing number; the sheet row moves between the
  * site's three sheets, and the view cell switches Paper and Blueprint. On
  * desktop the block sits in the bottom-right corner of the sheet border and
- * shares its lines, as on a real sheet.
+ * shares its lines, and the left column keeps to the block's rows.
  */
 import Brand from './Brand.astro';
 import ThemeToggle from './ThemeToggle.astro';
@@ -16,31 +17,37 @@ interface Props {
 
 const { sheet } = Astro.props;
 const current = sheet ? sheets[sheet] : null;
-const year = new Date().getFullYear();
+const built = new Date();
+const year = built.getFullYear();
+const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
+const updated = `${built.getDate()} ${months[built.getMonth()]} ${year}`;
 const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets[key] }));
 ---
 
-<footer class="footer">
-  <div class="container grid footer__grid">
-    <div class="footer__about">
+<footer class="footer" data-row>
+  <div class="container footer__grid">
+    <div class="footer__brand">
       <Brand />
-      <p>{site.description}</p>
-      <nav class="footer__links" aria-label="Footer">
-        <ul>
-          {nav.map((item) => (
-            <li>
-              <a href={item.href}>{item.label}</a>
-            </li>
-          ))}
-          <li>
-            <a href="/login">Log in</a>
-          </li>
-          <li>
-            <a href="/signup">Sign up</a>
-          </li>
-        </ul>
-      </nav>
     </div>
+    <p class="footer__about">{site.description}</p>
+    <nav class="footer__links" aria-label="Footer">
+      <ul>
+        {nav.map((item) => (
+          <li>
+            <a href={item.href}>{item.label}</a>
+          </li>
+        ))}
+        <li>
+          <a href="/login">Log in</a>
+        </li>
+        <li>
+          <a href="/signup">Sign up</a>
+        </li>
+      </ul>
+    </nav>
+    <p class="footer__legal">
+      Autodesk Fusion is a trademark of Autodesk, Inc. Trace is not affiliated with Autodesk.
+    </p>
 
     <div class="titleblock">
       <div class="cell cell--title">
@@ -52,6 +59,19 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
         <p class="cell__value num">
           {current ? `${current.number} of ${sheetCount}` : `– of ${sheetCount}`}
         </p>
+      </div>
+
+      <div class="cell">
+        <p class="label">Updated</p>
+        <p class="cell__value num">{updated}</p>
+      </div>
+      <div class="cell">
+        <p class="label">Drawn</p>
+        <p class="cell__value">Trace</p>
+      </div>
+      <div class="cell">
+        <p class="label">Dwg no.</p>
+        <p class="cell__value num">TR-WEB-01</p>
       </div>
 
       <nav class="cell cell--sheets" aria-label="Sheets">
@@ -85,26 +105,16 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     padding-top: var(--section-pad);
     padding-bottom: var(--sp-5);
     background: var(--bg);
-    border-top: 1px solid var(--line-strong);
+    border-top: var(--rule) solid var(--text-strong);
   }
 
   .footer__grid {
-    row-gap: var(--sp-5);
-    align-items: end;
-  }
-
-  .footer__about,
-  .titleblock {
-    grid-column: 1 / -1;
-  }
-
-  .footer__about {
     display: grid;
     gap: var(--sp-2);
     justify-items: start;
   }
 
-  .footer__about > p {
+  .footer__about {
     max-width: 38ch;
     color: var(--text-muted);
   }
@@ -113,13 +123,12 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-1) var(--sp-3);
-    margin-top: var(--sp-1);
     padding: 0;
     list-style: none;
   }
 
   .footer__links a {
-    font-size: var(--s-1);
+    font-weight: 500;
     color: var(--text);
     text-decoration: none;
   }
@@ -129,21 +138,29 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     text-decoration: underline;
   }
 
-  /* Title block: the 1px gaps over a line-colored ground draw the cell rules. */
+  .footer__legal {
+    max-width: 52ch;
+    font-size: var(--s-2);
+    color: var(--text-faint);
+  }
+
+  /* Title block: the 1px gaps over a line-coloured ground draw the cell rules. */
   .titleblock {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
+    justify-self: stretch;
+    margin-top: var(--sp-3);
     background: var(--line);
-    border: 2px solid var(--text-strong);
+    border: var(--rule-heavy) solid var(--text-strong);
   }
 
   .cell {
     display: grid;
     align-content: start;
-    gap: 0.375rem;
+    gap: 0.25rem;
     min-width: 0;
-    padding: 0.75rem var(--sp-2) 0.875rem;
+    padding: 0.625rem var(--sp-2) 0.75rem;
     background: var(--bg);
   }
 
@@ -152,16 +169,16 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
   }
 
   .cell__title {
+    font-family: var(--font-display);
     font-size: var(--s3);
     font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.1;
     color: var(--text-strong);
   }
 
   .cell__value {
     font-family: var(--font-mono);
-    font-size: var(--s0);
+    font-size: var(--s-1);
     font-weight: 500;
     color: var(--text-strong);
   }
@@ -191,7 +208,7 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
     padding: 0.5rem var(--sp-2);
     background: var(--bg);
     font-size: var(--s-1);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-strong);
     text-decoration: none;
   }
@@ -199,6 +216,7 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
   .cell--sheets a .num {
     font-family: var(--font-mono);
     font-size: var(--s-2);
+    font-weight: 500;
     color: var(--text-muted);
   }
 
@@ -229,24 +247,61 @@ const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets
   }
 
   /*
-   * Desktop: the block reaches the sheet border on the right and at the bottom
-   * and uses the border as its own right and bottom lines.
+   * Desktop: two halves on one set of rows. The title block holds zones 5 to
+   * 8 and reaches the border on the right and at the bottom, using it as its
+   * own lines; the left column's items sit on the block's rows.
    */
   @media (min-width: 64rem) {
     .footer {
       padding-bottom: 0;
     }
 
+    .footer__grid {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      grid-template-rows: repeat(4, auto);
+      gap: 0;
+      align-items: center;
+    }
+
+    .footer__brand,
+    .footer__about,
+    .footer__links,
+    .footer__legal {
+      grid-column: 1 / span 4;
+      padding-inline: var(--pad);
+    }
+
+    .footer__brand {
+      grid-row: 1;
+    }
+
     .footer__about {
-      grid-column: 1 / span 6;
-      padding-bottom: var(--sp-5);
+      grid-row: 2;
+    }
+
+    .footer__links {
+      grid-row: 3;
+    }
+
+    .footer__legal {
+      grid-row: 4;
     }
 
     .titleblock {
-      grid-column: 9 / -1;
-      margin-right: calc((var(--gutter) / 2 + var(--edge)) * -1);
+      grid-column: 5 / -1;
+      grid-row: 1 / span 4;
+      grid-template-rows: subgrid;
+      margin-top: 0;
       border-right: 0;
       border-bottom: 0;
+    }
+
+    .cell--title {
+      grid-row: 1;
+    }
+
+    .cell--sheets {
+      grid-row: 3;
     }
   }
 </style>

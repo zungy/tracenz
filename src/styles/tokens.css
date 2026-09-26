@@ -4,10 +4,10 @@
  * The five palette colors carry the brand: ink for text, lines and actions,
  * cobalt, vellum, film and paper for the rest. The sheet itself is a light
  * film tint, so paper-white panels and pages sit on it. One extra color,
- * redline, is reserved for the change being traced: its revision cloud,
- * delta tag, new value and trace line, the way red markup works on a
- * drawing. It is never used for text or buttons. Light theme is "Paper",
- * dark theme is "Blueprint".
+ * redline, marks what changed in the current revision: revision clouds,
+ * delta tags and the trace line, the way red markup works on a drawing. It
+ * is never used for text or buttons. Light theme is "Paper", dark theme is
+ * "Blueprint".
  */
 
 :root {
@@ -28,7 +28,7 @@
   --text: var(--ink);
   --text-strong: var(--ink);
   --text-muted: rgb(25 44 100 / 0.8);
-  --text-faint: rgb(25 44 100 / 0.66);
+  --text-faint: rgb(25 44 100 / 0.7);
   --line: var(--vellum);
   --line-soft: var(--film);
   --line-strong: rgb(25 44 100 / 0.55);
@@ -44,26 +44,36 @@
   --tint: rgb(36 63 143 / 0.06);
   --band-bg: var(--ink);
   --band-surface: rgb(36 63 143 / 0.55);
+  /* The sheet frame's own ink; scoped schemes don't change it. */
+  --frame-ink: var(--ink);
 
-  /* Type: one family, IBM Plex, in sans for words and mono for values */
-  --font-body:
-    'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto,
-    sans-serif;
-  --font-display: var(--font-body);
+  /*
+   * Type. Headings are set in Barlow Semi Condensed and text in Barlow, both
+   * after DIN 1451, the German standard lettering for engineering drawings.
+   * IBM Plex Mono, with its dotted zero, is kept for values and annotations:
+   * dimensions, log entries, part numbers and figure labels.
+   */
+  --font-display:
+    'Barlow Semi Condensed', 'Barlow', 'DIN Alternate', 'Bahnschrift', 'Arial Narrow', sans-serif;
+  --font-body: 'Barlow', 'DIN Alternate', 'Bahnschrift', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --display-weight: 500;
 
-  /* Type scale: ratio 2^(1/4), so every second step is x sqrt2 and every fourth doubles */
+  /*
+   * Sizes, each with a line height on the 8px baseline: display 88/88,
+   * title 44/48, lead 20/32, text 16/24, small 13/20, mono 12/16. The
+   * --s steps are kept for components and map onto the same values.
+   */
   --s-2: 0.75rem;
-  --s-1: 0.875rem;
+  --s-1: 0.8125rem;
   --s0: 1rem;
-  --s1: 1.189rem;
-  --s2: 1.414rem;
-  --s3: 1.682rem;
+  --s1: 1.25rem;
+  --s2: 1.5rem;
+  --s3: 1.75rem;
   --s4: 2rem;
-  --s6: 2.828rem;
+  --s6: 2.75rem;
   --s8: 4rem;
-  --s10: 5.657rem;
+  --s10: 5.5rem;
 
   /* Spacing: an 8px unit times 1, 2, 3, 5, 8, 13 */
   --sp-half: 0.25rem;
@@ -75,15 +85,22 @@
   --sp-13: 6.5rem;
 
   /*
+   * Line weights: the sheet border, containers (tables, panels, section
+   * rules) and hairlines (cells, dividers).
+   */
+  --rule-heavy: 2px;
+  --rule: 1px;
+
+  /*
    * Layout. On desktop the page is a drawing sheet: --frame is the border
-   * margin, --mat-x the side margin (wider on very wide screens, where the
-   * sheet stops at 100rem) and --edge the extra clearance inside the border.
-   * The 16 columns line up with the frame's 8 zones, a gutter centered on
-   * every zone line (see .grid in global.css).
+   * margin and --mat-x the side margin (wider on very wide screens, where
+   * the sheet stops at 100rem). Inside the border the layout grid is the
+   * frame's eight zones, edge to edge with no gutter; content keeps --pad
+   * from the zone lines, and rules and panel edges sit on them.
    */
   --frame: 0px;
   --mat-x: 0px;
-  --edge: 0px;
+  --pad: 0px;
   --container: 80rem;
   --gutter: 1rem;
   --page-pad: clamp(1rem, 4vw, 2.5rem);
@@ -104,12 +121,12 @@
 
 @media (min-width: 64rem) {
   :root {
-    --cols: 16;
+    --cols: 8;
     --frame: 1.5rem;
     --mat-x: max(var(--frame), calc((100% - 100rem) / 2));
-    --edge: 1.5rem;
-    --gutter: 2.5rem;
-    --section-pad: 6.5rem;
+    --pad: 2rem;
+    --gutter: 0px;
+    --section-pad: 6rem;
   }
 }
 
@@ -140,6 +157,7 @@
     --tint: rgb(233 235 243 / 0.08);
     --band-bg: var(--cobalt);
     --band-surface: rgb(25 44 100 / 0.45);
+    --frame-ink: var(--paper);
   }
 }
 
@@ -169,6 +187,7 @@
   --tint: rgb(233 235 243 / 0.08);
   --band-bg: var(--cobalt);
   --band-surface: rgb(25 44 100 / 0.45);
+  --frame-ink: var(--paper);
 }
 
 /*
@@ -211,7 +230,7 @@
   --text: var(--ink);
   --text-strong: var(--ink);
   --text-muted: rgb(25 44 100 / 0.8);
-  --text-faint: rgb(25 44 100 / 0.66);
+  --text-faint: rgb(25 44 100 / 0.7);
   --line: var(--vellum);
   --line-soft: var(--film);
   --line-strong: rgb(25 44 100 / 0.55);

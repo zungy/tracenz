@@ -14,7 +14,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: calc(5rem + var(--frame));
+  scroll-padding-top: 5rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -25,13 +25,14 @@ html {
 
 /* The page sits inside the drawing-sheet border on desktop (see SheetFrame). */
 body {
+  position: relative;
   min-height: 100vh;
   padding-block: var(--frame);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--s0);
-  line-height: 1.6;
+  line-height: 1.5;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -63,17 +64,23 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  line-height: 1.06;
-  letter-spacing: -0.028em;
+  line-height: 1.0909;
+  letter-spacing: -0.015em;
   color: var(--text-strong);
   text-wrap: balance;
 }
 
 h3,
 h4 {
+  font-family: var(--font-body);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* Section titles share one size: 44/48 on desktop. */
+.title {
+  font-size: clamp(var(--s4), 1.4rem + 1.6vw, var(--s6));
 }
 
 p,
@@ -127,41 +134,81 @@ samp,
   padding-inline: var(--page-pad);
 }
 
-/*
- * On desktop the container spans the sheet inside the frame, inset by half a
- * gutter plus --edge, so content keeps clear of the border line.
- */
-@media (min-width: 64rem) {
-  .container {
-    max-width: none;
-    padding-inline: calc(var(--mat-x) + var(--gutter) / 2 + var(--edge));
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   column-gap: var(--gutter);
 }
 
-/*
- * Desktop: 16 columns in the frame's 8 zones, the gutter between each pair
- * centered on a zone line. --unit is the column width the grid would have if
- * it reached half a gutter from the border; the two outer columns give up
- * --edge, which keeps every zone line in place.
- */
-@media (min-width: 64rem) {
-  .grid {
-    --unit: calc((100% + 2 * var(--edge) + var(--gutter)) / 16 - var(--gutter));
-    grid-template-columns:
-      calc(var(--unit) - var(--edge))
-      repeat(14, var(--unit))
-      calc(var(--unit) - var(--edge));
-  }
-}
-
 .section {
   padding-block: var(--section-pad);
+}
+
+/*
+ * Desktop: the page is a drawing sheet. Header, sections and footer sit
+ * inside the border lines, and the layout grid is the frame's eight zones,
+ * edge to edge. Text keeps --pad from the zone lines (.pad); rules and panel
+ * edges sit on them.
+ *
+ * Each block with data-row is one of the sheet's rows: a counter letters
+ * them A, B, C... down the page, and each writes its letter in the frame's
+ * margin on both sides, with a division line at its top edge.
+ */
+@media (min-width: 64rem) {
+  body > .header,
+  main > section,
+  body > .footer {
+    margin-inline: calc(var(--mat-x) + var(--rule-heavy));
+  }
+
+  .container {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .pad {
+    padding-inline: var(--pad);
+  }
+
+  body {
+    counter-reset: row;
+  }
+
+  [data-row] {
+    position: relative;
+    counter-increment: row;
+  }
+
+  [data-row]::before,
+  [data-row]::after {
+    content: counter(row, upper-alpha);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    width: calc(var(--frame) - 5px);
+    border-top: var(--rule) solid var(--frame-ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--frame-ink);
+    pointer-events: none;
+  }
+
+  [data-row]::before {
+    right: calc(100% + var(--rule-heavy));
+  }
+
+  [data-row]::after {
+    left: calc(100% + var(--rule-heavy));
+  }
+
+  main > [data-row]:first-child::before,
+  main > [data-row]:first-child::after {
+    border-top: 0;
+  }
 }
 
 .prose {
@@ -169,23 +216,23 @@ samp,
 }
 
 /*
- * Sheet callout: the small caps line that opens a section, the way a drawing
- * labels a view or a table. Use it only for information (a view, a table, a count).
+ * Annotation: figure, view and table labels, in mono caps, the way a drawing
+ * labels its views. Only for real labels, never as a heading ornament.
  */
 .label {
   font-family: var(--font-mono);
   font-size: var(--s-2);
   font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.06em;
+  line-height: 1.3333;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .lead {
-  font-size: clamp(var(--s0), 0.95rem + 0.3vw, 1.1875rem);
-  font-weight: 450;
-  line-height: 1.55;
+  font-size: var(--s1);
+  font-weight: 400;
+  line-height: 1.6;
   color: var(--text);
 }
 
@@ -367,6 +414,22 @@ samp,
 }
 
 /*
+ * Blueprint paper: a photographed cyanotype sheet laid in soft light over a
+ * blueprint ground, so only its fibre and the unevenness of the coating
+ * come through. The parent sets position and isolation.
+ */
+.cyanotype {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('/textures/cyanotype.webp') center / cover;
+  filter: grayscale(1) brightness(1.75) contrast(2.4);
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/*
  * CAD-style selection handles: eight squares on the corners and edge
  * midpoints, the way a CAD tool marks the selected object. `.handles` is
  * always selected; `.handles-hover` shows the handles on hover or focus.
@@ -409,4 +472,100 @@ samp,
 
 .handles-hover:not(:hover, :focus-within)::after {
   opacity: 0;
+}
+
+/*
+ * Technical drawings (src/components/drawings), after ISO 128: thick lines
+ * for visible outlines, thin lines for dimensions, leaders and hatching,
+ * chain lines for centre lines, dashed lines for hidden edges. Weights are
+ * screen pixels; a page that draws at reduced scale sets --dwg-scale.
+ */
+.dwg {
+  --dwg-ink: var(--text-strong);
+  --dwg-scale: 1;
+  --w-thick: calc(1.9px * var(--dwg-scale));
+  --w-thin: calc(0.95px * var(--dwg-scale));
+  display: block;
+  width: calc(var(--paper-w) * 3.7795px * var(--dwg-scale));
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.dwg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.dwg .thick {
+  fill: none;
+  stroke: var(--dwg-ink);
+  stroke-width: var(--w-thick);
+  stroke-linejoin: round;
+}
+
+.dwg .thin {
+  fill: none;
+  stroke: var(--dwg-ink);
+  stroke-width: var(--w-thin);
+}
+
+.dwg .chain {
+  fill: none;
+  stroke: var(--dwg-ink);
+  stroke-width: var(--w-thin);
+  stroke-dasharray: calc(12px * var(--dwg-scale)) calc(2.5px * var(--dwg-scale))
+    calc(2px * var(--dwg-scale)) calc(2.5px * var(--dwg-scale));
+}
+
+.dwg .hidden {
+  fill: none;
+  stroke: var(--dwg-ink);
+  stroke-width: var(--w-thin);
+  stroke-dasharray: calc(4px * var(--dwg-scale)) calc(2px * var(--dwg-scale));
+}
+
+.dwg .cut {
+  stroke: var(--dwg-ink);
+  stroke-width: var(--w-thick);
+  stroke-linejoin: round;
+}
+
+.dwg .cut--solid {
+  fill: var(--dwg-ink);
+}
+
+.dwg .arrow {
+  fill: var(--dwg-ink);
+}
+
+.dwg text {
+  font-family: var(--font-body);
+  font-weight: 500;
+  fill: var(--dwg-ink);
+}
+
+/* Lettering over a line breaks it, as a drafter would leave a gap. */
+.dwg .halo {
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: calc(4px * var(--dwg-scale));
+  stroke-linejoin: round;
+}
+
+.dwg .rev-cloud {
+  fill: none;
+  stroke: var(--change);
+  stroke-width: calc(1.25px * var(--dwg-scale));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dwg .rev-tri {
+  fill: var(--change);
+}
+
+.dwg .rev-letter {
+  fill: var(--on-change);
+  font-family: var(--font-mono);
+  font-weight: 600;
 }

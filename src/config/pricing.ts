@@ -36,7 +36,7 @@ export const plans: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    summary: 'For engineers documenting their own designs.',
+    summary: 'For engineers documenting their designs.',
     monthly: 24,
     yearly: 20,
     unit: 'per month',
@@ -66,6 +66,14 @@ export const plans: Plan[] = [
       'Priority support',
     ],
   },
+];
+
+/** What every plan includes, listed once beside the plans. */
+export const everyPlan = [
+  'Logging in Autodesk Fusion from the first change',
+  'Each statement linked to its log entries',
+  'Search and filters across the log',
+  'Apps for Windows and macOS',
 ];
 
 /** true = included, false = not included, string = included with this detail. */

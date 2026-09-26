@@ -3,18 +3,19 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base title="Page not found · Trace" sheet={null}>
-  <section class="missing" aria-labelledby="missing-title">
-    <div class="container grid missing__grid">
-      <p class="label">Error 404</p>
-      <h1 id="missing-title">This sheet isn't in the set.</h1>
-      <p class="lead">The page you're looking for doesn't exist or has moved.</p>
-      <div class="missing__actions">
-        <a class="btn btn--primary" href="/">
-          Go to the home page
-        </a>
-        <a class="btn btn--secondary" href="/pricing">
-          See pricing
-        </a>
+  <section class="missing" aria-labelledby="missing-title" data-row>
+    <div class="container grid">
+      <div class="missing__text pad">
+        <h1 id="missing-title">This sheet isn't in the set.</h1>
+        <p class="lead">Error 404: the page you're looking for doesn't exist or has moved.</p>
+        <div class="missing__actions">
+          <a class="btn btn--primary" href="/">
+            Go to the home page
+          </a>
+          <a class="btn btn--secondary" href="/pricing">
+            See pricing
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -22,28 +23,37 @@ import Base from '../layouts/Base.astro';
 
 <style>
   .missing {
-    position: relative;
     padding-block: var(--sp-13);
   }
 
-  .missing__grid {
-    position: relative;
-    row-gap: var(--sp-3);
-  }
-
-  .missing__grid > :global(*) {
+  .missing__text {
     grid-column: 1 / -1;
+    display: grid;
+    justify-items: start;
+    gap: var(--sp-3);
   }
 
   h1 {
-    font-size: clamp(2.5rem, 1.2rem + 5vw, var(--s8));
-    letter-spacing: -0.035em;
     max-width: 14ch;
+    font-size: clamp(2.75rem, 1rem + 5.2vw, var(--s10));
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    max-width: 44ch;
   }
 
   .missing__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2);
+    margin-top: var(--sp-1);
+  }
+
+  @media (min-width: 64rem) {
+    .missing__text {
+      grid-column: 1 / span 5;
+    }
   }
 </style>

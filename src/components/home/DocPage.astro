@@ -1,16 +1,15 @@
 ---
 /**
  * Page 1 of the design document Trace writes, laid out as an A4 page
- * (794 × 1123 px at 96 dpi). Every size is a multiple of --u, one page pixel,
- * which the parent sets from its own width: the same page renders reduced on
- * the sheet and at actual size in the detail view.
+ * (794 × 1123 px at 96 dpi). Every size is a multiple of --u, one page
+ * pixel, which the parent sets from its own width, so the page renders at
+ * any scale; its figures are true to scale on the printed page.
  *
- * The page keeps to fixed rows, so the parent can point at parts of it by
- * page coordinates: the revision block (top right), the change table's
- * source column, and the sign-off block at the foot.
+ * Elements the notes point at carry data-target: the revision block, the
+ * change table's source column and the sign-off block.
  */
-import PadHoles from '../drawings/PadHoles.astro';
-import WallSection from '../drawings/WallSection.astro';
+import HousingDetail from '../drawings/HousingDetail.astro';
+import HousingSection from '../drawings/HousingSection.astro';
 
 interface Props {
   /** Id prefix for the drawings, so the page can appear twice. */
@@ -20,9 +19,10 @@ interface Props {
 const { id } = Astro.props;
 
 const changes = [
-  { id: '2.1', what: 'Motor mount wall', was: '2.0 mm', now: '2.5 mm', source: '09:12 Sketch 4' },
-  { id: '2.2', what: 'Housing material', was: 'ABS', now: 'PC-ABS', source: '10:20 Housing' },
-  { id: '2.3', what: 'Dust extraction', was: '6 × Ø8', now: '8 × Ø9', source: '10:24, 10:26' },
+  { id: '2.1', what: 'Motor mount wall', was: '2.0', now: '2.5', source: '09:12 Sketch 4' },
+  { id: '2.2', what: 'Root fillet', was: 'R1.5', now: 'R2', source: '09:31 Fillet 7' },
+  { id: '2.3', what: 'Housing material', was: 'ABS', now: 'PC-ABS', source: '10:20 Housing' },
+  { id: '2.4', what: 'Bearing seat', was: 'Ø21.8', now: 'Ø22 H7', source: '10:24, 10:26' },
 ];
 ---
 
@@ -30,7 +30,7 @@ const changes = [
   <header class="head">
     <span>Design document</span>
     <span class="num">TR-0142</span>
-    <span class="num">Page 1 of 3</span>
+    <span class="num">Sheet 1 of 1</span>
   </header>
 
   <div class="top">
@@ -39,7 +39,7 @@ const changes = [
       <p class="meta num">Written by Trace from 71 changes in 16 sessions</p>
       <p class="meta num">22 Sep 2026</p>
     </div>
-    <table class="revs">
+    <table class="revs" data-target="revs">
       <thead>
         <tr>
           <th scope="col">Rev</th>
@@ -64,7 +64,7 @@ const changes = [
             <span class="visually-hidden">B</span>
           </td>
           <td class="num">22 Sep 2026</td>
-          <td>Wall, material, holes</td>
+          <td>Wall, fillet, material, seat</td>
         </tr>
       </tbody>
     </table>
@@ -75,26 +75,34 @@ const changes = [
       <span class="num">1</span> Overview
     </h3>
     <p class="text">
-      A two-piece clamshell in PC-ABS around a 125 mm orbital pad. The motor sits on a bracket that
-      mates to the housing boss, and dust is drawn through eight holes in the pad into the rear
-      port. Wall thickness is 2.5 mm nominal throughout.
+      The upper housing of a random orbital sander, molded in one piece around a 125 mm pad. The
+      motor stands on a wall inside the housing, in a 608 bearing held by a boss under the wall; the
+      palm grip closes the top, and the dust port leaves the skirt at the back.
     </p>
     <dl class="specs">
       <div>
-        <dt>Parts</dt>
-        <dd class="num">4</dd>
+        <dt>Height</dt>
+        <dd class="num">124</dd>
       </div>
       <div>
-        <dt>Pad</dt>
-        <dd class="num">Ø125</dd>
+        <dt>Rim</dt>
+        <dd class="num">Ø124</dd>
       </div>
       <div>
         <dt>Wall</dt>
-        <dd class="num">2.5 mm</dd>
+        <dd class="num">2.5 nominal</dd>
       </div>
       <div>
         <dt>Material</dt>
-        <dd>PC-ABS</dd>
+        <dd>
+          PC-ABS
+          <span class="tri tri--small" role="img" aria-label="changed in revision B">
+            <svg viewBox="0 0 24 21" aria-hidden="true">
+              <path d="M12 1.5 22.5 19.5H1.5Z"></path>
+            </svg>
+            <span aria-hidden="true">B</span>
+          </span>
+        </dd>
       </div>
     </dl>
   </section>
@@ -110,7 +118,9 @@ const changes = [
           <th scope="col">Change</th>
           <th scope="col">Was</th>
           <th scope="col">Now</th>
-          <th scope="col">Source</th>
+          <th scope="col" data-target="sources">
+            Source
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -119,7 +129,7 @@ const changes = [
             <td class="num">{c.id}</td>
             <th scope="row">{c.what}</th>
             <td class="num">
-              <del class="old-value">{c.was}</del>
+              <del class="was">{c.was}</del>
             </td>
             <td class="num">
               <ins class="now">{c.now}</ins>
@@ -131,17 +141,17 @@ const changes = [
     </table>
     <div class="figs">
       <figure>
-        <WallSection id={`${id}-wall`} />
-        <figcaption>Section A–A, 2:1</figcaption>
+        <HousingSection id={`${id}-sec`} />
+        <figcaption>Fig. 1 Half section · 1:2.5</figcaption>
       </figure>
       <figure>
-        <PadHoles id={`${id}-holes`} />
-        <figcaption>View B, pad from below, 1:2.5</figcaption>
+        <HousingDetail id={`${id}-det`} />
+        <figcaption>Fig. 2 Detail A · 1:1</figcaption>
       </figure>
     </div>
   </section>
 
-  <footer class="signoff">
+  <footer class="signoff" data-target="signoff">
     <div>
       <p class="k">Written</p>
       <p class="v">Trace</p>
@@ -179,8 +189,30 @@ const changes = [
     text-align: left;
   }
 
-  .page :global(.drawing *) {
-    vector-effect: none;
+  /* Drawings print at their true scale on the page. */
+  .page :global(.dwg) {
+    --dwg-ink: var(--ink);
+    --w-thick: calc(1.9 * var(--u));
+    --w-thin: calc(0.8 * var(--u));
+    width: calc(var(--paper-w) * 3.7795 * var(--u));
+    max-width: none;
+  }
+
+  .page :global(.dwg .chain) {
+    stroke-dasharray: calc(12 * var(--u)) calc(2.5 * var(--u)) calc(2 * var(--u))
+      calc(2.5 * var(--u));
+  }
+
+  .page :global(.dwg .hidden) {
+    stroke-dasharray: calc(4 * var(--u)) calc(2 * var(--u));
+  }
+
+  .page :global(.dwg .halo) {
+    stroke-width: calc(4 * var(--u));
+  }
+
+  .page :global(.dwg .rev-cloud) {
+    stroke-width: calc(1.25 * var(--u));
   }
 
   .head {
@@ -191,7 +223,7 @@ const changes = [
     font-family: var(--font-mono);
     font-size: calc(11 * var(--u));
     font-weight: 500;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
@@ -213,10 +245,11 @@ const changes = [
 
   .title {
     margin-bottom: calc(8 * var(--u));
-    font-size: calc(30 * var(--u));
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-size: calc(32 * var(--u));
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
   }
 
   .meta {
@@ -246,7 +279,7 @@ const changes = [
     font-family: var(--font-mono);
     font-size: calc(10.5 * var(--u));
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: rgb(25 44 100 / 0.75);
   }
@@ -262,6 +295,7 @@ const changes = [
     font-weight: 600;
   }
 
+  /* Revision triangles: redline, as on the drawings. */
   .tri {
     position: relative;
     display: inline-grid;
@@ -277,15 +311,27 @@ const changes = [
     width: 100%;
     height: 100%;
     overflow: visible;
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: 1.5;
+    fill: var(--redline);
   }
 
   .tri span {
     position: relative;
     top: calc(2.5 * var(--u));
-    font-size: calc(10 * var(--u));
+    font-family: var(--font-mono);
+    font-size: calc(9.5 * var(--u));
+    font-weight: 600;
+    color: var(--paper);
+  }
+
+  .tri--small {
+    width: calc(16 * var(--u));
+    height: calc(14 * var(--u));
+    margin-left: calc(6 * var(--u));
+  }
+
+  .tri--small span {
+    top: calc(2 * var(--u));
+    font-size: calc(8 * var(--u));
   }
 
   .block {
@@ -312,7 +358,7 @@ const changes = [
   }
 
   .text {
-    max-width: calc(620 * var(--u));
+    max-width: calc(640 * var(--u));
   }
 
   .specs {
@@ -336,12 +382,14 @@ const changes = [
   .specs dt {
     font-family: var(--font-mono);
     font-size: calc(10.5 * var(--u));
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: rgb(25 44 100 / 0.75);
   }
 
   .specs dd {
+    display: flex;
+    align-items: center;
     font-size: calc(15 * var(--u));
     font-weight: 600;
   }
@@ -355,7 +403,7 @@ const changes = [
   }
 
   .table td:first-child {
-    width: calc(44 * var(--u));
+    width: calc(40 * var(--u));
     font-family: var(--font-mono);
     color: rgb(25 44 100 / 0.75);
   }
@@ -364,8 +412,9 @@ const changes = [
     font-family: var(--font-mono);
   }
 
-  .table .old-value {
+  .was {
     color: rgb(25 44 100 / 0.66);
+    text-decoration: line-through;
   }
 
   .now {
@@ -378,17 +427,16 @@ const changes = [
   }
 
   .figs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
     gap: calc(16 * var(--u));
-    margin-top: calc(6 * var(--u));
+    margin-top: calc(4 * var(--u));
   }
 
   .figs figure {
     display: grid;
     gap: calc(6 * var(--u));
-    padding: calc(10 * var(--u));
-    border: calc(1 * var(--u)) solid var(--vellum);
   }
 
   .figs figcaption {
@@ -421,7 +469,7 @@ const changes = [
   .k {
     font-family: var(--font-mono);
     font-size: calc(10.5 * var(--u));
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: rgb(25 44 100 / 0.75);
   }

@@ -1,0 +1,569 @@
+---
+/**
+ * A product shot, drawn rather than captured: a CAD window with the housing
+ * in its viewport (the live render, from the CAD camera), the browser tree,
+ * the feature timeline along the bottom, and Trace docked on the right with
+ * the document it has just written. The timeline flags the features that
+ * changed in revision B, the same changes the page follows. Generic on
+ * purpose: no vendor's interface is copied.
+ */
+import ModelView from './ModelView.astro';
+
+type Glyph = 'sketch' | 'revolve' | 'shell' | 'extrude' | 'fillet' | 'hole' | 'pattern';
+const timeline: { glyph: Glyph; rev?: boolean }[] = [
+  { glyph: 'sketch' },
+  { glyph: 'revolve' },
+  { glyph: 'shell' },
+  { glyph: 'sketch' },
+  { glyph: 'extrude' },
+  { glyph: 'fillet' },
+  { glyph: 'sketch', rev: true },
+  { glyph: 'extrude' },
+  { glyph: 'fillet', rev: true },
+  { glyph: 'hole', rev: true },
+  { glyph: 'sketch' },
+  { glyph: 'pattern' },
+  { glyph: 'fillet' },
+];
+
+const glyphs: Record<Glyph, string> = {
+  sketch: 'M3 12.5h10M3 12.5v-8h7l3 3v5M5.5 10l3-3',
+  revolve: 'M8 2.5v11M5 4.5a5 5 0 1 0 6 0M11 4.5l.2 2.4-2.3-.4',
+  shell: 'M3 4.5v8h10v-8M5.5 4.5v5.5h5v-5.5',
+  extrude: 'M3 6l5-2.5L13 6v5l-5 2.5L3 11zM3 6l5 2.5L13 6M8 8.5v5',
+  fillet: 'M3 13V8a5 5 0 0 1 5-5h5M3 13h3M13 3v3',
+  hole: 'M8 3a5 5 0 1 0 0 10A5 5 0 0 0 8 3zM8 1.5v13M1.5 8h13',
+  pattern:
+    'M4 5.5a1.5 1.5 0 1 0 0 .01zM12 5.5a1.5 1.5 0 1 0 0 .01zM4 11.5a1.5 1.5 0 1 0 0 .01zM12 11.5a1.5 1.5 0 1 0 0 .01z',
+};
+
+const tools = [
+  { group: 'Create', glyphs: ['sketch', 'extrude', 'revolve', 'hole'] as Glyph[] },
+  { group: 'Modify', glyphs: ['fillet', 'shell', 'pattern'] as Glyph[] },
+];
+---
+
+<div
+  class="cad scheme-paper"
+  role="img"
+  aria-label="A CAD window with the sander housing open and Trace docked beside it, showing the design document it has written for revision B."
+>
+  <div class="cad__tabs" aria-hidden="true">
+    <span class="cad__tab">
+      orbital-sander <span class="num">v14</span>
+    </span>
+    <span class="cad__space">Design</span>
+  </div>
+
+  <div class="cad__tools" aria-hidden="true">
+    {tools.map((t) => (
+      <div class="cad__group">
+        <span class="cad__group-name">{t.group}</span>
+        <span class="cad__icons">
+          {t.glyphs.map((g) => (
+            <svg viewBox="0 0 16 16">
+              <path d={glyphs[g]} />
+            </svg>
+          ))}
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <div class="cad__body" aria-hidden="true">
+    <div class="cad__tree">
+      <p class="cad__panel-title">Browser</p>
+      <ul>
+        <li class="open">Orbital sander v14</li>
+        <li class="lvl">Origin</li>
+        <li class="lvl open">Bodies</li>
+        <li class="lvl2">Housing</li>
+        <li class="lvl">Sketches</li>
+        <li class="lvl open">Components</li>
+        <li class="lvl2">Motor bracket</li>
+        <li class="lvl2">Pad</li>
+      </ul>
+    </div>
+
+    <div class="cad__view">
+      <ModelView alt="" view="cad" tone="light" />
+      <svg class="cad__cube" viewBox="0 0 40 40">
+        <path class="face" d="M20 4 34 12 20 20 6 12Z"></path>
+        <path d="M20 4 34 12 20 20 6 12ZM6 12v15l14 8V20M34 12v15l-14 8"></path>
+      </svg>
+      <svg class="cad__axes" viewBox="0 0 44 44">
+        <path d="M8 36V12M8 36l22-6M8 36l-5 5"></path>
+        <text x="8" y="8">
+          Z
+        </text>
+        <text x="33" y="31">
+          X
+        </text>
+      </svg>
+    </div>
+
+    <div class="cad__trace scheme-paper">
+      <p class="cad__trace-head">
+        <span class="cad__logo"></span>
+        <span class="cad__trace-name">Trace</span>
+        <span class="cad__live">Logging</span>
+      </p>
+      <div class="cad__doc">
+        <p class="cad__label">Design document</p>
+        <p class="cad__doc-title num">TR-0142 · Rev B</p>
+        <p class="cad__status">Ready for review</p>
+        <dl class="cad__facts">
+          <div>
+            <dt>Changes since Rev A</dt>
+            <dd class="num">4</dd>
+          </div>
+          <div>
+            <dt>Logged this revision</dt>
+            <dd class="num">71</dd>
+          </div>
+          <div>
+            <dt>Written</dt>
+            <dd class="num">10:31</dd>
+          </div>
+        </dl>
+        <span class="cad__button">Open document</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cad__timeline" aria-hidden="true">
+    <span class="cad__controls">
+      <svg viewBox="0 0 16 16">
+        <path d="M4 3v10M13 3 6 8l7 5z"></path>
+      </svg>
+      <svg viewBox="0 0 16 16">
+        <path d="M5 3l7 5-7 5z"></path>
+      </svg>
+    </span>
+    <span class="cad__steps">
+      {timeline.map((step) => (
+        <span class:list={['cad__step', step.rev && 'is-rev']}>
+          <svg viewBox="0 0 16 16">
+            <path d={glyphs[step.glyph]} />
+          </svg>
+        </span>
+      ))}
+      <span class="cad__marker"></span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .cad {
+    display: grid;
+    grid-template-rows: 2.25rem 2.75rem minmax(0, 1fr) 3.25rem;
+    aspect-ratio: 16 / 10.4;
+    overflow: hidden;
+    border: var(--rule) solid var(--film);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: var(--s-2);
+    line-height: 1.3;
+    box-shadow: 0 30px 60px -30px rgb(8 14 36 / 0.55);
+  }
+
+  svg {
+    display: block;
+    overflow: visible;
+  }
+
+  svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .cad__tabs {
+    display: flex;
+    align-items: end;
+    gap: var(--sp-2);
+    padding-inline: var(--sp-2);
+    background: var(--film);
+    border-bottom: 1px solid var(--vellum);
+  }
+
+  .cad__tab {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--vellum);
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    background: var(--paper);
+    font-weight: 600;
+    margin-bottom: -1px;
+  }
+
+  .cad__tab .num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__space {
+    margin-left: auto;
+    padding-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--cobalt);
+  }
+
+  .cad__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-inline: var(--sp-2);
+    border-bottom: 1px solid var(--vellum);
+  }
+
+  .cad__group {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .cad__group + .cad__group {
+    padding-left: var(--sp-3);
+    border-left: 1px solid var(--vellum);
+  }
+
+  .cad__group-name {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__icons {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .cad__icons svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .cad__body {
+    display: grid;
+    grid-template-columns: 22% minmax(0, 1fr) 27%;
+    min-height: 0;
+  }
+
+  .cad__tree {
+    padding: 0.75rem 0.75rem 0;
+    border-right: 1px solid var(--vellum);
+    background: var(--paper);
+  }
+
+  .cad__panel-title,
+  .cad__label {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__tree ul {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 0.625rem;
+    padding: 0;
+    list-style: none;
+    white-space: nowrap;
+  }
+
+  .cad__tree li {
+    position: relative;
+    padding-left: 0.875rem;
+  }
+
+  .cad__tree li::before {
+    content: '';
+    position: absolute;
+    left: 0.125rem;
+    top: 0.4em;
+    border: 0.25rem solid transparent;
+    border-left-color: rgb(25 44 100 / 0.6);
+  }
+
+  .cad__tree li.open::before {
+    top: 0.55em;
+    border-left-color: transparent;
+    border-top-color: rgb(25 44 100 / 0.6);
+  }
+
+  .cad__tree .lvl {
+    margin-left: 0.75rem;
+  }
+
+  .cad__tree .lvl2 {
+    margin-left: 1.5rem;
+  }
+
+  .cad__tree .lvl2::before {
+    width: 0.4rem;
+    height: 0.4rem;
+    border: 1px solid rgb(25 44 100 / 0.6);
+    border-radius: 1px;
+    top: 0.45em;
+  }
+
+  .cad__view {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: 0.5rem;
+    background: linear-gradient(#ffffff, #e4e8f2);
+  }
+
+  /* A body in the viewport's default appearance: a shaded blue-grey. */
+  .cad__view :global(.model) {
+    --model-shade-0: #3c4f86;
+    --model-shade-1: #7d8ab3;
+    --model-shade-2: #b3bcd6;
+    --model-shade-3: var(--film);
+    --model-gain: 0.75;
+    width: 100%;
+    aspect-ratio: 1040 / 750;
+  }
+
+  .cad__cube {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2.5rem;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__cube .face {
+    fill: rgb(36 63 143 / 0.12);
+    stroke: none;
+  }
+
+  .cad__axes {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.5rem;
+    width: 2.75rem;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__axes text {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: currentColor;
+  }
+
+  .cad__trace {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border-left: 1px solid var(--vellum);
+    background: var(--paper);
+  }
+
+  .cad__trace-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--vellum);
+  }
+
+  .cad__logo {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 1px;
+    background: var(--ink);
+  }
+
+  .cad__trace-name {
+    font-size: var(--s-1);
+    font-weight: 600;
+  }
+
+  .cad__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: auto;
+    font-family: var(--font-mono);
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__live::before {
+    content: '';
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--cobalt);
+  }
+
+  .cad__doc {
+    display: grid;
+    align-content: start;
+    gap: 0.375rem;
+    padding: 0.875rem;
+  }
+
+  .cad__doc-title {
+    font-family: var(--font-display);
+    font-size: var(--s1);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .cad__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--cobalt);
+  }
+
+  .cad__status::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .cad__facts {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0.5rem 0;
+    padding-block: 0.5rem;
+    border-block: 1px solid var(--film);
+  }
+
+  .cad__facts div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .cad__facts dt {
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  .cad__facts dd {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .cad__button {
+    display: grid;
+    place-items: center;
+    min-height: 2rem;
+    border-radius: 2px;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 600;
+  }
+
+  .cad__timeline {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding-inline: var(--sp-2);
+    border-top: 1px solid var(--vellum);
+    background: var(--film);
+  }
+
+  .cad__controls {
+    display: flex;
+    gap: 0.5rem;
+    color: rgb(25 44 100 / 0.7);
+  }
+
+  .cad__controls svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .cad__steps {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-left: var(--sp-2);
+    border-left: 1px solid var(--vellum);
+  }
+
+  .cad__step {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    border: 1px solid var(--vellum);
+    border-radius: 2px;
+    background: var(--paper);
+  }
+
+  .cad__step svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Features changed in revision B carry the delta tag, in redline. */
+  .cad__step.is-rev {
+    border-color: var(--redline);
+  }
+
+  .cad__step.is-rev::after {
+    content: '';
+    position: absolute;
+    top: -0.45rem;
+    right: -0.35rem;
+    width: 0.7rem;
+    height: 0.6rem;
+    background: var(--redline);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+
+  .cad__marker {
+    width: 2px;
+    height: 1.875rem;
+    margin-left: 0.25rem;
+    background: var(--cobalt);
+  }
+
+  /*
+   * Phones: the window stacks instead of shrinking. The browser tree and the
+   * tool group names drop out, the viewport takes the full width with Trace
+   * docked under it, and the timeline shows as many steps as fit.
+   */
+  @media (max-width: 39.99rem) {
+    .cad {
+      grid-template-rows: 2.25rem 2.75rem auto 3.25rem;
+      aspect-ratio: auto;
+    }
+
+    .cad__group-name,
+    .cad__tree {
+      display: none;
+    }
+
+    .cad__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cad__trace {
+      border-top: 1px solid var(--vellum);
+      border-left: 0;
+    }
+
+    .cad__timeline {
+      overflow: hidden;
+    }
+  }
+</style>

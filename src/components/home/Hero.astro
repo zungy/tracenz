@@ -1,51 +1,45 @@
 ---
 import DownloadButtons from '../DownloadButtons.astro';
-import SanderElevation from '../drawings/SanderElevation.astro';
+import ModelView from '../ModelView.astro';
 import DocCard from './DocCard.astro';
 import LogPanel from './LogPanel.astro';
 ---
 
-<section class="hero" aria-labelledby="hero-title" data-hero>
+<section class="hero" aria-labelledby="hero-title" data-hero data-row>
   <div class="container">
-    <h1 id="hero-title" class="hero__title">
+    <h1 id="hero-title" class="hero__title pad">
       <span class="hero__line">Model the part.</span>
       <span class="hero__line">Trace writes the design doc.</span>
     </h1>
 
     <div class="grid hero__intro">
-      <p class="lead hero__lead">
+      <p class="lead hero__lead pad">
         Trace records every change you make in CAD, from a sketch dimension to a new material. Its
-        AI turns that history into a design document that covers the overall design and every change
-        that shaped it.
+        AI turns that history into a design document: the overall design, and every change that
+        shaped it.
       </p>
-      <div class="hero__get">
-        <p class="label hero__label">Download the desktop app</p>
-        <DownloadButtons />
+      <div class="hero__get pad">
+        <DownloadButtons size="lg" />
         <p class="hero__meta">
-          Free for one project, no card needed. Or <a href="/signup">create an account</a> first.
+          Free for one project. Runs beside Autodesk Fusion. <a href="/signup">Create an account</a>
         </p>
       </div>
     </div>
 
     <figure class="figure" data-trace-figure data-active="wall">
-      <div class="grid figure__grid">
-        <div class="figure__part figure__drawing">
-          <p class="figure__label">
-            <span class="num">1</span> You model the part
-          </p>
-          <SanderElevation id="hero-elev" />
-          <p class="figure__view mono">Front elevation, half section</p>
+      <div class="grid figure__band">
+        <div class="cell cell--model">
+          <ModelView
+            alt="The sander housing with a quarter cut away. The motor mount wall inside, which changed in revision B, is drawn in red."
+            anchors
+            intro
+          />
+          <p class="cell__label mono">Housing, Rev B · quarter section</p>
         </div>
-        <div class="figure__part figure__log">
-          <p class="figure__label">
-            <span class="num">2</span> Trace logs each change
-          </p>
+        <div class="cell cell--log">
           <LogPanel />
         </div>
-        <div class="figure__part figure__doc">
-          <p class="figure__label">
-            <span class="num">3</span> Trace writes it up
-          </p>
+        <div class="cell cell--doc">
           <DocCard />
         </div>
       </div>
@@ -53,11 +47,11 @@ import LogPanel from './LogPanel.astro';
         <path class="trace__path" pathLength="1"></path>
         <g class="trace__marks"></g>
       </svg>
-      <figcaption class="figure__caption">
+      <figcaption class="figure__caption pad">
         <span class="mono">Fig. 1</span>
         <span>
-          The motor mount wall, traced from the model through the log into the document. Point at
-          another change to trace it instead.
+          One change on its way through Trace: the motor mount wall, from the model to its log
+          entries to the design document.
         </span>
       </figcaption>
     </figure>
@@ -76,14 +70,13 @@ import LogPanel from './LogPanel.astro';
 <style>
   .hero {
     --play: 1500ms;
-    padding-block: var(--sp-5) var(--sp-8);
+    padding-top: var(--sp-5);
   }
 
   .hero__title {
-    font-size: clamp(2.75rem, 1rem + 5.2vw, 6rem);
-    font-weight: var(--display-weight);
+    font-size: clamp(2.75rem, 1rem + 5.2vw, var(--s10));
     line-height: 1;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     text-wrap: initial;
   }
 
@@ -108,12 +101,7 @@ import LogPanel from './LogPanel.astro';
   .hero__get {
     display: grid;
     align-content: start;
-    gap: 0.75rem;
-    max-width: 30rem;
-  }
-
-  .hero__label {
-    color: var(--text-strong);
+    gap: var(--sp-2);
   }
 
   .hero__meta {
@@ -121,74 +109,38 @@ import LogPanel from './LogPanel.astro';
     color: var(--text-muted);
   }
 
-  /* Figure: drawing, log and document, joined by the trace line */
+  .hero__meta a {
+    font-weight: 500;
+  }
+
+  /* Figure: model, log and document, joined by the trace line */
   .figure {
     position: relative;
     margin-top: var(--sp-8);
   }
 
-  .figure__grid {
-    row-gap: var(--sp-5);
+  .figure__band {
+    row-gap: var(--sp-3);
   }
 
-  .figure__part {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    align-content: start;
-    gap: 0.75rem;
+  .cell {
     grid-column: 1 / -1;
     min-width: 0;
   }
 
-  .figure__label {
-    display: flex;
-    gap: 0.75rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--text-strong);
-    font-family: var(--font-mono);
+  .cell--model {
+    display: grid;
+    align-content: space-between;
+    gap: var(--sp-1);
+  }
+
+  .cell--model :global(.model) {
+    aspect-ratio: 1040 / 750;
+  }
+
+  .cell__label {
     font-size: var(--s-2);
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-strong);
-  }
-
-  .figure__label span {
-    color: var(--text-muted);
-  }
-
-  /*
-   * The drawing is a size container, so the note's height on screen is known:
-   * it sits 85 of the drawing's 516 units down. The margin puts the note on
-   * the log's first row, 121px below the panel top.
-   */
-  .figure__drawing {
-    position: relative;
-    container-type: inline-size;
-  }
-
-  @media (min-width: 64rem) {
-    .figure__drawing :global(.elev) {
-      margin-top: calc(121px - 100cqi * 85 / 516);
-    }
-
-    /* The view title sits on the panels' footer line. */
-    .figure__view {
-      position: absolute;
-      left: 0;
-      bottom: calc(0.75rem + 1px);
-    }
-  }
-
-  .figure__drawing {
-    grid-template-rows: auto auto 1fr;
-  }
-
-  .figure__view {
-    align-self: end;
-    font-size: var(--s-2);
-    letter-spacing: 0.06em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
@@ -196,7 +148,7 @@ import LogPanel from './LogPanel.astro';
   .figure__caption {
     display: flex;
     gap: 0.75rem;
-    margin-top: var(--sp-3);
+    padding-block: var(--sp-2);
     font-size: var(--s-1);
     color: var(--text-muted);
   }
@@ -205,7 +157,7 @@ import LogPanel from './LogPanel.astro';
     flex: none;
     font-size: var(--s-2);
     font-weight: 600;
-    line-height: 1.75;
+    line-height: 1.6;
     color: var(--text-strong);
   }
 
@@ -214,39 +166,52 @@ import LogPanel from './LogPanel.astro';
   }
 
   @media (min-width: 40rem) {
-    .figure__log {
-      grid-column: 1 / span 5;
+    .cell--log {
+      grid-column: 1 / span 4;
     }
 
-    .figure__doc {
-      grid-column: 6 / -1;
+    .cell--doc {
+      grid-column: 5 / -1;
     }
   }
 
+  /*
+   * Desktop: the figure is a band across the sheet, cut into cells on the
+   * zone lines: the model in zones 1 to 3, the log in 4 and 5, the document
+   * in 6 to 8. The cells share their rules, as the blocks of a drawing do.
+   */
   @media (min-width: 64rem) {
     .hero {
       padding-top: var(--sp-8);
     }
 
     .hero__lead {
-      grid-column: 1 / span 6;
+      grid-column: 1 / span 3;
     }
 
     .hero__get {
-      grid-column: 7 / span 6;
-      max-width: none;
+      grid-column: 4 / span 4;
+      padding-top: 0.3rem;
     }
 
-    .figure__drawing {
-      grid-column: 1 / span 6;
+    .figure__band {
+      row-gap: 0;
+      border-block: var(--rule) solid var(--text-strong);
     }
 
-    .figure__log {
-      grid-column: 7 / span 6;
+    .cell--model {
+      grid-column: 1 / span 3;
+      padding: var(--sp-3) var(--pad) var(--sp-2);
     }
 
-    .figure__doc {
-      grid-column: 13 / -1;
+    .cell--log {
+      grid-column: 4 / span 2;
+      border-left: var(--rule) solid var(--text-strong);
+    }
+
+    .cell--doc {
+      grid-column: 6 / -1;
+      border-left: var(--rule) solid var(--text-strong);
     }
 
     .trace {
@@ -274,26 +239,22 @@ import LogPanel from './LogPanel.astro';
     fill: var(--change);
   }
 
-  /* Sequence: log, document, trace line, then the revision mark on the drawing. */
+  .trace :global(.trace__ring) {
+    fill: var(--bg);
+    stroke: var(--change);
+    stroke-width: 1.5;
+  }
+
+  /* Sequence: the section plane sweeps in, the log fills, then the trace draws. */
   .hero.is-playing .trace__path {
-    animation: draw 600ms var(--ease) both;
+    animation: draw 700ms var(--ease) both;
     animation-delay: calc(var(--play) + 800ms);
   }
 
-  .hero.is-playing .trace :global(.trace__mark) {
-    animation: mark-in 200ms var(--ease) both;
+  .hero.is-playing .trace :global(.trace__mark),
+  .hero.is-playing .trace :global(.trace__ring) {
+    animation: mark-in 240ms var(--ease) both;
     animation-delay: calc(var(--play) + 800ms);
-  }
-
-  .hero.is-playing :global(.rev .cloud) {
-    animation: draw 800ms var(--ease) both;
-    animation-delay: calc(var(--play) + 1300ms);
-  }
-
-  .hero.is-playing :global(.rev .tag),
-  .hero.is-playing :global(.rev text) {
-    animation: mark-in 300ms var(--ease) both;
-    animation-delay: calc(var(--play) + 2000ms);
   }
 
   @keyframes draw {
@@ -313,14 +274,14 @@ import LogPanel from './LogPanel.astro';
   const ARROW = 8;
 
   for (const figure of document.querySelectorAll<HTMLElement>('[data-trace-figure]')) {
-    // The trace line joins one change across the three panels: from the
-    // drawing into its log entry, and from the entry into the document
-    // statement written from it. Where two ends sit on one line it runs
-    // straight; otherwise it turns at right angles in the gap between panels.
+    // The trace line joins one change across the three cells: from its cut
+    // face in the model to its first log entry, and on into the document
+    // statement written from it. Where both ends sit on one line it runs
+    // straight; otherwise it turns once, just before the next cell.
     const svg = figure.querySelector<SVGSVGElement>('[data-trace-svg]');
     const path = svg?.querySelector('path');
     const marks = svg?.querySelector('g');
-    const linked = [...figure.querySelectorAll<HTMLElement | SVGElement>('[data-link]')];
+    const linked = [...figure.querySelectorAll<HTMLElement>('.log [data-link], .doc [data-link]')];
 
     const layout = () => {
       if (!svg || !path || !marks) return;
@@ -329,9 +290,9 @@ import LogPanel from './LogPanel.astro';
       const source = figure.querySelector(`[data-source="${key}"]`);
       const row = figure.querySelector<HTMLElement>(`.log [data-link="${key}"]`);
       const item = figure.querySelector<HTMLElement>(`.doc [data-link="${key}"]`);
-      const log = row?.closest('.log');
-      const doc = item?.closest('.doc');
-      if (!source || !row || !item || !log || !doc) return;
+      const logCell = row?.closest('.cell');
+      const docCell = item?.closest('.cell');
+      if (!source || !row || !item || !logCell || !docCell) return;
 
       const box = figure.getBoundingClientRect();
       const rel = (r: DOMRect) => ({
@@ -342,63 +303,67 @@ import LogPanel from './LogPanel.astro';
       });
       const s = rel(source.getBoundingClientRect());
       const l = rel(row.getBoundingClientRect());
-      const logBox = rel(log.getBoundingClientRect());
-      const docBox = rel(doc.getBoundingClientRect());
-      // A statement is entered at its first line.
+      const logBox = rel(logCell.getBoundingClientRect());
+      const docBox = rel(docCell.getBoundingClientRect());
       const style = getComputedStyle(item);
-      const itemY = rel(item.getBoundingClientRect()).top + parseFloat(style.paddingTop);
-      const docY = itemY + parseFloat(style.lineHeight) / 2;
+      const docY =
+        rel(item.getBoundingClientRect()).top +
+        parseFloat(style.paddingTop) +
+        parseFloat(style.lineHeight) / 2;
       const f = (n: number) => n.toFixed(1);
 
-      const leg = (x1: number, y1: number, x2: number, y2: number) => {
-        if (Math.abs(y2 - y1) < 4) return `M${f(x1)} ${f(y2)} H${f(x2)}`;
-        const gx = x2 - 20;
-        return `M${f(x1)} ${f(y1)} H${f(gx)} V${f(y2)} H${f(x2)}`;
-      };
-      const start = { x: s.right + 6, y: s.mid };
-      const snapped = Math.abs(start.y - l.mid) < 4 ? l.mid : start.y;
-      const docEnd = Math.abs(docY - l.mid) < 4 ? l.mid : docY;
+      const start = { x: (s.left + s.right) / 2, y: s.mid };
+      const y1 = Math.abs(start.y - l.mid) < 4 ? l.mid : start.y;
+      const bend = logBox.left - 24;
+      let d =
+        Math.abs(y1 - l.mid) < 0.5
+          ? `M${f(start.x)} ${f(l.mid)} H${f(logBox.left)}`
+          : `M${f(start.x)} ${f(y1)} H${f(bend)} V${f(l.mid)} H${f(logBox.left)}`;
+      // Across the shared rule into the document.
+      const into = docBox.left + 14;
+      const straight = Math.abs(docY - l.mid) < 4;
+      d += straight
+        ? ` M${f(logBox.right)} ${f(l.mid)} H${f(into)}`
+        : ` M${f(logBox.right)} ${f(l.mid)} H${f(docBox.left + 6)} V${f(docY)} H${f(into)}`;
+      const endY = straight ? l.mid : docY;
 
       svg.setAttribute('viewBox', `0 0 ${f(box.width)} ${f(box.height)}`);
-      path.setAttribute(
-        'd',
-        `${leg(start.x, snapped, logBox.left - 1, l.mid)} ${leg(logBox.right + 1, l.mid, docBox.left - 1, docEnd)}`,
-      );
+      path.setAttribute('d', d);
+      const ring = (x: number, y: number) =>
+        `<circle class="trace__ring" cx="${f(x)}" cy="${f(y)}" r="4"></circle>`;
       const dot = (x: number, y: number) =>
         `<circle class="trace__mark" cx="${f(x)}" cy="${f(y)}" r="3"></circle>`;
       const arrow = (x: number, y: number) =>
         `<path class="trace__mark" d="M${f(x)} ${f(y)} l${-ARROW} -3 v6 z"></path>`;
       marks.innerHTML =
-        dot(start.x, snapped) +
-        arrow(logBox.left - 1, l.mid) +
-        dot(logBox.right + 1, l.mid) +
-        arrow(docBox.left - 1, docEnd);
+        ring(start.x, y1) +
+        arrow(logBox.left, l.mid) +
+        dot(logBox.right, l.mid) +
+        arrow(into, endY);
     };
 
     // Pointing at a change traces it instead; letting go returns to the wall.
-    const activate = (key: string, pointing: boolean) => {
+    const activate = (key: string) => {
       figure.dataset.active = key;
-      for (const el of linked) {
-        const match = el.dataset.link === key;
-        if (el instanceof SVGElement) el.classList.toggle('is-linked', pointing && match);
-        else el.classList.toggle('is-active', match);
-      }
+      for (const el of linked) el.classList.toggle('is-active', el.dataset.link === key);
+      figure.dispatchEvent(new CustomEvent('trace:active', { detail: key }));
       layout();
     };
     for (const el of linked) {
-      el.addEventListener('mouseenter', () => activate(el.dataset.link ?? 'wall', true));
-      el.addEventListener('mouseleave', () => activate('wall', false));
+      el.addEventListener('mouseenter', () => activate(el.dataset.link ?? 'wall'));
+      el.addEventListener('mouseleave', () => activate('wall'));
     }
 
+    figure.addEventListener('model:anchors', layout);
     layout();
     new ResizeObserver(layout).observe(figure);
     document.fonts?.ready.then(layout);
   }
 
-  // The revision tag is the last step. Once it lands, drop the playing state so
+  // The trace is the last step. Once it has drawn, drop the playing state so
   // later layout changes can't restart anything. Replay restarts the sequence.
   for (const hero of document.querySelectorAll<HTMLElement>('[data-hero]')) {
-    hero.querySelector('.rev .tag')?.addEventListener('animationend', () => {
+    hero.querySelector('.trace__path')?.addEventListener('animationend', () => {
       hero.classList.remove('is-playing');
     });
     hero.querySelector('[data-replay]')?.addEventListener('click', () => {

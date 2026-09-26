@@ -15,7 +15,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 
 <header class="header">
   <div class="container header__inner">
-    <Brand />
+    <div class="header__brand">
+      <Brand />
+    </div>
 
     {variant === 'site' ? (
       <>
@@ -32,10 +34,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </nav>
 
         <div class="header__actions">
+          <div class="header__view">
+            <ThemeToggle id="header" compact />
+          </div>
           <a class="header__login" href="/login">
             Log in
           </a>
-          <a class="btn btn--primary btn--sm" href="/signup">
+          <a class="btn btn--secondary btn--sm header__signup" href="/signup">
             Sign up
           </a>
 
@@ -65,6 +70,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       </>
     ) : (
       <div class="header__actions">
+        <div class="header__view">
+          <ThemeToggle id="header" compact />
+        </div>
         <a class="header__back" href="/">
           <Icon name="arrow-left" size={18} />
           Back to home
@@ -77,10 +85,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 <style>
   .header {
     position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + var(--frame));
+    top: env(safe-area-inset-top, 0px);
     z-index: 50;
     background: var(--bg);
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--rule) solid var(--line);
   }
 
   .header__inner {
@@ -92,12 +100,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 
   .header__nav {
     display: none;
-    margin-left: var(--sp-3);
   }
 
   .header__nav ul {
     display: flex;
-    gap: var(--sp-3);
+    gap: var(--sp-5);
     padding: 0;
     list-style: none;
   }
@@ -127,7 +134,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     margin-left: auto;
   }
 
-  .header__login {
+  .header__login,
+  .header__view {
     display: none;
   }
 
@@ -194,13 +202,41 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     font-family: var(--font-display);
     font-size: var(--s2);
     font-weight: 500;
-    letter-spacing: -0.015em;
     text-decoration: none;
   }
 
+  /*
+   * Desktop: the header is the sheet's top strip, laid on the zone grid. The
+   * brand holds zones 1 and 2, the navigation starts at zone 3, and the
+   * actions end at the right-hand border.
+   */
   @media (min-width: 64rem) {
-    .header__nav,
-    .header__login {
+    .header__inner {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .header__brand {
+      grid-column: 1 / span 2;
+      padding-inline: var(--pad);
+    }
+
+    .header__nav {
+      display: block;
+      grid-column: 3 / span 3;
+      padding-inline: var(--pad);
+    }
+
+    .header__actions {
+      grid-column: 6 / -1;
+      justify-content: flex-end;
+      gap: var(--sp-3);
+      padding-inline: var(--pad);
+    }
+
+    .header__login,
+    .header__view {
       display: block;
     }
 

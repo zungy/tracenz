@@ -1,13 +1,13 @@
 ---
 /**
  * Drawing-sheet border on desktop, after ISO 5457: an outer trim line, a 2px
- * border line, zone numbers top and bottom, zone letters left and right,
- * division ticks between the two lines and centering marks. It is fixed to
- * the viewport, so the page scrolls under it. The 8 zones match the layout
- * grid: every gutter between a pair of columns sits on a zone line.
+ * border line, zone numbers top and bottom, and centering marks. It covers
+ * the whole page rather than the viewport, so the page is the sheet: the
+ * zone lines are the layout grid's lines (see .grid in global.css), and each
+ * section writes its own row letter in the side margins, with a division
+ * line level with its top edge (see [data-row]).
  */
 const numbers = Array.from({ length: 8 }, (_, i) => i + 1);
-const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 ---
 
 <div class="frame" aria-hidden="true">
@@ -20,16 +20,6 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     <div class="zones zones--bottom">
       {numbers.map((n) => (
         <span>{n}</span>
-      ))}
-    </div>
-    <div class="zones zones--left">
-      {letters.map((l) => (
-        <span>{l}</span>
-      ))}
-    </div>
-    <div class="zones zones--right">
-      {letters.map((l) => (
-        <span>{l}</span>
       ))}
     </div>
     <span class="center center--top"></span>
@@ -47,7 +37,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   @media (min-width: 64rem) {
     .frame {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 70;
       display: block;
@@ -56,15 +46,13 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     }
   }
 
-  /* The border line; its outward shadow is the paper margin that hides the page as it scrolls. */
   .border {
     position: absolute;
     top: var(--frame);
     bottom: var(--frame);
     left: var(--mat-x);
     right: var(--mat-x);
-    border: 2px solid var(--text-strong);
-    box-shadow: 0 0 0 200vmax var(--bg);
+    border: var(--rule-heavy) solid var(--frame-ink);
   }
 
   .trim {
@@ -78,12 +66,24 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   .zones {
     position: absolute;
+    left: 0;
+    right: 0;
     display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    height: var(--strip);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1;
-    color: var(--text-strong);
+    color: var(--frame-ink);
+  }
+
+  .zones--top {
+    bottom: calc(100% + var(--rule-heavy));
+  }
+
+  .zones--bottom {
+    top: calc(100% + var(--rule-heavy));
   }
 
   .zones span {
@@ -92,71 +92,27 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     place-items: center;
   }
 
-  .zones--top,
-  .zones--bottom {
-    left: 0;
-    right: 0;
-    height: var(--strip);
-    grid-template-columns: repeat(8, 1fr);
-  }
-
-  .zones--top {
-    bottom: calc(100% + 2px);
-  }
-
-  .zones--bottom {
-    top: calc(100% + 2px);
-  }
-
-  .zones--left,
-  .zones--right {
-    top: 0;
-    bottom: 0;
-    width: var(--strip);
-    grid-template-rows: repeat(6, 1fr);
-  }
-
-  .zones--left {
-    right: calc(100% + 2px);
-  }
-
-  .zones--right {
-    left: calc(100% + 2px);
-  }
-
   /* Zone divisions run from the trim line to the border line. */
-  .zones--top span + span::before,
-  .zones--bottom span + span::before {
+  .zones span + span::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     width: 1px;
-    background: var(--text-strong);
-  }
-
-  .zones--left span + span::before,
-  .zones--right span + span::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 1px;
-    background: var(--text-strong);
+    background: var(--frame-ink);
   }
 
   /* Centering marks cross the border line into the sheet. */
   .center {
     position: absolute;
-    background: var(--text-strong);
+    background: var(--frame-ink);
   }
 
   .center--top,
   .center--bottom {
     left: 50%;
-    width: 2px;
+    width: var(--rule-heavy);
     height: calc(var(--strip) + 10px);
     transform: translateX(-50%);
   }
@@ -172,7 +128,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
   .center--left,
   .center--right {
     top: 50%;
-    height: 2px;
+    height: var(--rule-heavy);
     width: calc(var(--strip) + 10px);
     transform: translateY(-50%);
   }

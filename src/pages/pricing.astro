@@ -13,32 +13,28 @@ import { site } from '../config/site';
   description="Trace is free for one project. Pro and Team add unlimited projects, full history, more export formats and team review."
   sheet="pricing"
 >
-  <section class="intro" aria-labelledby="pricing-title">
-    <div class="container grid intro__grid">
-      <p class="label intro__eyebrow">Plans and prices in USD</p>
-      <h1 id="pricing-title">Pricing</h1>
-      <p class="lead intro__lead">
-        Start free with one project. Pay when you need more projects, the full history or team
-        review.
-      </p>
-    </div>
-  </section>
-
-  <section class="section plans-section" aria-label="Plans">
+  <section class="pricing" aria-labelledby="pricing-title" data-row>
     <div class="container">
+      <div class="grid intro">
+        <h1 id="pricing-title" class="intro__title pad">
+          Pricing
+        </h1>
+        <p class="lead intro__lead pad">
+          Start free with one project. Pay when you need more projects, the full history or team
+          review.
+        </p>
+      </div>
+
       <PlanCards />
 
-      <div class="enterprise">
-        <div class="enterprise__copy">
-          <h2 class="enterprise__name">Enterprise</h2>
-          <p>
-            Single sign-on, audit log export, private deployment and a named contact for your
-            company.
-          </p>
-        </div>
-        <div class="enterprise__actions">
-          <a class="btn btn--secondary" href={`mailto:${site.salesEmail}`}>
-            <Icon name="mail" size={20} />
+      <div class="grid enterprise">
+        <h2 class="enterprise__name pad">Enterprise</h2>
+        <p class="enterprise__text pad">
+          Single sign-on, audit log export, private deployment and a named contact for your company.
+        </p>
+        <div class="enterprise__actions pad">
+          <a class="btn btn--secondary btn--sm" href={`mailto:${site.salesEmail}`}>
+            <Icon name="mail" size={18} />
             Contact sales
           </a>
           <p class="enterprise__email mono">{site.salesEmail}</p>
@@ -47,79 +43,67 @@ import { site } from '../config/site';
     </div>
   </section>
 
-  <section class="section compare-section">
-    <div class="container">
-      <CompareTable />
-    </div>
-  </section>
-
-  <section class="section faq-section">
-    <div class="container">
-      <Faq />
-    </div>
-  </section>
-
+  <CompareTable />
+  <Faq />
   <DownloadBand />
 </Base>
 
 <style>
+  .pricing {
+    padding-block: var(--sp-5) var(--section-pad);
+  }
+
   .intro {
-    position: relative;
-    padding-block: var(--sp-8) var(--sp-5);
-  }
-
-  .intro__grid {
-    position: relative;
     row-gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
   }
 
-  .intro__eyebrow,
-  h1,
+  .intro__title,
   .intro__lead {
     grid-column: 1 / -1;
   }
 
-  h1 {
-    font-size: clamp(3rem, 1.4rem + 6.4vw, var(--s10));
-    font-weight: var(--display-weight);
+  .intro__title {
+    font-size: clamp(2.75rem, 1rem + 5.2vw, var(--s10));
     line-height: 1;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.02em;
   }
 
   .intro__lead {
     max-width: 44ch;
   }
 
-  .plans-section {
-    padding-top: var(--sp-5);
-  }
-
   .enterprise {
-    display: grid;
-    gap: var(--sp-3);
+    row-gap: var(--sp-2);
     margin-top: var(--sp-3);
     padding: var(--sp-3);
-    border: 1px dashed var(--line-strong);
+    border: 1px solid var(--line-strong);
   }
 
-  .enterprise__copy {
-    display: grid;
-    gap: var(--sp-1);
+  .enterprise__name,
+  .enterprise__text,
+  .enterprise__actions {
+    grid-column: 1 / -1;
   }
 
   .enterprise__name {
-    font-size: var(--s3);
+    font-family: var(--font-body);
+    font-size: var(--s1);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
   }
 
-  .enterprise__copy p {
+  .enterprise__text {
     max-width: 52ch;
     color: var(--text-muted);
   }
 
   .enterprise__actions {
-    display: grid;
-    gap: var(--sp-1);
-    justify-items: start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-3);
   }
 
   .enterprise__email {
@@ -128,24 +112,58 @@ import { site } from '../config/site';
     user-select: all;
   }
 
-  .compare-section,
-  .faq-section {
-    border-top: 1px solid var(--line);
-  }
-
+  /*
+   * Desktop: the title sits over zones 1 to 4 and the lead beside it. Under
+   * the plans, Enterprise is one more row of the band, on the same zone
+   * lines; the next section's rule closes it.
+   */
   @media (min-width: 64rem) {
+    .pricing {
+      padding-block: var(--sp-8) 0;
+    }
+
+    .intro {
+      align-items: end;
+      margin-bottom: var(--sp-8);
+    }
+
+    .intro__title {
+      grid-column: 1 / span 4;
+    }
+
     .intro__lead {
-      grid-column: 1 / span 7;
+      grid-column: 5 / span 4;
     }
 
     .enterprise {
-      grid-template-columns: minmax(0, 1fr) auto;
+      row-gap: 0;
+      margin-top: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .enterprise__name,
+    .enterprise__text,
+    .enterprise__actions {
+      display: flex;
       align-items: center;
-      padding: var(--sp-3) var(--sp-5);
+      padding-block: var(--sp-3);
+    }
+
+    .enterprise__name {
+      grid-column: 1 / span 2;
+    }
+
+    .enterprise__text {
+      grid-column: 3 / span 4;
+      max-width: none;
+      border-left: var(--rule) solid var(--text-strong);
     }
 
     .enterprise__actions {
-      justify-items: end;
+      grid-column: 7 / span 2;
+      justify-content: space-between;
+      border-left: var(--rule) solid var(--text-strong);
     }
   }
 </style>

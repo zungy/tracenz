@@ -1,28 +1,41 @@
 ---
+/**
+ * Questions about plans. On desktop the heading holds zones 1 to 3 and the
+ * list zones 4 to 8, its rules running to the border.
+ */
 import Icon from '../Icon.astro';
 import { faqs } from '../../config/pricing';
 ---
 
-<section class="faq grid" aria-labelledby="faq-title">
-  <div class="faq__head">
-    <p class="label">Questions</p>
-    <h2 id="faq-title">Common questions</h2>
-  </div>
-  <div class="faq__list">
-    {faqs.map((item, i) => (
-      <details name="faq" open={i === 0}>
-        <summary>
-          <span>{item.q}</span>
-          <Icon name="plus" size={20} class="faq__icon" />
-        </summary>
-        <p>{item.a}</p>
-      </details>
-    ))}
+<section class="faq" aria-labelledby="faq-title" data-row>
+  <div class="container grid faq__grid">
+    <div class="faq__head pad">
+      <h2 id="faq-title" class="title">
+        Common questions
+      </h2>
+      <p class="faq__intro">About what Trace records, the documents it writes, and plans.</p>
+    </div>
+    <div class="faq__list">
+      {faqs.map((item, i) => (
+        <details name="faq" open={i === 0}>
+          <summary>
+            <span>{item.q}</span>
+            <Icon name="plus" size={20} class="faq__icon" />
+          </summary>
+          <p>{item.a}</p>
+        </details>
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
   .faq {
+    padding-block: var(--section-pad);
+    border-top: var(--rule) solid var(--text-strong);
+  }
+
+  .faq__grid {
     row-gap: var(--sp-5);
   }
 
@@ -37,12 +50,13 @@ import { faqs } from '../../config/pricing';
     gap: var(--sp-2);
   }
 
-  .faq__head h2 {
-    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  .faq__intro {
+    max-width: 32ch;
+    color: var(--text-muted);
   }
 
   .faq__list {
-    border-top: 1px solid var(--line-strong);
+    border-top: var(--rule) solid var(--text-strong);
   }
 
   details {
@@ -55,9 +69,9 @@ import { faqs } from '../../config/pricing';
     align-items: center;
     gap: var(--sp-3);
     padding-block: var(--sp-3);
-    font-family: var(--font-display);
     font-size: var(--s1);
     font-weight: 600;
+    line-height: 1.4;
     color: var(--text-strong);
     cursor: pointer;
     list-style: none;
@@ -85,11 +99,16 @@ import { faqs } from '../../config/pricing';
 
   @media (min-width: 64rem) {
     .faq__head {
-      grid-column: 1 / span 5;
+      grid-column: 1 / span 3;
     }
 
     .faq__list {
-      grid-column: 7 / -1;
+      grid-column: 4 / -1;
+    }
+
+    summary,
+    details p {
+      padding-inline: var(--pad);
     }
   }
 </style>

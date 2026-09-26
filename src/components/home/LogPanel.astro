@@ -1,14 +1,15 @@
 ---
 /**
- * The change log as Trace shows it: a session timeline and the latest
- * changes, each with its value before and after. Rows that share a `link`
- * key with the drawing and the document light up together; the active one
- * (the motor mount wall, until the visitor points at another) is drawn in
- * redline. Plays in when the parent .hero has `is-playing`; otherwise it
- * shows its finished state.
+ * The change log as Trace shows it next to the CAD window: a session
+ * timeline and the latest changes, each with its value before and after.
+ * Rows that share a `link` key with the model and the document light up
+ * together; the active one (the motor mount wall, until the visitor points
+ * at another) carries the redline.
  *
- * The panel keeps to the same row grid as DocCard: a 44px bar, a 56px block
- * and 40px rows, so a change and its document statement sit on one line.
+ * In the hero band the panel has no border of its own: it fills a cell of
+ * the figure, whose rules frame it. It keeps to the same row grid as
+ * DocCard (a 44px bar, a 56px block, 40px rows), so a change and the
+ * document statement written from it sit on one line.
  */
 import Icon from '../Icon.astro';
 
@@ -20,9 +21,9 @@ const sessions = [
 ];
 
 const rows = [
-  { time: '09:12', feature: 'Sketch 4', param: 'D3', from: '2.0', to: '2.5 mm', link: 'wall' },
-  { time: '09:31', feature: 'Fillet 7', param: 'Radius', from: 'R1.5', to: 'R2' },
-  { time: '10:02', feature: 'Motor bracket', param: 'Part', added: true },
+  { time: '09:12', feature: 'Sketch 4', param: 'D3', from: '2.0', to: '2.5', link: 'wall' },
+  { time: '09:31', feature: 'Fillet 7', param: 'Radius', from: 'R1.5', to: 'R2', link: 'wall' },
+  { time: '10:02', feature: 'Motor bracket', param: 'Component', added: true },
   {
     time: '10:20',
     feature: 'Housing',
@@ -31,15 +32,16 @@ const rows = [
     to: 'PC-ABS',
     link: 'material',
   },
-  { time: '10:24', feature: 'Pattern 1', param: 'Holes', from: '6', to: '8', link: 'holes' },
-  { time: '10:26', feature: 'Hole 3', param: 'Dia.', from: 'Ø8', to: 'Ø9', link: 'holes' },
+  { time: '10:24', feature: 'Hole 3', param: 'Dia.', from: 'Ø21.8', to: 'Ø22', link: 'bearing' },
+  { time: '10:26', feature: 'Hole 3', param: 'Fit', from: '–', to: 'H7', link: 'bearing' },
 ];
 const recent = sessions.slice(-rows.length);
 ---
 
 <div class="log">
   <div class="log__bar">
-    <span class="log__file mono">orbital-sander / housing</span>
+    <span class="log__file mono">orbital-sander.f3d</span>
+    <span class="log__version mono num">v14</span>
     <span class="log__live">
       <span class="log__dot" aria-hidden="true"></span>Logging
     </span>
@@ -76,35 +78,36 @@ const recent = sessions.slice(-rows.length);
         </span>{' '}
         {row.added ? (
           <span class="row__change">
-            <ins class="new-value">added</ins>
+            <ins class="row__new">added</ins>
           </span>
         ) : (
           <span class="row__change num">
             <span class="visually-hidden">from </span>
-            <del class="old-value">{row.from}</del>
+            <del class="row__old">{row.from}</del>
             <span class="row__arrow" aria-hidden="true">
               →
             </span>
             <span class="visually-hidden"> to </span>
-            <ins class="new-value">{row.to}</ins>
+            <ins class="row__new">{row.to}</ins>
           </span>
         )}
       </li>
     ))}
   </ol>
 
-  <div class="log__foot mono">
-    <span class="num">6 of 71 changes</span>
-    <span class="num">Last saved 10:26</span>
-  </div>
+  <p class="log__foot">
+    <span class="mono num">6 of 71</span>
+    <span>Point at a change to trace it.</span>
+  </p>
 </div>
 
 <style>
   .log {
-    position: relative;
+    --cell-pad: var(--sp-2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 2.75rem 3.5rem 1fr auto;
+    height: 100%;
     background: var(--surface);
     border: 1px solid var(--text-strong);
   }
@@ -112,8 +115,8 @@ const recent = sessions.slice(-rows.length);
   .log__bar {
     display: flex;
     align-items: center;
-    gap: var(--sp-2);
-    padding-inline: var(--sp-2);
+    gap: 0.75rem;
+    padding-inline: var(--cell-pad) calc(var(--cell-pad) - 0.5rem);
     border-bottom: 1px solid var(--line);
   }
 
@@ -124,6 +127,15 @@ const recent = sessions.slice(-rows.length);
     color: var(--text-strong);
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  .log__version {
+    padding: 0 0.3rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 1px;
+    font-size: var(--s-2);
+    line-height: 1.4;
+    color: var(--text-muted);
   }
 
   .log__live {
@@ -156,7 +168,6 @@ const recent = sessions.slice(-rows.length);
   }
 
   .log__replay {
-    margin-right: -0.5rem;
     display: grid;
     place-items: center;
     width: 2rem;
@@ -182,7 +193,7 @@ const recent = sessions.slice(-rows.length);
   .timeline {
     display: grid;
     align-content: center;
-    padding-inline: var(--sp-2);
+    padding-inline: var(--cell-pad);
     border-bottom: 1px solid var(--line);
   }
 
@@ -229,11 +240,11 @@ const recent = sessions.slice(-rows.length);
 
   .row {
     display: grid;
-    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-columns: 2.625rem minmax(0, 1fr) auto;
     align-items: center;
     column-gap: 0.75rem;
     height: 2.5rem;
-    padding-inline: var(--sp-2);
+    padding-inline: var(--cell-pad);
     border-bottom: 1px solid var(--line-soft);
     font-size: var(--s-1);
   }
@@ -242,23 +253,9 @@ const recent = sessions.slice(-rows.length);
     cursor: default;
   }
 
-  /* The active change: a redline bar, its new value on a red chip. */
   .row:global(.is-active) {
     background: var(--change-tint);
     box-shadow: inset 2px 0 0 var(--change);
-  }
-
-  .row:global(.is-active) .new-value {
-    border-color: var(--change);
-    background: var(--change);
-    color: var(--on-change);
-  }
-
-  /* Muted rather than faint: the tinted row needs the extra contrast. */
-  .row:global(.is-active) .old-value {
-    color: var(--text-muted);
-    text-decoration-color: var(--change);
-    text-decoration-thickness: 1.5px;
   }
 
   .row__time {
@@ -285,31 +282,58 @@ const recent = sessions.slice(-rows.length);
     color: var(--text-muted);
   }
 
+  /* Old value struck through in light mono, then the new value in bold mono. */
   .row__change {
     display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
+    align-items: baseline;
+    gap: 0.4rem;
     font-family: var(--font-mono);
     font-size: var(--s-2);
     white-space: nowrap;
   }
 
-  .row__change .new-value {
-    padding-block: 0.05rem;
+  .row__old {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  .row:global(.is-active) .row__old {
+    text-decoration-color: var(--change);
+    text-decoration-thickness: 1.5px;
   }
 
   .row__arrow {
     color: var(--text-faint);
   }
 
+  .row__new {
+    font-weight: 600;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
   .log__foot {
     display: flex;
     justify-content: space-between;
     gap: var(--sp-2);
-    padding: 0.75rem var(--sp-2);
+    padding: 0.625rem var(--cell-pad) 0.75rem;
     border-top: 1px solid var(--line);
-    font-size: var(--s-2);
+    font-size: var(--s-1);
     color: var(--text-muted);
+  }
+
+  .log__foot .mono {
+    font-size: var(--s-2);
+    line-height: 1.6;
+  }
+
+  /* In the hero band the cell's rules frame the log. */
+  @media (min-width: 64rem) {
+    .log {
+      --cell-pad: var(--pad);
+      border: 0;
+    }
   }
 
   /* Playback: each element starts dimmed, never hidden, then settles. */

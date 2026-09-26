@@ -1,11 +1,17 @@
 ---
 /**
- * The design document Trace writes, as a sheet of paper in both themes. It
- * keeps to LogPanel's row grid (a 44px bar and a 56px block), so the first
- * change statement sits on the same line as the log entry it came from.
+ * The design document Trace writes, as a sheet of paper in both themes. In
+ * the hero band it fills a cell of the figure; it keeps to LogPanel's row
+ * grid (a 44px bar and a 56px block), so the first change statement sits on
+ * the same line as the log entry it came from.
  */
 const changes = [
-  { id: '2.1', text: 'Motor mount wall thickened from 2.0 to 2.5 mm.', ref: '09:12', link: 'wall' },
+  {
+    id: '2.1',
+    text: 'Motor mount wall thickened from 2.0 to 2.5 mm, with its root fillet raised from R1.5 to R2.',
+    ref: '09:12, 09:31',
+    link: 'wall',
+  },
   {
     id: '2.2',
     text: 'Housing material changed from ABS to PC-ABS.',
@@ -14,9 +20,9 @@ const changes = [
   },
   {
     id: '2.3',
-    text: 'Dust extraction moved from 6 to 8 holes, each Ø9.',
+    text: 'Bearing seat set to Ø22 H7 for the 608 bearing.',
     ref: '10:24, 10:26',
-    link: 'holes',
+    link: 'bearing',
   },
 ];
 ---
@@ -25,17 +31,20 @@ const changes = [
   <header class="doc__bar">
     <span class="doc__kind mono">Design document</span>
     <span class="doc__no mono num">TR-0142</span>
-    <span class="rev-tag" role="img" aria-label="Revision B">
-      <svg viewBox="0 0 24 21" aria-hidden="true">
-        <path d="M12 1.5 22.5 19.5H1.5Z"></path>
-      </svg>
-      <span aria-hidden="true">B</span>
+    <span class="doc__rev mono">
+      Rev B
+      <span class="rev-tag rev-tag--change" aria-hidden="true">
+        <svg viewBox="0 0 24 21">
+          <path d="M12 1.5 22.5 19.5H1.5Z"></path>
+        </svg>
+        <span>B</span>
+      </span>
     </span>
   </header>
 
   <div class="doc__block doc__line" style="--i: 0">
     <p class="doc__title">Orbital sander housing</p>
-    <p class="doc__meta mono num">Changes since Rev A · 22 Sep 2026</p>
+    <p class="doc__meta mono num">2 Changes since Rev A · 22 Sep 2026</p>
   </div>
 
   <ol class="doc__items">
@@ -49,7 +58,7 @@ const changes = [
         <span class="doc__id mono num">{c.id}</span>
         <span class="doc__text">{c.text}</span>
         <span class="doc__ref mono num">
-          <span class="visually-hidden">From log entry </span>↳ {c.ref}
+          <span class="visually-hidden">From log entries </span>↳ {c.ref}
         </span>
       </li>
     ))}
@@ -63,29 +72,31 @@ const changes = [
 
 <style>
   .doc {
+    --cell-pad: var(--sp-2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 2.75rem 3.5rem 1fr auto;
+    height: 100%;
     border: 1px solid var(--text-strong);
-    font-size: 0.8125rem;
-    line-height: 1.45;
+    font-size: var(--s-1);
+    line-height: 1.5;
   }
 
   .doc__bar {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding-inline: var(--sp-2) 0.75rem;
+    gap: var(--sp-2);
+    padding-inline: var(--cell-pad);
     border-bottom: 1px solid var(--line);
   }
 
   .doc__kind,
-  .doc__no {
+  .doc__no,
+  .doc__rev {
     font-size: var(--s-2);
     font-weight: 500;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--text-muted);
     white-space: nowrap;
   }
 
@@ -95,22 +106,29 @@ const changes = [
 
   .doc__no {
     margin-left: auto;
-    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  .doc__rev {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-strong);
   }
 
   .doc__block {
     display: grid;
     align-content: center;
     gap: 0.125rem;
-    padding-inline: var(--sp-2);
+    padding-inline: var(--cell-pad);
     border-bottom: 1px solid var(--line);
   }
 
   .doc__title {
+    font-family: var(--font-display);
     font-size: var(--s1);
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.2;
-    letter-spacing: -0.01em;
     color: var(--text-strong);
   }
 
@@ -128,12 +146,12 @@ const changes = [
     list-style: none;
   }
 
-  /* The first text line is centered 20px from the top, on the log's first row. */
+  /* The first text line is centred 20px from the top, on the log's first row. */
   .doc__item {
     display: grid;
-    grid-template-columns: 1.75rem minmax(0, 1fr);
+    grid-template-columns: 2rem minmax(0, 1fr);
     column-gap: 0.25rem;
-    padding: 0.6rem var(--sp-2) 0.625rem;
+    padding: 0.5625rem var(--cell-pad) 0.625rem;
     border-bottom: 1px solid var(--line-soft);
   }
 
@@ -166,10 +184,18 @@ const changes = [
     display: flex;
     justify-content: space-between;
     gap: var(--sp-2);
-    padding: 0.75rem var(--sp-2);
+    padding: 0.625rem var(--cell-pad) 0.75rem;
     border-top: 1px solid var(--line);
     font-size: var(--s-2);
+    line-height: 1.6;
     color: var(--text-muted);
+  }
+
+  @media (min-width: 64rem) {
+    .doc {
+      --cell-pad: var(--pad);
+      border: 0;
+    }
   }
 
   :global(.hero.is-playing) .doc__line {

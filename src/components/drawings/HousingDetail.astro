@@ -1,0 +1,159 @@
+---
+/**
+ * Detail A at 1:1: the motor mount wall where it meets the shell, with the
+ * bearing seat under it. Cut from the same model as Fig. 1, so the outline,
+ * fillets and walls match. At this scale the walls are wide enough for 45°
+ * hatching.
+ *
+ * Revision B changed the wall (2.0 to 2.5), its root fillet (R1.5 to R2)
+ * and the bearing seat (to Ø22 H7); each is clouded and tagged with the
+ * revision letter, in redline.
+ */
+import { G, radiusAt, sectionLoops, T } from '../../lib/sander';
+import { P, View, f } from '../../lib/drafting';
+import { cloudAround } from '../../scripts/revision-cloud';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const v = new View(1);
+const A = { x: 24, y: 38, r: 28 };
+
+const cut = sectionLoops()
+  .map((loop) => `M${loop.map(([x, y]) => P(x, y)).join('L')}Z`)
+  .join('');
+const axis = `M${P(0, A.y - A.r - 2)}L${P(0, A.y + A.r + 2)}`;
+
+// Wall thickness: arrows from outside, the value beside the upper arrow.
+const wallX = 31;
+const wall = v.dim({ x: wallX, y: G.wall.y0 }, { x: wallX, y: G.wall.y1 }, 'v', wallX, '');
+const wallText = { x: wallX + 1.6, y: G.wall.y1 + 4.2 };
+
+// Root fillet on top of the wall, where it meets the shell.
+const rIn = radiusAt(G.wall.y1 + G.fillet, -T);
+const fillet = v.leader(
+  { x: rIn - G.fillet * 0.29, y: G.wall.y1 + G.fillet * 0.29 },
+  { x: 40.5, y: 53 },
+  -1,
+);
+
+// Bearing seat, dimensioned the half-section way: one arrowhead on the
+// visible side, the line running on past the axis.
+const seatY = G.boss.y0 - 3.5;
+const seatLines =
+  `M${P(G.boss.r0, G.boss.y0 - v.p(1))}L${P(G.boss.r0, seatY - v.p(2))}` +
+  `M${P(G.boss.r0, seatY)}L${P(-8, seatY)}`;
+const seatArrow = v.arrow({ x: G.boss.r0, y: seatY }, { x: 0, y: seatY });
+const seatText = { x: 2.2, y: seatY + v.p(1) };
+
+// Revision clouds and their delta tags.
+const cloud1 = { x: wallX - 1.5, y: 42.8 + 1.8, w: 14.5, h: 11.2 };
+const cloud2 = { x: -7.5, y: seatY + 0.6, w: 18.5, h: 5.6 };
+const tri = (x: number, y: number) => `M${P(x, y + 3.6)}L${P(x + 2.1, y)}L${P(x - 2.1, y)}Z`;
+const tags = [
+  { x: cloud1.x + cloud1.w + 2.6, y: cloud1.y + cloud1.h - 3.4 },
+  { x: cloud2.x - 2.8, y: cloud2.y + 1.2 },
+];
+
+const vb = { x0: -12, x1: 58, y0: A.y - A.r - 1, y1: A.y + A.r + 1 };
+const viewBox = `${vb.x0} ${-vb.y1} ${vb.x1 - vb.x0} ${vb.y1 - vb.y0}`;
+---
+
+<svg
+  class="dwg"
+  viewBox={viewBox}
+  style={`--paper-w: ${f((vb.x1 - vb.x0) * v.scale)}`}
+  role="img"
+  aria-labelledby={`${id}-title`}
+>
+  <title id={`${id}-title`}>
+    Detail A at full size: the motor mount wall, now 2.5 millimetres thick with an R2 root fillet,
+    and the bearing seat below it, now 22 millimetres H7. Each change is marked as revision B.
+  </title>
+  <defs>
+    <clipPath id={`${id}-clip`}>
+      <circle cx={f(A.x)} cy={f(-A.y)} r={f(A.r)}></circle>
+    </clipPath>
+    <pattern
+      id={`${id}-hatch`}
+      width="1.2"
+      height="1.2"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <line
+        class="hatch-line"
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="1.2"
+        stroke="currentColor"
+        stroke-width="0.16"
+      ></line>
+    </pattern>
+  </defs>
+
+  <g clip-path={`url(#${id}-clip)`}>
+    <path class="chain" d={axis}></path>
+    <path class="cut dwg-hatch" d={cut} fill={`url(#${id}-hatch)`} fill-rule="evenodd"></path>
+  </g>
+  <circle class="thin" cx={f(A.x)} cy={f(-A.y)} r={f(A.r)}></circle>
+
+  <g class="dims">
+    <path class="thin" d={wall.lines + fillet.lines + seatLines}></path>
+    <path class="arrow" d={wall.arrows + fillet.mark + seatArrow}></path>
+    <text class="halo" x={f(wallText.x)} y={f(-wallText.y)} font-size={f(v.text)}>
+      2.5
+    </text>
+    <text
+      class="halo"
+      x={f(fillet.text.x)}
+      y={f(-fillet.text.y)}
+      text-anchor={fillet.text.anchor}
+      font-size={f(v.text)}
+    >
+      R2
+    </text>
+    <text
+      class="halo"
+      x={f(seatText.x)}
+      y={f(-seatText.y)}
+      text-anchor="middle"
+      font-size={f(v.text)}
+    >
+      Ø22 H7
+    </text>
+  </g>
+
+  <g class="rev">
+    <path
+      class="rev-cloud"
+      d={cloudAround(cloud1.x, -(cloud1.y + cloud1.h), cloud1.w, cloud1.h, 2.6)}
+    ></path>
+    <path
+      class="rev-cloud"
+      d={cloudAround(cloud2.x, -(cloud2.y + cloud2.h), cloud2.w, cloud2.h, 2.4)}
+    ></path>
+    {tags.map((t) => (
+      <>
+        <path class="rev-tri" d={tri(t.x, t.y)} />
+        <text class="rev-letter" x={f(t.x)} y={f(-t.y - 0.55)} text-anchor="middle" font-size="2.3">
+          B
+        </text>
+      </>
+    ))}
+  </g>
+</svg>
+
+<style>
+  .dwg-hatch {
+    color: var(--dwg-ink);
+  }
+
+  /* Hatching is sized on the paper, so it scales with the drawing. */
+  .hatch-line {
+    vector-effect: none;
+  }
+</style>

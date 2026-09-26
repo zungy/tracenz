@@ -1,6 +1,13 @@
 ---
+/**
+ * Log in and sign up share one sheet: the form, and beside it a blueprint
+ * panel with the housing from the home page, cut open where revision B
+ * changed it, over the log entry that recorded the change. On desktop both
+ * are cells between the header's and the footer's rules: the form in zones
+ * 1 to 4, the panel in zones 5 to 8.
+ */
+import ModelView from '../ModelView.astro';
 import AuthForm from './AuthForm.astro';
-import PadDrawing from './PadDrawing.astro';
 
 interface Props {
   mode: 'login' | 'signup';
@@ -9,133 +16,165 @@ interface Props {
 const { mode } = Astro.props;
 ---
 
-<div class="page">
-  <div class="container grid page__grid">
-    <div class="page__form">
+<section class="account" data-row>
+  <div class="container grid account__grid">
+    <div class="account__form">
       <AuthForm mode={mode} />
     </div>
 
     <aside class="panel scheme-blueprint" aria-label="Example from the change log">
-      <div class="panel__inner">
-        <p class="panel__label label">
-          <span>Detail D</span>
-          <span>Sanding pad</span>
-        </p>
-        <PadDrawing />
-        <div class="panel__log">
-          <span class="panel__mark" aria-hidden="true"></span>
-          <time class="num">10:26</time>{' '}
-          <span>
-            <strong>Hole 3</strong> Diameter
-          </span>{' '}
-          <span class="panel__change num">
-            <span class="visually-hidden">from </span>
-            <del class="old-value">Ø8</del>
-            <span aria-hidden="true">→</span>
-            <span class="visually-hidden"> to </span>
-            <ins class="new-value">Ø9</ins>
+      <div class="cyanotype" aria-hidden="true"></div>
+      <p class="panel__label mono">
+        <span>Housing, Rev B</span>
+        <span>Quarter section</span>
+      </p>
+      <ModelView
+        class="panel__model"
+        alt="The sander housing with a quarter cut away. The motor mount wall inside, which changed in revision B, is drawn in red."
+        tone="dark"
+        intro
+      />
+      <div class="panel__foot">
+        <p class="entry">
+          <time class="entry__time mono num">09:12</time>
+          <span class="entry__what">
+            <strong>Sketch 4</strong>
+            <span>D3</span>
           </span>
-        </div>
+          <span class="entry__change mono num">
+            <span class="visually-hidden">from </span>
+            <del>2.0</del>
+            <span class="entry__arrow" aria-hidden="true">
+              →
+            </span>
+            <span class="visually-hidden"> to </span>
+            <ins>2.5</ins>
+          </span>
+        </p>
         <p class="panel__caption">
-          Every dimension you change is logged with its value before and after.
+          Trace logged the thicker wall with its value before and after. The design document cites
+          this entry in section 2.1.
         </p>
       </div>
     </aside>
   </div>
-</div>
+</section>
 
 <style>
-  .page {
-    padding-block: var(--sp-5) var(--sp-8);
-  }
-
-  .page__grid {
+  .account__grid {
     row-gap: var(--sp-5);
-    align-items: start;
   }
 
-  .page__form {
+  .account__form {
     grid-column: 1 / -1;
     display: grid;
     justify-items: start;
+    padding-block: var(--sp-5) var(--sp-8);
   }
 
   .panel {
     display: none;
   }
 
+  /*
+   * Desktop: the form is centred in zones 1 to 4; the panel fills zones 5 to
+   * 8 from the header's rule to the footer's.
+   */
   @media (min-width: 64rem) {
-    .page {
-      padding-block: var(--sp-8);
+    .account__grid {
+      align-items: stretch;
     }
 
-    .page__form {
-      grid-column: 2 / span 6;
+    .account__form {
+      grid-column: 1 / span 4;
+      justify-items: center;
+      align-content: center;
+      padding: var(--sp-8) var(--pad);
     }
 
-    /* Blueprint sheet with a 32px square grid, four 8px units per square. */
     .panel {
-      display: block;
-      grid-column: 9 / -1;
-      border-radius: var(--radius);
-      background-image:
-        linear-gradient(var(--line-soft) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-      background-size: 32px 32px;
-      background-position: -1px -1px;
+      position: relative;
+      isolation: isolate;
+      grid-column: 5 / span 4;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: var(--sp-3);
+      padding: var(--sp-5) var(--pad);
     }
-  }
-
-  .panel__inner {
-    position: relative;
-    display: grid;
-    gap: var(--sp-3);
-    padding: var(--sp-5);
   }
 
   .panel__label {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 0.6rem;
+    padding-bottom: 0.625rem;
     border-bottom: 1px solid var(--line);
-  }
-
-  .panel__log {
-    position: relative;
-    display: grid;
-    grid-template-columns: 0.5rem 2.75rem minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem var(--sp-2);
-    border: 1px solid var(--line);
-    background: var(--surface);
-    font-size: var(--s-1);
-  }
-
-  .panel__mark {
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--accent);
-  }
-
-  .panel__log time {
-    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
 
-  .panel__log strong {
-    margin-right: 0.4rem;
+  .panel :global(.panel__model) {
+    align-self: center;
   }
 
-  .panel__change {
-    display: inline-flex;
+  .panel__foot {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  /* The log entry, as the active row of the hero's log. */
+  .entry {
+    display: grid;
+    grid-template-columns: 2.625rem minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.3rem;
-    font-family: var(--font-mono);
+    column-gap: 0.75rem;
+    height: 2.75rem;
+    padding-inline: var(--sp-2);
+    border: 1px solid var(--line);
+    background: var(--change-tint);
+    box-shadow: inset 2px 0 0 var(--change);
+    font-size: var(--s-1);
+  }
+
+  .entry__time {
+    font-size: var(--s-2);
+    color: var(--text-muted);
+  }
+
+  .entry__what {
+    display: flex;
+    gap: 0.4rem;
+    color: var(--text-muted);
+  }
+
+  .entry__change {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: var(--s-2);
+  }
+
+  .entry__change del {
+    color: var(--text-muted);
+    text-decoration-color: var(--change);
+    text-decoration-thickness: 1.5px;
+  }
+
+  .entry__arrow {
+    color: var(--text-faint);
+  }
+
+  .entry__change ins {
+    font-weight: 600;
+    color: var(--text-strong);
+    text-decoration: none;
   }
 
   .panel__caption {
-    max-width: 34ch;
+    max-width: 44ch;
+    font-size: var(--s-1);
     color: var(--text-muted);
   }
 </style>

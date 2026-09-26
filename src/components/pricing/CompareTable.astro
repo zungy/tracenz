@@ -1,77 +1,104 @@
 ---
+/**
+ * Every feature, plan by plan. On desktop the table runs the full width of
+ * the sheet with its columns on the zone lines, two zones each, and its
+ * last row closes on the next section's rule. Features are numbered by
+ * group, as items are in a parts list.
+ */
 import Icon from '../Icon.astro';
 import { comparison, plans } from '../../config/pricing';
 ---
 
-<section class="compare" aria-labelledby="compare-title">
-  <div class="compare__head">
-    <p class="label">Compare</p>
-    <h2 id="compare-title">Every plan, side by side</h2>
-  </div>
+<section class="compare" aria-labelledby="compare-title" data-row>
+  <div class="container">
+    <div class="grid compare__head">
+      <h2 id="compare-title" class="title compare__title pad">
+        Every plan, side by side
+      </h2>
+      <p class="compare__intro pad">
+        What each plan logs, writes and shares. The plans differ in how much history they keep, how
+        many documents they write and who can review them.
+      </p>
+    </div>
 
-  <div class="compare__scroll" role="region" aria-label="Plan comparison table" tabindex="0">
-    <table>
-      <colgroup>
-        <col class="col-feature" />
-        {plans.map(() => (
-          <col />
-        ))}
-      </colgroup>
-      <thead>
-        <tr>
-          <td></td>
-          {plans.map((plan) => (
-            <th scope="col">{plan.name}</th>
+    <div class="compare__scroll" role="region" aria-label="Plan comparison table" tabindex="0">
+      <table>
+        <colgroup>
+          <col class="col-feature" />
+          {plans.map(() => (
+            <col class="col-plan" />
           ))}
-        </tr>
-      </thead>
-      {comparison.map((group) => (
-        <tbody>
-          <tr class="group">
-            <th scope="rowgroup" colspan={plans.length + 1}>
-              {group.name}
-            </th>
+        </colgroup>
+        <thead>
+          <tr>
+            <td></td>
+            {plans.map((plan) => (
+              <th scope="col">
+                {plan.name}
+                {plan.recommended && <span class="recommended mono">Recommended</span>}
+              </th>
+            ))}
           </tr>
-          {group.rows.map((row) => (
-            <tr>
-              <th scope="row">{row.feature}</th>
-              {row.values.map((value) =>
-                value === true ? (
-                  <td>
-                    <Icon name="check" size={18} stroke={2} class="yes" />
-                    <span class="visually-hidden">Included</span>
-                  </td>
-                ) : value === false ? (
-                  <td>
-                    <span class="no" aria-hidden="true" />
-                    <span class="visually-hidden">Not included</span>
-                  </td>
-                ) : (
-                  <td>{value}</td>
-                ),
-              )}
+        </thead>
+        {comparison.map((group, g) => (
+          <tbody>
+            <tr class="group">
+              <th scope="rowgroup" colspan={plans.length + 1}>
+                <span class="item mono num">{g + 1}</span>
+                {group.name}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      ))}
-    </table>
+            {group.rows.map((row, r) => (
+              <tr>
+                <th scope="row">
+                  <span class="item mono num">
+                    {g + 1}.{r + 1}
+                  </span>
+                  {row.feature}
+                </th>
+                {row.values.map((value) =>
+                  value === true ? (
+                    <td>
+                      <Icon name="check" size={18} stroke={2} class="yes" />
+                      <span class="visually-hidden">Included</span>
+                    </td>
+                  ) : value === false ? (
+                    <td>
+                      <span class="no" aria-hidden="true" />
+                      <span class="visually-hidden">Not included</span>
+                    </td>
+                  ) : (
+                    <td class="mono">{value}</td>
+                  ),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        ))}
+      </table>
+    </div>
   </div>
 </section>
 
 <style>
   .compare {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-5);
+    padding-block: var(--section-pad);
+    border-top: var(--rule) solid var(--text-strong);
   }
 
   .compare__head {
-    display: grid;
-    gap: var(--sp-2);
+    row-gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
   }
 
-  .compare__head h2 {
-    font-size: clamp(var(--s4), 1.4rem + 2.2vw, var(--s6));
+  .compare__title,
+  .compare__intro {
+    grid-column: 1 / -1;
+  }
+
+  .compare__intro {
+    max-width: 52ch;
+    color: var(--text-muted);
   }
 
   /* position: relative keeps the absolutely positioned screen-reader labels
@@ -85,12 +112,14 @@ import { comparison, plans } from '../../config/pricing';
   table {
     width: 100%;
     min-width: 40rem;
+    table-layout: fixed;
     border-collapse: collapse;
     font-size: var(--s-1);
   }
 
-  .col-feature {
-    width: 34%;
+  .col-feature,
+  .col-plan {
+    width: 25%;
   }
 
   th,
@@ -99,36 +128,53 @@ import { comparison, plans } from '../../config/pricing';
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: middle;
+    color: var(--text-strong);
   }
 
-  thead td {
-    border-bottom: 1px solid var(--line-strong);
+  td.mono {
+    font-size: var(--s-2);
   }
 
   thead th {
-    font-family: var(--font-display);
     font-size: var(--s1);
     font-weight: 600;
-    color: var(--text-strong);
-    border-bottom: 1px solid var(--line-strong);
+    line-height: 1.4;
+  }
+
+  thead > tr > * {
+    padding-block: var(--sp-2);
+    border-bottom: var(--rule) solid var(--text-strong);
+  }
+
+  .recommended {
+    margin-left: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--select);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    vertical-align: 0.15em;
+    color: var(--select);
   }
 
   tbody th[scope='row'] {
     font-weight: 500;
-    color: var(--text);
   }
 
-  td {
-    color: var(--text-strong);
-  }
-
+  /* A group opens on a tinted row, numbered like the items under it. */
   .group th {
     padding-top: var(--sp-3);
-    font-family: var(--font-mono);
+    background: var(--bg-alt);
+    font-size: var(--s0);
+    font-weight: 600;
+  }
+
+  .item {
+    display: inline-block;
+    width: 2.5rem;
     font-size: var(--s-2);
     font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--text-muted);
   }
 
@@ -140,11 +186,56 @@ import { comparison, plans } from '../../config/pricing';
     color: var(--text-strong);
   }
 
-  /* Not included: a short hidden-line dash, the drafting mark for absent geometry */
+  /* Not included: a short thin rule */
   .no {
     display: inline-block;
-    width: 1.25rem;
-    border-top: 1.5px dashed var(--line-strong);
+    width: 0.875rem;
+    border-top: 1px solid var(--line-strong);
     vertical-align: middle;
+  }
+
+  /*
+   * Desktop: the table spans the sheet. The feature column and each plan
+   * column take two zones, with a hairline on each zone line between them,
+   * and the next section's rule closes the table.
+   */
+  @media (min-width: 64rem) {
+    .compare {
+      padding-bottom: 0;
+    }
+
+    .compare__head {
+      align-items: end;
+    }
+
+    .compare__title {
+      grid-column: 1 / span 4;
+    }
+
+    .compare__intro {
+      grid-column: 5 / span 4;
+    }
+
+    .compare__scroll {
+      overflow: visible;
+      border: 0;
+      border-top: var(--rule) solid var(--text-strong);
+    }
+
+    th,
+    td {
+      padding-inline: var(--pad);
+    }
+
+    th + th,
+    th + td,
+    td + th,
+    td + td {
+      border-left: 1px solid var(--line);
+    }
+
+    .group th {
+      border-left: 0;
+    }
   }
 </style>

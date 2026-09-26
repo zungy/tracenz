@@ -7,16 +7,18 @@
 interface Props {
   /** Unique per instance on a page, e.g. "header" or "menu". */
   id: string;
+  /** A shorter switch for the header. */
+  compact?: boolean;
 }
 
-const { id } = Astro.props;
+const { id, compact = false } = Astro.props;
 const options = [
   { value: 'light', label: 'Paper' },
   { value: 'dark', label: 'Blueprint' },
 ];
 ---
 
-<fieldset class="theme-toggle" data-theme-toggle>
+<fieldset class:list={['theme-toggle', compact && 'theme-toggle--compact']} data-theme-toggle>
   <legend class="visually-hidden">View</legend>
   {options.map((option) => (
     <label for={`theme-${id}-${option.value}`}>
@@ -39,6 +41,11 @@ const options = [
     padding: 3px;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
+  }
+
+  .theme-toggle--compact {
+    height: 2rem;
+    padding: 2px;
   }
 
   label {
