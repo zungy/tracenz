@@ -97,7 +97,7 @@ accounts or cloud data.
 ## Windows downloads
 
 `site.downloads.windows` in `src/config/site.ts` points to the GitHub release asset. The current
-release is `desktop-v0.6.1`, with asset `Trace-desktop-v0.6.1-Windows-x64.zip`. Publish that exact
+release is `desktop-v0.6.2`, with asset `Trace-desktop-v0.6.2-Windows-x64.zip`. Publish that exact
 asset before making its download link live. For later releases, publish the new asset, update the
 URL and version shown on `/download`, then deploy the website.
 
