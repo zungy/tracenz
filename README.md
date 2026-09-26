@@ -127,6 +127,83 @@ npm run build                          # so dist/ picks up the new files
 
 ## Deploying
 
-Build command `npm run build`, output directory `dist`. Netlify, Cloudflare Pages and Vercel all
-detect Astro automatically. GitHub Pages also works, but serving a private repository through it
-requires a paid GitHub plan.
+The site is fully static: `npm run build` writes it to `dist/`, and any static host can serve
+that folder. Netlify and Cloudflare Pages detect Astro automatically. GitHub Pages also works,
+but serving a private repository through it requires a paid GitHub plan. For Vercel, follow the
+guide below.
+
+### Deploying to Vercel
+
+Vercel detects Astro and serves the static build from its CDN. No adapter is needed: the
+`@astrojs/vercel` adapter is only for server rendering or Vercel services such as Web Analytics
+and Image Optimization, which this site doesn't use. There are no environment variables to set.
+
+On the free Hobby plan, Vercel deploys public and private repositories from a personal GitHub
+account. A private repository owned by a GitHub organization needs a Pro team; the command line
+route below also works, as it doesn't use the Git connection.
+
+#### From the dashboard
+
+Connecting the repository deploys every push automatically.
+
+1. Sign in at [vercel.com](https://vercel.com) and choose **Add New… → Project**, or go to
+   [vercel.com/new](https://vercel.com/new).
+2. Under **Import Git Repository**, pick `Jinomee/trace`. If it isn't listed, follow the link to
+   adjust the GitHub app's permissions and give Vercel access to the repository.
+3. Check the settings Vercel fills in on the configure screen:
+
+   | Setting          | Value                                                    |
+   | ---------------- | -------------------------------------------------------- |
+   | Framework Preset | Astro                                                    |
+   | Root Directory   | `./`                                                     |
+   | Build Command    | `npm run build` (the preset's `astro build` is the same) |
+   | Output Directory | `dist`                                                   |
+   | Install Command  | The default, which installs from `package-lock.json`     |
+
+4. Choose **Deploy**. The first deployment goes to production, at `<project-name>.vercel.app`.
+
+#### Which branch goes live
+
+Vercel deploys one branch to production and every other branch and pull request as a preview,
+each with its own URL. For production it uses `main` if there is one, then `master`, then the
+repository's default branch. This repository has a single branch for now,
+`claude/amazing-goodall-sb0vfn`, so that is what goes live. Once the work is merged into `main`,
+point production at it: in the project, open **Settings → Environments → Production → Branch
+Tracking**, enter `main` and save.
+
+#### From the command line
+
+The Vercel CLI deploys from a local checkout:
+
+```sh
+npm install --global vercel
+vercel login
+vercel          # first run: links the folder to a new or existing project and deploys it
+vercel          # later runs: a preview deployment with its own URL
+vercel --prod   # a production deployment
+```
+
+The CLI uploads the project and Vercel builds it with the settings above. The link to the
+project is kept in `.vercel/`, which is git-ignored.
+
+#### Node.js version
+
+Astro needs Node.js 22.12 or later. The `engines` field in `package.json` says so, and Vercel
+follows it in preference to the **Node.js Version** setting under **Settings → Build and
+Deployment**, so there is nothing to set. Because the range is open-ended, the build log may
+warn that it will pick up new major versions of Node.js; that is expected.
+
+#### After the first deployment
+
+1. **Domain:** in the project's **Settings → Domains**, add the domain, then create the DNS
+   records Vercel shows for it at your DNS provider: an A record for an apex domain such as
+   `example.com`, a CNAME for a subdomain such as `www`. Vercel issues the HTTPS certificate once
+   DNS resolves.
+2. **Site URL:** set `site` in `astro.config.mjs` to the production URL, for example
+   `site: 'https://example.com'`. Astro uses it to build absolute URLs, such as canonical links
+   or a sitemap if you add them. Push the change and the next deployment picks it up.
+3. **Placeholders:** replace everything listed under
+   [Before launch](#before-launch-placeholders-to-replace).
+4. **Check it:** open `/`, `/pricing`, `/login` and `/signup`; an unknown address, which gets the
+   site's own not-found page (Vercel serves `dist/404.html` with a 404 status); and
+   `/samples/TR-0142-rev-b.pdf`.

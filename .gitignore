@@ -5,6 +5,9 @@ node_modules/
 dist/
 .astro/
 
+# Vercel CLI project link
+.vercel/
+
 # environment
 .env
 .env.*
