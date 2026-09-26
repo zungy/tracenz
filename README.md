@@ -97,13 +97,18 @@ accounts or cloud data.
 ## Windows downloads
 
 `site.downloads.windows` in `src/config/site.ts` points to the GitHub release asset. The current
-release is `desktop-v0.6.2`, with asset `Trace-desktop-v0.6.2-Windows-x64.zip`. Publish that exact
+release is `desktop-v0.7.0`, with asset `Trace-desktop-v0.7.0-Windows-x64.zip`. Publish that exact
 asset before making its download link live. For later releases, publish the new asset, update the
 URL and version shown on `/download`, then deploy the website.
 
 The desktop ZIP is an unsigned portable Windows x64 app. Users must extract the whole ZIP, quit
 any old Trace through its system tray, then open `Trace.exe`. The website does not distribute
 macOS builds or install desktop updates automatically.
+
+Desktop v0.7.0 adds **Design report**: an engineering PDF for a selected document, with cited
+analysis, original rationale, normalized changes and a complete chronological checkpoint appendix.
+Available screenshots are included, and missing images are identified. Reports are generated and
+saved through the desktop app; the website viewer continues to offer browsing and ZIP exports.
 
 ## Remaining marketing content
 
