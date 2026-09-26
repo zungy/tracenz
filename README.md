@@ -1,63 +1,117 @@
 # Trace
 
-Trace logs the changes you make in CAD and uses AI to turn that history into a design document.
+Trace records changes in Autodesk Fusion and saves engineering decisions, screenshots and AI
+summaries to a private design history. This repository is the existing Astro website: marketing
+pages, email account access, Windows downloads and the signed-in web viewer.
 
-This repository holds the marketing website: a landing page, a pricing page and log in / sign up
-pages. It's a static site built with [Astro](https://astro.build), so it deploys to any static
-host.
+The site remains a static Astro build. Authentication uses Supabase Auth in the browser; private
+history is read from the same Trace Edge API and Supabase project used by the desktop app. No
+copy or import into a separate web database is needed.
 
 ## Getting started
 
-Requires Node 22.12 or later.
+Use Node 24 or later for the development and test commands below. Install the exact locked
+package versions with `npm ci`.
 
 ```sh
-npm install
+npm ci
 npm run dev       # local server at http://localhost:4321
+npm test          # auth/session and history regression tests; no live accounts needed
+npm run check     # type and template checks
 npm run build     # static site in dist/
 npm run preview   # serve the built site
-npm run check     # type and template checks
 npm run format    # format with Prettier
 ```
 
 ## Pages
 
-| Route              | Source                            | Contents                                                                                    |
-| ------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `/`                | `src/pages/index.astro`           | Hero with the model, log and document joined by a trace line; the document; plans; download |
-| `/pricing`         | `src/pages/pricing.astro`         | Plans with a monthly/yearly switch, Enterprise, comparison table, FAQ                       |
-| `/login`           | `src/pages/login.astro`           | Log in form beside the housing, cut open                                                    |
-| `/signup`          | `src/pages/signup.astro`          | Sign up form; `?plan=pro` or `?plan=team` notes the chosen plan                             |
-| `/samples/tr-0142` | `src/pages/samples/tr-0142.astro` | The sample design document at full size, for printing (not indexed)                         |
-| 404                | `src/pages/404.astro`             | Not-found page                                                                              |
+| Route              | Source                            | Contents                                                                                            |
+| ------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `/`                | `src/pages/index.astro`           | Product overview, illustrative model/log/document, plans and Windows download                       |
+| `/pricing`         | `src/pages/pricing.astro`         | Existing pricing copy and comparison; billing is not implemented                                    |
+| `/login`           | `src/pages/login.astro`           | Email/password login, then a same-origin redirect to `/app`                                         |
+| `/signup`          | `src/pages/signup.astro`          | Create the same account used by desktop; return to desktop or log in on the web                     |
+| `/app`             | `src/pages/app.astro`             | Documents first, then searchable timelines, checkpoint details, private screenshots and ZIP exports |
+| `/download`        | `src/pages/download.astro`        | Windows portable ZIP and setup instructions; no macOS download                                      |
+| `/samples/tr-0142` | `src/pages/samples/tr-0142.astro` | Illustrative design document for printing; not private user history                                 |
+| 404                | `src/pages/404.astro`             | Not-found page                                                                                      |
 
-## Before launch: placeholders to replace
+## Accounts and shared history
 
-| What                           | Where                                                                                                                                                     |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Trace logo                     | `src/components/LogoPlaceholder.astro` and `public/favicon.svg`                                                                                           |
-| Google / Microsoft sign-in     | `src/components/auth/AuthForm.astro` (logo slots and links)                                                                                               |
-| Download URLs                  | `downloads` in `src/config/site.ts`                                                                                                                       |
-| Supabase Auth                  | `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` locally and Vercel project settings                                           |
-| Sales email                    | `salesEmail` in `src/config/site.ts`                                                                                                                      |
-| Plans, prices, FAQ             | `src/config/pricing.ts`                                                                                                                                   |
-| Terms, privacy, password reset | Links in `src/components/auth/AuthForm.astro`                                                                                                             |
-| Production URL                 | Set `site` in `astro.config.mjs` once the domain is known                                                                                                 |
-| Claims to confirm              | "Only the projects you choose are logged" (download band), "Runs beside Autodesk Fusion", Windows and macOS apps (`everyPlan` in `src/config/pricing.ts`) |
-| Trademark line                 | Footer (`src/components/Footer.astro`); have it checked                                                                                                   |
-| Site drawing number            | `TR-WEB-01` in the footer's title block                                                                                                                   |
+The browser uses the pinned Supabase JavaScript SDK from `src/lib/supabase.ts`. Email/password
+login redirects to `/app`; signup creates an account and offers the next step instead of silently
+opening the viewer. With the current demo configuration, email confirmation is disabled. Any
+session issued during signup is signed out with `scope: 'local'`, which preserves existing desktop
+sessions. If email confirmation is enabled later, configure the confirmation flow and email sender
+before inviting users.
 
-Copy `.env.example` to `.env.local` for local development and fill in the Supabase project's URL and
-publishable key. Set the same variables in Vercel for each deployment environment you use. The
-sign-up form stores the full name in Supabase Auth user metadata and requires email confirmation
-when that option is enabled in Supabase; login uses the user's email and password. Configure the
-Supabase Auth redirect allow list to include `http://localhost:4321/**` and the website's deployed
-origin (plus preview origins if you test sign-up on Vercel previews).
+Login uses session storage by default. **Keep me logged in on this device** opts into local
+storage. The SDK manages token renewal; `src/lib/trace-client.ts` coordinates retries, discards
+responses after logout/account changes, and sends authenticated reads to the Trace API. Web logout
+clears browser credentials and signs out only the browser session.
 
-Until a download URL is set, its buttons explain that downloads are not available yet. Google and
-Microsoft sign-in remain placeholders until their providers are configured.
+The viewer is intentionally limited to viewing, searching and downloading. It does not delete or
+edit records, install Fusion, change cloud settings or create checkpoints. Screenshots and ZIP
+exports require authentication. Users only see histories owned by their account; these are the
+same uploaded checkpoints visible in desktop. The desktop must finish uploading a local capture
+before it appears on the website. A shared demo login shares one editable desktop history among
+all people using that account.
 
-All copy is a first draft, and the example project (an orbital sander housing, its log and
-its design document TR-0142) is illustrative.
+### Public Supabase configuration
+
+Copy `.env.example` to `.env.local` for explicit local configuration, and set these same public
+values in the Vercel project's Production and relevant Preview environments:
+
+```dotenv
+PUBLIC_SUPABASE_URL=https://sbupyqgysoznucelwsij.supabase.co
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_1dB-sxxKQ-DxiYgPrlnVzg_ecucKZ-l
+```
+
+These are public client values. Never place an OpenAI key, Supabase secret key or service-role key
+in a `PUBLIC_` variable, source file or downloadable artifact. The current project values are also
+bundled as defaults, so missing environment variables do not break the public release. The client
+rejects a different project URL to prevent accidental separation from the desktop database. A
+project migration must update both the desktop and this client, including the Trace API URL.
+
+### Trace API and CORS
+
+Private reads use:
+
+```text
+https://sbupyqgysoznucelwsij.supabase.co/functions/v1/trace
+```
+
+The Edge function is maintained in the desktop repository under
+`supabase/functions/trace/`. Its deployment configuration must set the signup URL to
+`https://tracenz.vercel.app/signup`; the handler uses that origin to permit the production
+website's authenticated browser requests. The desktop signup destination must use the same URL.
+An existing `TRACE_SIGNUP_URL` Edge secret overrides the checked-in configuration, so keep it in
+sync when deploying.
+
+The production origin must be allowed before deploying the viewer. Localhost and Vercel preview
+origins are not automatically permitted by the production API: explicitly configure any trusted
+additional testing origins in the backend before using real accounts there. Do not make private
+API access anonymous to work around CORS. Unit tests use isolated fixtures and require no live
+accounts or cloud data.
+
+## Windows downloads
+
+`site.downloads.windows` in `src/config/site.ts` points to the GitHub release asset. The current
+release is `desktop-v0.6.1`, with asset `Trace-desktop-v0.6.1-Windows-x64.zip`. Publish that exact
+asset before making its download link live. For later releases, publish the new asset, update the
+URL and version shown on `/download`, then deploy the website.
+
+The desktop ZIP is an unsigned portable Windows x64 app. Users must extract the whole ZIP, quit
+any old Trace through its system tray, then open `Trace.exe`. The website does not distribute
+macOS builds or install desktop updates automatically.
+
+## Remaining marketing content
+
+The design system, logo placeholders and illustrative housing remain from the original site.
+Review sales email (`salesEmail` in `src/config/site.ts`), pricing/FAQ (`src/config/pricing.ts`),
+product claims and the footer trademark line before a general release. Google/Microsoft login,
+password-reset controls and links to unpublished legal pages are intentionally absent from the
+account form; only working email/password controls are presented.
 
 ## Design system
 
@@ -134,82 +188,33 @@ npm run build                          # so dist/ picks up the new files
 
 ## Deploying
 
-The site is fully static: `npm run build` writes it to `dist/`, and any static host can serve
-that folder. Netlify and Cloudflare Pages detect Astro automatically. GitHub Pages also works,
-but serving a private repository through it requires a paid GitHub plan. For Vercel, follow the
-guide below.
+The existing GitHub repository is `zungy/tracenz`. Its `main` branch deploys to the Vercel project
+`tracenz`, at `https://tracenz.vercel.app`. Continue using this Astro project; no framework rewrite
+or server adapter is needed.
 
-### Deploying to Vercel
+Vercel build settings:
 
-Vercel detects Astro and serves the static build from its CDN. No adapter is needed: the
-`@astrojs/vercel` adapter is only for server rendering or Vercel services such as Web Analytics
-and Image Optimization, which this site doesn't use. There are no environment variables to set.
+| Setting          | Value                          |
+| ---------------- | ------------------------------ |
+| Framework Preset | Astro                          |
+| Root Directory   | `./`                           |
+| Build Command    | `npm run build`                |
+| Output Directory | `dist`                         |
+| Install Command  | `npm ci` / locked dependencies |
+| Node.js          | 24                             |
 
-On the free Hobby plan, Vercel deploys public and private repositories from a personal GitHub
-account. A private repository owned by a GitHub organization needs a Pro team; the command line
-route below also works, as it doesn't use the Git connection.
+Before publishing:
 
-#### From the dashboard
+1. Run `npm test`, `npm run check` and `npm run build`.
+2. Set the public Supabase variables above for the deployment environment.
+3. Deploy the compatible Trace Edge backend with the production CORS/signup origin.
+4. Publish the Windows ZIP release asset and confirm its configured URL downloads successfully.
+5. Push the website changes to the production branch, or review a Vercel preview before merging.
 
-Connecting the repository deploys every push automatically.
+After deployment, check `/signup`, `/login`, `/app` and `/download`. Use a disposable test account
+to check signup, web login, documents/timeline access, private screenshots, download and logout.
+A signed-out visitor must see login guidance and must not receive another user's private data.
+Private records are fetched at runtime and are never rendered into the static build.
 
-1. Sign in at [vercel.com](https://vercel.com) and choose **Add New… → Project**, or go to
-   [vercel.com/new](https://vercel.com/new).
-2. Under **Import Git Repository**, pick `Jinomee/trace`. If it isn't listed, follow the link to
-   adjust the GitHub app's permissions and give Vercel access to the repository.
-3. Check the settings Vercel fills in on the configure screen:
-
-   | Setting          | Value                                                    |
-   | ---------------- | -------------------------------------------------------- |
-   | Framework Preset | Astro                                                    |
-   | Root Directory   | `./`                                                     |
-   | Build Command    | `npm run build` (the preset's `astro build` is the same) |
-   | Output Directory | `dist`                                                   |
-   | Install Command  | The default, which installs from `package-lock.json`     |
-
-4. Choose **Deploy**. The first deployment goes to production, at `<project-name>.vercel.app`.
-
-#### Which branch goes live
-
-Vercel deploys one branch to production and every other branch and pull request as a preview,
-each with its own URL. For production it uses `main` if there is one, then `master`, then the
-repository's default branch, so here it picks `main`. If the Vercel project was set up before
-`main` existed, point production at it: in the project, open **Settings → Environments →
-Production → Branch Tracking**, enter `main` and save.
-
-#### From the command line
-
-The Vercel CLI deploys from a local checkout:
-
-```sh
-npm install --global vercel
-vercel login
-vercel          # first run: links the folder to a new or existing project and deploys it
-vercel          # later runs: a preview deployment with its own URL
-vercel --prod   # a production deployment
-```
-
-The CLI uploads the project and Vercel builds it with the settings above. The link to the
-project is kept in `.vercel/`, which is git-ignored.
-
-#### Node.js version
-
-Astro needs Node.js 22.12 or later. The `engines` field in `package.json` says so, and Vercel
-follows it in preference to the **Node.js Version** setting under **Settings → Build and
-Deployment**, so there is nothing to set. Because the range is open-ended, the build log may
-warn that it will pick up new major versions of Node.js; that is expected.
-
-#### After the first deployment
-
-1. **Domain:** in the project's **Settings → Domains**, add the domain, then create the DNS
-   records Vercel shows for it at your DNS provider: an A record for an apex domain such as
-   `example.com`, a CNAME for a subdomain such as `www`. Vercel issues the HTTPS certificate once
-   DNS resolves.
-2. **Site URL:** set `site` in `astro.config.mjs` to the production URL, for example
-   `site: 'https://example.com'`. Astro uses it to build absolute URLs, such as canonical links
-   or a sitemap if you add them. Push the change and the next deployment picks it up.
-3. **Placeholders:** replace everything listed under
-   [Before launch](#before-launch-placeholders-to-replace).
-4. **Check it:** open `/`, `/pricing`, `/login` and `/signup`; an unknown address, which gets the
-   site's own not-found page (Vercel serves `dist/404.html` with a 404 status); and
-   `/samples/TR-0142-rev-b.pdf`.
+`astro.config.mjs` contains the production site URL. Update it when a custom domain is introduced,
+and update the desktop signup URL, Supabase URL settings and backend CORS origin together.
