@@ -77,6 +77,7 @@ const leaderEnd = (() => {
   <!-- Pad and hub (not sectioned) -->
   <path
     class="visible"
+    data-link="holes"
     d={`M${X(-62.5)} ${Y(12)} V${Y(1.5)} Q${P(-62.5, 0)} ${P(-61, 0)} H${X(61)} Q${P(62.5, 0)} ${P(62.5, 1.5)} V${Y(12)} Z`}
   ></path>
   <path class="thin" d={`M${P(-62.5, 3.5)} H${X(62.5)}`}></path>
@@ -100,9 +101,9 @@ const leaderEnd = (() => {
   <path class="chain" d={`M${P(-98, 31)} H${X(-52)}`}></path>
 
   <!-- Section half (right): wall, rib and boss, hatched -->
-  <path class="section" d={sectionWall} fill={`url(#${id}-hatch)`}></path>
-  <path class="section" d={rib} fill={`url(#${id}-hatch)`}></path>
-  <path class="section" d={boss} fill={`url(#${id}-hatch)`}></path>
+  <path class="section" d={sectionWall} fill={`url(#${id}-hatch)`} data-link="material"></path>
+  <path class="section" d={rib} fill={`url(#${id}-hatch)`} data-link="wall"></path>
+  <path class="section" d={boss} fill={`url(#${id}-hatch)`} data-link="wall"></path>
   <path class="visible" d={`M${P(0, 16)} H${X(60)}`}></path>
 
   <!-- Pad diameter -->
@@ -151,18 +152,27 @@ const leaderEnd = (() => {
     vector-effect: non-scaling-stroke;
   }
 
+  /* ISO 128 weights: thick visible edges, thin dimension and leader lines, fine hatch. */
   .visible {
     fill: none;
     stroke: var(--text-strong);
-    stroke-width: 1.75;
+    stroke-width: 2;
     stroke-linejoin: round;
   }
 
   /* Cut faces take the hatch pattern from their fill attribute. */
   .section {
     stroke: var(--text-strong);
-    stroke-width: 1.5;
+    stroke-width: 2;
     stroke-linejoin: round;
+  }
+
+  [data-link] {
+    transition: stroke 160ms var(--ease);
+  }
+
+  [data-link]:global(.is-linked) {
+    stroke: var(--change);
   }
 
   .thin,
@@ -192,7 +202,7 @@ const leaderEnd = (() => {
 
   .hatch {
     stroke: var(--text-muted);
-    stroke-width: 0.8;
+    stroke-width: 0.6;
   }
 
   .arrow {
@@ -212,7 +222,7 @@ const leaderEnd = (() => {
 
   .note__label {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.06em;
     fill: var(--text-muted);
@@ -225,8 +235,8 @@ const leaderEnd = (() => {
   }
 
   .note__strike {
-    stroke: var(--text-faint);
-    stroke-width: 1.25;
+    stroke: var(--change);
+    stroke-width: 1.5;
   }
 
   .note__arrow {

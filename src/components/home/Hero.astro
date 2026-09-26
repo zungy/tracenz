@@ -1,13 +1,12 @@
 ---
-import DownloadLink from '../DownloadLink.astro';
+import DownloadButton from '../DownloadButton.astro';
 import SanderElevation from '../drawings/SanderElevation.astro';
 import DocCard from './DocCard.astro';
 import LogPanel from './LogPanel.astro';
 import { cloudPath } from '../../scripts/revision-cloud';
-import { site } from '../../config/site';
 
 // Server-rendered cloud for a typical box; the client redraws it to the exact size.
-const fallbackCloud = cloudPath(560, 130, 22);
+const fallbackCloud = cloudPath(560, 130, 24);
 ---
 
 <section class="hero" aria-labelledby="hero-title" data-hero>
@@ -44,23 +43,12 @@ const fallbackCloud = cloudPath(560, 130, 22);
           change that shaped it.
         </p>
         <div class="hero__actions">
-          <a class="btn btn--primary" href="/signup">
+          <DownloadButton />
+          <a class="btn btn--secondary" href="/signup">
             Sign up free
           </a>
-          <DownloadLink os="windows" variant="secondary" />
         </div>
-        <p class="hero__meta">
-          Free for one project. <a href="/pricing">See pricing</a> or{' '}
-          <a
-            href={site.downloads.macos ?? '#download'}
-            data-pending={
-              site.downloads.macos ? undefined : "The macOS download isn't available yet."
-            }
-          >
-            get the macOS app
-          </a>
-          .
-        </p>
+        <p class="hero__meta">Runs alongside Autodesk Fusion. Free for one project.</p>
       </div>
     </div>
 
@@ -81,8 +69,10 @@ const fallbackCloud = cloudPath(560, 130, 22);
         <path class="trace__path" pathLength="1"></path>
         <g class="trace__nodes"></g>
       </svg>
-      <figcaption class="figure__caption mono">
-        <span>Fig. 1</span> Change 09:12, traced from the model through the log into the document.
+      <figcaption class="figure__caption">
+        <span class="mono">Fig. 1</span>
+        Change 09:12, traced from the model through the log into the document. Point at any change
+        in the log to find it in the other two.
       </figcaption>
     </figure>
   </div>
@@ -100,8 +90,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
 <style>
   .hero {
     --play: 1500ms;
-    padding-block: var(--sp-5) var(--sp-8);
-    border-bottom: 1px solid var(--line-strong);
+    padding-block: var(--sp-5) var(--section-pad);
   }
 
   .hero__top {
@@ -116,10 +105,10 @@ const fallbackCloud = cloudPath(560, 130, 22);
 
   .hero__title {
     font-size: clamp(2.5rem, 1.1rem + 4.7vw, 5rem);
-    font-weight: 780;
-    font-stretch: 112%;
+    font-weight: 660;
+    font-stretch: 110%;
     line-height: 1.02;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.03em;
   }
 
   .hero__line {
@@ -169,7 +158,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
   }
 
   .figure__view {
-    font-size: 0.6875rem;
+    font-size: var(--s-2);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
@@ -179,15 +168,16 @@ const fallbackCloud = cloudPath(560, 130, 22);
     display: flex;
     gap: 0.75rem;
     margin-top: var(--sp-5);
-    padding-top: 0.75rem;
+    padding-top: var(--sp-2);
     border-top: 1px solid var(--line);
-    font-size: var(--s-2);
+    font-size: var(--s-1);
     color: var(--text-muted);
   }
 
   .figure__caption span {
-    color: var(--text-strong);
+    flex: none;
     font-weight: 600;
+    color: var(--text-strong);
   }
 
   .trace {
@@ -206,7 +196,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
 
   @media (min-width: 64rem) {
     .hero {
-      padding-block: var(--sp-8);
+      padding-top: var(--sp-8);
     }
 
     .hero__title {
@@ -224,10 +214,14 @@ const fallbackCloud = cloudPath(560, 130, 22);
 
     .figure__log {
       grid-column: 7 / span 5;
+      margin-left: var(--sp-2);
     }
 
+    /* Leave room for the stacked sheet's offset inside the column. */
     .figure__doc {
       grid-column: 12 / -1;
+      margin-left: calc(var(--sp-5) - var(--gutter) + 6px);
+      margin-right: 6px;
     }
 
     .trace {
@@ -265,20 +259,20 @@ const fallbackCloud = cloudPath(560, 130, 22);
 
   .revmark__cloud {
     position: absolute;
-    top: -0.1em;
-    left: -0.16em;
+    top: -0.12em;
+    left: -0.12em;
     z-index: -1;
-    width: calc(100% + 0.32em);
+    width: calc(100% + 0.3em);
     max-width: none;
-    height: calc(100% + 0.2em);
+    height: calc(100% + 0.24em);
     overflow: visible;
     pointer-events: none;
   }
 
   .revmark__cloud path {
-    fill: var(--change-fill);
+    fill: none;
     stroke: var(--change);
-    stroke-width: 2;
+    stroke-width: 1.75;
     stroke-linecap: round;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
@@ -313,10 +307,8 @@ const fallbackCloud = cloudPath(560, 130, 22);
   }
 
   .hero.is-playing .revmark__cloud path {
-    animation:
-      draw 800ms var(--ease) both,
-      fill-in 400ms var(--ease) both;
-    animation-delay: calc(var(--play) + 2000ms), calc(var(--play) + 2600ms);
+    animation: draw 900ms var(--ease) both;
+    animation-delay: calc(var(--play) + 2000ms);
   }
 
   .hero.is-playing .revmark__tag {
@@ -327,12 +319,6 @@ const fallbackCloud = cloudPath(560, 130, 22);
   @keyframes draw {
     from {
       stroke-dashoffset: 1;
-    }
-  }
-
-  @keyframes fill-in {
-    from {
-      fill-opacity: 0;
     }
   }
 
@@ -353,7 +339,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
 <script>
   import { cloudPath } from '../../scripts/revision-cloud';
 
-  // Redraw the revision cloud to the phrase's real size so the scallops stay round.
+  // Redraw the revision cloud to the phrase's real size so the arcs stay round.
   for (const mark of document.querySelectorAll<HTMLElement>('[data-revmark]')) {
     const svg = mark.querySelector<SVGSVGElement>('.revmark__cloud');
     const path = svg?.querySelector('path');
@@ -365,7 +351,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
       const fontSize = parseFloat(getComputedStyle(mark).fontSize);
       svg.setAttribute('viewBox', `0 0 ${width.toFixed(2)} ${height.toFixed(2)}`);
       svg.removeAttribute('preserveAspectRatio');
-      path.setAttribute('d', cloudPath(width, height, Math.max(10, fontSize * 0.22)));
+      path.setAttribute('d', cloudPath(width, height, Math.max(12, fontSize * 0.3)));
     };
 
     draw();
@@ -373,18 +359,18 @@ const fallbackCloud = cloudPath(560, 130, 22);
     document.fonts?.ready.then(draw);
   }
 
-  // The trace line: from the drawing's callout into log row 09:12, and out of
-  // that row into document item 2.1. Routed with right angles through the gutters.
   for (const figure of document.querySelectorAll<HTMLElement>('[data-trace-figure]')) {
+    // The trace line: from the drawing's callout into log row 09:12, and out of
+    // that row into document item 2.1, routed with right angles through the gaps.
     const svg = figure.querySelector<SVGSVGElement>('[data-trace-svg]');
     const path = svg?.querySelector('path');
     const nodes = svg?.querySelector('g');
     const source = figure.querySelector('[data-trace="source"]');
     const row = figure.querySelector('[data-trace="log"]');
     const item = figure.querySelector('[data-trace="doc"]');
-    if (!svg || !path || !nodes || !source || !row || !item) continue;
 
     const layout = () => {
+      if (!svg || !path || !nodes || !source || !row || !item) return;
       if (getComputedStyle(svg).display === 'none') return;
       const box = figure.getBoundingClientRect();
       const rel = (r: DOMRect) => ({
@@ -397,7 +383,7 @@ const fallbackCloud = cloudPath(560, 130, 22);
       const d = rel(item.getBoundingClientRect());
       const logBox = rel((row.closest('.log') ?? row).getBoundingClientRect());
       const docBox = rel((item.closest('.doc') ?? item).getBoundingClientRect());
-      const gap1 = (s.right + logBox.left) / 2 + 4;
+      const gap1 = (s.right + logBox.left) / 2;
       const gap2 = (logBox.right + docBox.left) / 2;
       const f = (n: number) => n.toFixed(1);
 
@@ -407,16 +393,15 @@ const fallbackCloud = cloudPath(560, 130, 22);
         `M${f(s.right + 2)} ${f(s.mid)} H${f(gap1)} V${f(l.mid)} H${f(l.left)}` +
           ` M${f(l.right)} ${f(l.mid)} H${f(gap2)} V${f(d.mid)} H${f(docBox.left + 1)}`,
       );
-      const squares = [
+      nodes.innerHTML = [
         [s.right + 2, s.mid],
         [l.left, l.mid],
         [l.right, l.mid],
         [docBox.left + 1, d.mid],
-      ];
-      nodes.innerHTML = squares
+      ]
         .map(
           ([x, y]) =>
-            `<rect class="trace__node" x="${f(x - 3)}" y="${f(y - 3)}" width="6" height="6"></rect>`,
+            `<rect class="trace__node" x="${f(x - 3.5)}" y="${f(y - 3.5)}" width="7" height="7"></rect>`,
         )
         .join('');
     };
@@ -424,6 +409,17 @@ const fallbackCloud = cloudPath(560, 130, 22);
     layout();
     new ResizeObserver(layout).observe(figure);
     document.fonts?.ready.then(layout);
+
+    // Pointing at a change lights it up in all three panels.
+    const linked = [...figure.querySelectorAll<HTMLElement | SVGElement>('[data-link]')];
+    const highlight = (key: string | null) => {
+      figure.classList.toggle('is-pointing', key !== null);
+      for (const el of linked) el.classList.toggle('is-linked', el.dataset.link === key);
+    };
+    for (const el of linked) {
+      el.addEventListener('mouseenter', () => highlight(el.dataset.link ?? null));
+      el.addEventListener('mouseleave', () => highlight(null));
+    }
   }
 
   // The revision tag is the last step. Once it lands, drop the playing state so

@@ -35,8 +35,9 @@ const options = [
 <style>
   .theme-toggle {
     display: inline-flex;
-    padding: 2px;
-    border: 1px solid var(--line);
+    height: 2.5rem;
+    padding: 3px;
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
   }
 
@@ -54,8 +55,10 @@ const options = [
   }
 
   span {
-    display: block;
-    padding: 0.3rem 0.55rem;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding-inline: 0.625rem;
     border-radius: 1px;
     font-family: var(--font-mono);
     font-size: var(--s-2);

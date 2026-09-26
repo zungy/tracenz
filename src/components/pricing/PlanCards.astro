@@ -162,7 +162,7 @@ import { plans } from '../../config/pricing';
   }
 
   .card__badge {
-    color: var(--mark);
+    color: var(--select);
   }
 
   .card__summary {
@@ -180,7 +180,7 @@ import { plans } from '../../config/pricing';
   .card__amount {
     font-family: var(--font-display);
     font-size: var(--s8);
-    font-weight: 780;
+    font-weight: var(--display-weight);
     font-stretch: 112%;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -216,7 +216,7 @@ import { plans } from '../../config/pricing';
 
   .card__includes :global(.icon) {
     margin-top: 0.2rem;
-    color: var(--mark);
+    color: var(--text-strong);
   }
 
   /* Hovering or tabbing into another plan moves the selection to it. */

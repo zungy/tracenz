@@ -1,10 +1,11 @@
 /*
  * Design tokens.
  *
- * The five palette colors are the only hues on the site; everything else is an
- * alpha tint or a mix of them. Ink carries text and actions. Cobalt is kept for
- * one meaning: change (revision clouds, delta tags, new values, trace lines).
- * Light theme is "Paper", dark theme is "Blueprint".
+ * The five palette colors carry the brand: ink for text, lines and actions,
+ * cobalt, vellum, film and paper for the rest. One extra color, redline, is
+ * reserved for change: revision clouds, delta tags, new values and trace
+ * lines, the way red markup works on a drawing. It is never used for text
+ * or buttons. Light theme is "Paper", dark theme is "Blueprint".
  */
 
 :root {
@@ -16,6 +17,7 @@
   --vellum: #bdc5dd;
   --film: #e9ebf3;
   --paper: #ffffff;
+  --redline: #d2401f;
 
   /* Semantic colors: Paper */
   --bg: var(--paper);
@@ -32,12 +34,13 @@
   --accent-hover: var(--cobalt);
   --on-accent: var(--paper);
   --link: var(--ink);
-  --change: var(--cobalt);
-  --change-fill: var(--film);
+  --change: var(--redline);
+  --change-tint: rgb(210 64 31 / 0.07);
   --on-change: var(--paper);
   --mark: var(--change);
+  --select: var(--cobalt);
   --focus: var(--cobalt);
-  --tint: rgb(36 63 143 / 0.07);
+  --tint: rgb(36 63 143 / 0.06);
   --band-bg: var(--ink);
   --band-surface: rgb(36 63 143 / 0.55);
 
@@ -47,6 +50,7 @@
     'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto,
     sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --display-weight: 640;
 
   /* Type scale: ratio 2^(1/4), so every second step is x sqrt2 and every fourth doubles */
   --s-2: 0.75rem;
@@ -69,8 +73,14 @@
   --sp-8: 4rem;
   --sp-13: 6.5rem;
 
-  /* Layout. --frame is the margin of the drawing-sheet border (desktop only). */
+  /*
+   * Layout. On desktop the page is a drawing sheet: --frame is the border
+   * margin, --mat-x the side margin (wider on very wide screens, where the
+   * sheet stops at 100rem), and the 16 columns line up with the frame's 8
+   * zones, a gutter centered on every zone line.
+   */
   --frame: 0px;
+  --mat-x: 0px;
   --container: 80rem;
   --gutter: 1rem;
   --page-pad: clamp(1rem, 4vw, 2.5rem);
@@ -93,8 +103,9 @@
   :root {
     --cols: 16;
     --frame: 1.5rem;
-    --page-pad: calc(var(--frame) + 2.5rem);
-    --section-pad: 5.5rem;
+    --mat-x: max(var(--frame), calc((100% - 100rem) / 2));
+    --gutter: 2.5rem;
+    --section-pad: 6rem;
   }
 }
 
@@ -116,10 +127,12 @@
     --accent-hover: var(--paper);
     --on-accent: var(--ink);
     --link: var(--paper);
-    --change: var(--paper);
-    --change-fill: rgb(233 235 243 / 0.12);
+    --redline: #ff7a59;
+    --change: var(--redline);
+    --change-tint: rgb(255 122 89 / 0.12);
     --on-change: var(--ink);
     --mark: var(--change);
+    --select: var(--paper);
     --focus: var(--paper);
     --tint: rgb(233 235 243 / 0.08);
     --band-bg: var(--cobalt);
@@ -144,10 +157,12 @@
   --accent-hover: var(--paper);
   --on-accent: var(--ink);
   --link: var(--paper);
-  --change: var(--paper);
-  --change-fill: rgb(233 235 243 / 0.12);
+  --redline: #ff7a59;
+  --change: var(--redline);
+  --change-tint: rgb(255 122 89 / 0.12);
   --on-change: var(--ink);
   --mark: var(--change);
+  --select: var(--paper);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
   --band-bg: var(--cobalt);
@@ -156,8 +171,8 @@
 
 /*
  * Scoped schemes. A blueprint band stays dark in both themes (its ground shifts
- * to cobalt in dark mode so it still stands apart); a paper sheet, like a
- * document preview, stays paper in both themes.
+ * to cobalt in dark mode so it still stands apart); a paper sheet, like the
+ * document spread, stays paper in both themes.
  */
 .scheme-blueprint {
   color-scheme: dark;
@@ -175,10 +190,12 @@
   --accent-hover: var(--paper);
   --on-accent: var(--ink);
   --link: var(--paper);
-  --change: var(--paper);
-  --change-fill: rgb(233 235 243 / 0.12);
+  --redline: #ff7a59;
+  --change: var(--redline);
+  --change-tint: rgb(255 122 89 / 0.12);
   --on-change: var(--ink);
   --mark: var(--change);
+  --select: var(--paper);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
   background: var(--bg);
@@ -201,12 +218,14 @@
   --accent-hover: var(--cobalt);
   --on-accent: var(--paper);
   --link: var(--ink);
-  --change: var(--cobalt);
-  --change-fill: var(--film);
+  --redline: #d2401f;
+  --change: var(--redline);
+  --change-tint: rgb(210 64 31 / 0.07);
   --on-change: var(--paper);
   --mark: var(--change);
+  --select: var(--cobalt);
   --focus: var(--cobalt);
-  --tint: rgb(36 63 143 / 0.07);
+  --tint: rgb(36 63 143 / 0.06);
   background: var(--bg);
   color: var(--text);
 }

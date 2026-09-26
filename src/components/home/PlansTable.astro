@@ -1,7 +1,7 @@
 ---
 /**
- * Plans as a drawing's parts list: item, description, one column per plan,
- * prices in the header and a button at the foot of each column. The
+ * Plans as a compact drawing table: one column per plan with its price and
+ * button in the header, features below, table notes underneath. The
  * recommended plan's column carries CAD selection handles.
  */
 import Icon from '../Icon.astro';
@@ -13,7 +13,7 @@ const rows: { desc: string; values: [Cell, Cell, Cell] }[] = [
   { desc: 'Change history', values: ['30 days', 'Full', 'Full'] },
   { desc: 'Design documents', values: ['3 a month', 'Unlimited', 'Unlimited'] },
   { desc: 'Export', values: ['PDF', 'PDF, Word, Markdown', 'PDF, Word, Markdown'] },
-  { desc: 'Custom document templates', values: [false, true, true] },
+  { desc: 'Custom templates', values: [false, true, true] },
   { desc: 'Shared projects and review', values: [false, false, true] },
   { desc: 'Support', values: ['Community', 'Email', 'Priority'] },
 ];
@@ -21,112 +21,121 @@ const recommended = plans.findIndex((p) => p.recommended);
 ---
 
 <section class="section plans" aria-labelledby="plans-title">
-  <div class="container">
-    <div class="grid plans__head">
-      <p class="label plans__callout">Table 1 · Plans · USD per month</p>
+  <div class="container grid plans__grid">
+    <div class="plans__head">
+      <p class="mono plans__ref">Table 1</p>
       <h2 id="plans-title">Free for your first project.</h2>
-      <p class="plans__note">
-        Yearly billing saves two months. <a href="/pricing">Compare every detail</a>
-      </p>
+      <p>Upgrade when you need more projects, the full history or team review.</p>
     </div>
 
-    <div class="plans__scroll" role="region" aria-label="Plans table" tabindex="0">
-      <div class="plans__frame">
-        <table>
-          <colgroup>
-            <col class="col-item" />
-            <col class="col-desc" />
-            {plans.map(() => (
-              <col class="col-plan" />
-            ))}
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col" class="item">
-                Item
-              </th>
-              <th scope="col">Description</th>
-              {plans.map((plan) => (
-                <th scope="col" class="plan">
-                  <span class="plan__name">{plan.name}</span>
-                  <span class="plan__price num">${plan.monthly}</span>
-                  <span class="plan__unit">{plan.unit}</span>
-                </th>
+    <div class="plans__body">
+      <div class="plans__scroll" role="region" aria-label="Plans table" tabindex="0">
+        <div class="plans__frame">
+          <table>
+            <colgroup>
+              <col class="col-desc" />
+              {plans.map(() => (
+                <col class="col-plan" />
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
+            </colgroup>
+            <thead>
               <tr>
-                <td class="item mono num">{i + 1}</td>
-                <th scope="row">{row.desc}</th>
-                {row.values.map((value) =>
-                  value === true ? (
-                    <td>
-                      <Icon name="check" size={18} stroke={2} />
-                      <span class="visually-hidden">Included</span>
-                    </td>
-                  ) : value === false ? (
-                    <td>
-                      <span class="no" aria-hidden="true" />
-                      <span class="visually-hidden">Not included</span>
-                    </td>
-                  ) : (
-                    <td>{value}</td>
-                  ),
-                )}
+                <td class="corner"></td>
+                {plans.map((plan) => (
+                  <th scope="col" class="plan">
+                    <span class="plan__name">{plan.name}</span>
+                    <span class="plan__for">{plan.summary}</span>
+                    <span class="plan__price num">${plan.monthly}</span>
+                    <span class="plan__unit">{plan.unit}</span>
+                    <a
+                      class:list={[
+                        'btn',
+                        'btn--sm',
+                        'btn--block',
+                        plan.recommended ? 'btn--primary' : 'btn--secondary',
+                      ]}
+                      href={plan.cta.href}
+                    >
+                      {plan.cta.label}
+                    </a>
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td class="item"></td>
-              <td></td>
-              {plans.map((plan) => (
-                <td>
-                  <a
-                    class:list={[
-                      'btn',
-                      'btn--block',
-                      plan.recommended ? 'btn--primary' : 'btn--secondary',
-                    ]}
-                    href={plan.cta.href}
-                  >
-                    {plan.cta.label}
-                  </a>
-                </td>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.desc}</th>
+                  {row.values.map((value) =>
+                    value === true ? (
+                      <td>
+                        <Icon name="check" size={18} stroke={2} />
+                        <span class="visually-hidden">Included</span>
+                      </td>
+                    ) : value === false ? (
+                      <td>
+                        <span class="none" aria-hidden="true" />
+                        <span class="visually-hidden">Not included</span>
+                      </td>
+                    ) : (
+                      <td>{value}</td>
+                    ),
+                  )}
+                </tr>
               ))}
-            </tr>
-          </tfoot>
-        </table>
-        <div class="plans__overlay" aria-hidden="true">
-          <span class="handles" style={`grid-column: ${recommended + 3}`}></span>
+            </tbody>
+          </table>
+          <div class="plans__overlay" aria-hidden="true">
+            <span class="handles" style={`grid-column: ${recommended + 2}`}>
+              <span class="plans__tag mono">Recommended</span>
+            </span>
+          </div>
         </div>
       </div>
+
+      <ol class="plans__notes">
+        <li>Prices in USD per month. Yearly billing saves two months.</li>
+        <li>
+          Every limit and feature is on the <a href="/pricing">pricing page</a>.
+        </li>
+      </ol>
     </div>
   </div>
 </section>
 
 <style>
   .plans {
-    border-bottom: 1px solid var(--line-strong);
+    border-top: 1px solid var(--line-strong);
   }
 
-  .plans__head {
-    row-gap: var(--sp-2);
-    align-items: end;
-    margin-bottom: var(--sp-5);
+  .plans__grid {
+    row-gap: var(--sp-5);
   }
 
-  .plans__head > * {
+  .plans__head,
+  .plans__body {
     grid-column: 1 / -1;
   }
 
-  .plans__head h2 {
-    font-size: clamp(var(--s4), 1.3rem + 2.4vw, 3rem);
+  .plans__head {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
   }
 
-  .plans__note {
+  .plans__ref {
+    font-size: var(--s-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .plans__head h2 {
+    font-size: clamp(var(--s4), 1.2rem + 2vw, 2.75rem);
+  }
+
+  .plans__head p:last-child {
+    max-width: 30ch;
     color: var(--text);
   }
 
@@ -134,13 +143,13 @@ const recommended = plans.findIndex((p) => p.recommended);
   .plans__scroll {
     position: relative;
     overflow-x: auto;
-    padding: 6px;
-    margin: -6px;
+    padding: 28px 8px 8px;
+    margin: -28px -8px -8px;
   }
 
   .plans__frame {
     position: relative;
-    min-width: 46rem;
+    min-width: 40rem;
   }
 
   table {
@@ -151,138 +160,132 @@ const recommended = plans.findIndex((p) => p.recommended);
     font-size: var(--s-1);
   }
 
-  .col-item {
-    width: 6%;
-  }
-
   .col-desc {
-    width: 31%;
+    width: 28%;
   }
 
   .col-plan {
-    width: 21%;
+    width: 24%;
   }
 
   th,
   td {
-    padding: 0.8rem var(--sp-2);
+    padding: 0.75rem var(--sp-2);
     border: 1px solid var(--line);
     text-align: left;
     vertical-align: middle;
     color: var(--text-strong);
   }
 
-  thead th {
+  thead th,
+  thead td {
     border-bottom: 1.5px solid var(--text-strong);
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    vertical-align: bottom;
+    vertical-align: top;
   }
 
-  thead th.plan {
-    padding-block: var(--sp-2);
+  .plan {
+    padding-block: var(--sp-3) var(--sp-2);
+    font-weight: 400;
   }
 
   .plan__name,
+  .plan__for,
   .plan__price,
   .plan__unit {
     display: block;
   }
 
   .plan__name {
-    color: var(--text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .plan__for {
+    min-height: 2.6em;
+    margin-top: 0.3rem;
+    font-size: var(--s-1);
+    line-height: 1.3;
+    color: var(--text-muted);
   }
 
   .plan__price {
-    margin-top: 0.4rem;
+    margin-top: var(--sp-2);
     font-family: var(--font-display);
     font-size: var(--s6);
-    font-weight: 780;
-    font-stretch: 112%;
+    font-weight: var(--display-weight);
+    font-stretch: 110%;
     line-height: 1;
     letter-spacing: -0.03em;
-    text-transform: none;
-    color: var(--text-strong);
   }
 
   .plan__unit {
-    margin-top: 0.3rem;
-    letter-spacing: 0.02em;
-    text-transform: none;
+    margin: 0.3rem 0 var(--sp-2);
+    font-size: var(--s-2);
+    color: var(--text-muted);
   }
 
   tbody th {
     font-weight: 500;
   }
 
-  .item {
-    color: var(--text-muted);
-    text-align: center;
-  }
-
-  tfoot td {
-    padding-block: var(--sp-2);
-    border-top: 1.5px solid var(--text-strong);
-  }
-
   td :global(.icon) {
     color: var(--text-strong);
   }
 
-  /* Not included: a short hidden-line dash */
-  .no {
+  /* Not included: a short thin rule */
+  .none {
     display: inline-block;
-    width: 1.25rem;
-    border-top: 1.5px dashed var(--line-strong);
+    width: 0.875rem;
+    border-top: 1px solid var(--line-strong);
     vertical-align: middle;
   }
 
-  /* Selection handles around the recommended column, on the same column grid as the table. */
+  /* Selection handles around the recommended column, on the table's own column grid. */
   .plans__overlay {
     position: absolute;
     inset: 0;
     display: grid;
-    grid-template-columns: 6% 31% 21% 21% 21%;
+    grid-template-columns: 28% 24% 24% 24%;
     pointer-events: none;
   }
 
   .plans__overlay .handles {
     grid-row: 1;
     background: var(--tint);
-    mix-blend-mode: multiply;
   }
 
-  :global(:root[data-theme='dark']) .plans__overlay .handles {
-    mix-blend-mode: normal;
+  .plans__tag {
+    position: absolute;
+    left: -1px;
+    bottom: calc(100% + 6px);
+    padding: 0.2rem 0.45rem;
+    background: var(--select);
+    color: var(--bg);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .plans__overlay .handles {
-      mix-blend-mode: normal;
-    }
+  .plans__notes {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: var(--sp-3);
+    padding-left: 1.25rem;
+    font-size: var(--s-1);
+    color: var(--text-muted);
   }
 
   @media (min-width: 64rem) {
-    .plans__callout {
-      grid-column: 1 / span 6;
-      grid-row: 1;
+    .plans__head {
+      grid-column: 1 / span 4;
     }
 
-    .plans__head h2 {
-      grid-column: 1 / span 10;
-      grid-row: 2;
-    }
-
-    .plans__note {
-      grid-column: 11 / -1;
-      grid-row: 2;
-      justify-self: end;
-      padding-bottom: 0.35rem;
-      text-align: right;
+    .plans__body {
+      grid-column: 5 / -1;
     }
   }
 </style>

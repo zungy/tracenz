@@ -1,70 +1,62 @@
 ---
 /**
- * Closing band on the home and pricing pages: download the app for the
- * visitor's system, or sign up first. A blueprint sheet in both themes.
+ * Closing band on the home and pricing pages, laid out as a blueprint sheet:
+ * the heading at top left, the part drawn in white linework, drawing notes
+ * bottom left and a title block bottom right that holds the download.
  */
-import Icon from './Icon.astro';
-import { site } from '../config/site';
-
-const platforms = {
-  windows: { label: 'Windows', icon: 'brand-windows', url: site.downloads.windows },
-  macos: { label: 'macOS', icon: 'brand-apple', url: site.downloads.macos },
-} as const;
-type Os = keyof typeof platforms;
-const pending = (os: Os) =>
-  platforms[os].url ? undefined : `The ${platforms[os].label} download isn't available yet.`;
+import DownloadButton from './DownloadButton.astro';
+import SanderElevation from './drawings/SanderElevation.astro';
 ---
 
 <section id="download" class="band scheme-blueprint" aria-labelledby="download-title">
   <div class="container grid band__grid">
     <div class="band__copy">
-      <p class="label">Desktop app · Windows and macOS</p>
-      <h2 id="download-title">Put Trace next to your CAD tool.</h2>
-      <p class="band__text">
-        Install the app, sign in and open a project. Logging starts on its own.
-      </p>
+      <h2 id="download-title">Put Trace next to Autodesk Fusion.</h2>
+      <p>Install the desktop app, sign in and open a project. Logging starts on its own.</p>
     </div>
 
-    {(['windows', 'macos'] as Os[]).map((os) => {
-      const other: Os = os === 'windows' ? 'macos' : 'windows';
-      return (
-        <div class="band__actions" data-os={os} hidden={os === 'macos'}>
-          <a
-            class="btn btn--primary band__download"
-            href={platforms[os].url ?? '#download'}
-            data-pending={pending(os)}
-          >
-            <Icon name={platforms[os].icon} size={20} />
-            Download for {platforms[os].label}
-          </a>
-          <p class="band__other">
-            <a href={platforms[other].url ?? '#download'} data-pending={pending(other)}>
-              Download for {platforms[other].label}
-            </a>
-            <span aria-hidden="true"> · </span>
-            <a href="/signup">Create a free account</a>
-          </p>
-        </div>
-      );
-    })}
+    <div class="band__drawing">
+      <SanderElevation id="band-elev" />
+    </div>
+
+    <div class="band__notes">
+      <p class="mono band__label">Notes</p>
+      <ol>
+        <li>Free for one project. No card needed.</li>
+        <li>
+          Needs a Trace account. <a href="/signup">Create one here</a>.
+        </li>
+        <li>Windows and macOS.</li>
+      </ol>
+    </div>
+
+    <dl class="band__block">
+      <div class="cell cell--wide">
+        <dt class="mono">Title</dt>
+        <dd>Trace desktop app</dd>
+      </div>
+      <div class="cell">
+        <dt class="mono">Works with</dt>
+        <dd>Autodesk Fusion</dd>
+      </div>
+      <div class="cell">
+        <dt class="mono">Rev</dt>
+        <dd>B</dd>
+      </div>
+      <div class="cell cell--wide cell--action">
+        <dt class="visually-hidden">Download</dt>
+        <dd>
+          <DownloadButton other />
+        </dd>
+      </div>
+    </dl>
   </div>
 </section>
-
-<script>
-  // Offer the visitor's own system first.
-  const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
-  const platform = nav.userAgentData?.platform || navigator.platform || navigator.userAgent;
-  if (/mac/i.test(platform)) {
-    for (const el of document.querySelectorAll<HTMLElement>('[data-os]')) {
-      el.hidden = el.dataset.os !== 'macos';
-    }
-  }
-</script>
 
 <style>
   /* Blueprint sheet: a square grid of 32px, four 8px units per square. */
   .band {
-    padding-block: var(--sp-8);
+    padding-block: var(--section-pad);
     background-image:
       linear-gradient(var(--line-soft) 1px, transparent 1px),
       linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
@@ -74,62 +66,134 @@ const pending = (os: Os) =>
 
   .band__grid {
     row-gap: var(--sp-5);
-    align-items: end;
   }
 
   .band__copy,
-  .band__actions {
+  .band__drawing,
+  .band__notes,
+  .band__block {
     grid-column: 1 / -1;
   }
 
   .band__copy {
     display: grid;
+    align-content: start;
     gap: var(--sp-2);
   }
 
   .band__copy h2 {
-    font-size: clamp(var(--s4), 1.2rem + 3vw, 3.364rem);
-    font-stretch: 114%;
+    font-size: clamp(var(--s4), 1.2rem + 2.8vw, 3.25rem);
+    font-stretch: 110%;
   }
 
-  .band__text {
-    max-width: 40ch;
+  .band__copy p {
+    max-width: 36ch;
     font-size: var(--s1);
+    line-height: 1.5;
+  }
+
+  .band__drawing {
+    max-width: 40rem;
+  }
+
+  .band__label {
+    font-size: var(--s-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .band__notes {
+    display: grid;
+    align-content: end;
+    gap: var(--sp-1);
+  }
+
+  .band__notes ol {
+    display: grid;
+    gap: 0.25rem;
+    padding-left: 1.25rem;
     color: var(--text);
   }
 
-  .band__actions {
+  /* Title block with the download in its last row */
+  .band__block {
     display: grid;
-    justify-items: start;
-    gap: var(--sp-2);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-self: end;
+    gap: 1px;
+    background: var(--line-strong);
+    border: 1.5px solid var(--text-strong);
   }
 
-  .band__actions[hidden] {
-    display: none;
+  .cell {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.625rem var(--sp-2);
+    background: var(--band-bg, var(--bg));
   }
 
-  .band__download {
-    --btn-h: 3.5rem;
-    min-width: 17.5rem;
-    font-size: var(--s1);
+  .cell--wide {
+    grid-column: 1 / -1;
   }
 
-  .band__other {
-    font-size: var(--s-1);
+  .cell dt {
+    font-size: var(--s-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
 
+  .cell dd {
+    font-family: var(--font-mono);
+    font-size: var(--s0);
+    font-weight: 500;
+    color: var(--text-strong);
+  }
+
+  .cell--wide:first-child dd {
+    font-family: var(--font-display);
+    font-size: var(--s2);
+    font-weight: var(--display-weight);
+    font-stretch: 110%;
+  }
+
+  .cell--action {
+    padding-block: var(--sp-2);
+  }
+
+  /*
+   * Desktop: laid out like a sheet. The drawing takes the main field; the
+   * right-hand column holds the heading, the notes and, at the bottom, the
+   * title block with the download.
+   */
   @media (min-width: 64rem) {
-    .band {
-      padding-block: var(--sp-13);
+    .band__grid {
+      grid-template-rows: auto 1fr auto;
+      row-gap: var(--sp-3);
+    }
+
+    .band__drawing {
+      grid-column: 1 / span 9;
+      grid-row: 1 / span 3;
+      align-self: center;
+      max-width: none;
     }
 
     .band__copy {
-      grid-column: 1 / span 9;
+      grid-column: 11 / -1;
+      grid-row: 1;
     }
 
-    .band__actions {
+    .band__notes {
       grid-column: 11 / -1;
+      grid-row: 2;
+      align-content: start;
+    }
+
+    .band__block {
+      grid-column: 11 / -1;
+      grid-row: 3;
     }
   }
 </style>

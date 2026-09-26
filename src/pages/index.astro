@@ -1,16 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import DownloadBand from '../components/DownloadBand.astro';
+import DocSpread from '../components/home/DocSpread.astro';
 import Hero from '../components/home/Hero.astro';
 import PlansTable from '../components/home/PlansTable.astro';
-import Problem from '../components/home/Problem.astro';
-import Walkthrough from '../components/home/Walkthrough.astro';
 ---
 
 <Base title="Trace · Design documents from your CAD history" sheet="home">
   <Hero />
-  <Problem />
-  <Walkthrough />
+  <DocSpread />
   <PlansTable />
   <DownloadBand />
 </Base>

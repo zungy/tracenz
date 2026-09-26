@@ -1,0 +1,576 @@
+---
+/**
+ * The deliverable, full size: the design document Trace writes, as a two-page
+ * spread. Numbered balloons on the pages point to the notes below it, the way
+ * a drawing's balloons point to its notes.
+ */
+import PadHoles from '../drawings/PadHoles.astro';
+import SanderElevation from '../drawings/SanderElevation.astro';
+import WallSection from '../drawings/WallSection.astro';
+
+const changes = [
+  { id: '2.1', what: 'Motor mount wall', was: '2.0 mm', now: '2.5 mm', source: '09:12 Sketch 4' },
+  { id: '2.2', what: 'Housing material', was: 'ABS', now: 'PC-ABS', source: '10:20 Housing' },
+  { id: '2.3', what: 'Dust extraction', was: '6 × Ø8', now: '8 × Ø9', source: '10:24, 10:26' },
+];
+
+const notes = [
+  'Every change cites the log entries it came from, so a reviewer can check the source.',
+  'Each revision gets its own change list. Earlier revisions stay in the document history.',
+  'Reviewers sign off in the document, and the record stays for audits. Review is part of the Team plan.',
+];
+---
+
+<section id="how-it-works" class="section spread" aria-labelledby="spread-title">
+  <div class="container">
+    <div class="grid spread__head">
+      <h2 id="spread-title">Design intent gets lost between revisions. Trace writes it down.</h2>
+      <p class="spread__lead">
+        This is the document Trace wrote for the housing after an afternoon of changes: the overall
+        design first, then every change since the last revision, each one tied to its source.
+      </p>
+    </div>
+
+    <figure class="spread__figure">
+      <div class="pages">
+        <article class="page scheme-paper stacked" aria-label="Design document, page 1">
+          <header class="page__head mono">
+            <span>Design document</span>
+            <span class="page__rev">
+              TR-0142 · Rev B
+              <span class="balloon" aria-label="Note 2">
+                2
+              </span>
+            </span>
+          </header>
+          <p class="page__title">Orbital sander housing</p>
+          <p class="page__meta mono">
+            Written by Trace from 71 changes in 16 sessions · 22 Sep 2026
+          </p>
+
+          <ol class="toc">
+            <li>
+              <span>1 Overview</span>
+              <span class="toc__dots"></span>
+              <span class="mono">1</span>
+            </li>
+            <li>
+              <span>2 Changes since Rev A</span>
+              <span class="toc__dots"></span>
+              <span class="mono">2</span>
+            </li>
+            <li>
+              <span>3 Review</span>
+              <span class="toc__dots"></span>
+              <span class="mono">2</span>
+            </li>
+          </ol>
+
+          <h3 class="page__h">
+            <span class="mono">1</span> Overview
+          </h3>
+          <p class="page__text">
+            The housing is a two-piece clamshell in PC-ABS around a 125 mm orbital pad. The motor
+            sits on a bracket that mates to the housing boss, and dust is pulled through eight holes
+            in the pad into the rear port. Wall thickness is 2.5 mm nominal throughout.
+          </p>
+
+          <div class="page__figure">
+            <SanderElevation id="doc-elev" />
+            <p class="page__caption mono">Figure 1 · Front elevation, half section</p>
+          </div>
+
+          <dl class="specs">
+            <div>
+              <dt>Parts</dt>
+              <dd>Upper shell, lower shell, motor bracket, pad</dd>
+            </div>
+            <div>
+              <dt>Pad</dt>
+              <dd class="num">Ø125, 8 × Ø9 dust holes</dd>
+            </div>
+            <div>
+              <dt>Wall</dt>
+              <dd class="num">2.5 mm nominal</dd>
+            </div>
+            <div>
+              <dt>Material</dt>
+              <dd>PC-ABS</dd>
+            </div>
+          </dl>
+
+          <footer class="page__foot mono">
+            <span>TR-0142 Rev B</span>
+            <span>1 / 2</span>
+          </footer>
+        </article>
+
+        <article class="page scheme-paper stacked" aria-label="Design document, page 2">
+          <header class="page__head mono">
+            <span>Design document</span>
+            <span>TR-0142 · Rev B</span>
+          </header>
+
+          <h3 class="page__h">
+            <span class="mono">2</span> Changes since Rev A
+          </h3>
+          <p class="page__text">
+            Rev B changes the motor mount, the housing material and the dust extraction. The pad and
+            the outside envelope are unchanged.
+          </p>
+
+          <div class="table-scroll" role="region" aria-label="Changes since Rev A" tabindex="0">
+            <table class="changes">
+              <thead>
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">Change</th>
+                  <th scope="col">Was</th>
+                  <th scope="col">Now</th>
+                  <th scope="col" class="changes__source">
+                    Source{' '}
+                    <span class="balloon" aria-label="Note 1">
+                      1
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {changes.map((c) => (
+                  <tr>
+                    <td class="mono num">{c.id}</td>
+                    <th scope="row">{c.what}</th>
+                    <td class="mono num">
+                      <del class="old-value">{c.was}</del>
+                    </td>
+                    <td class="mono num">
+                      <ins class="new-value">{c.now}</ins>
+                    </td>
+                    <td class="mono num changes__ref">↳ {c.source}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="details">
+            <figure>
+              <WallSection />
+              <figcaption class="mono">Fig. 2 · Section A–A · 2:1</figcaption>
+            </figure>
+            <figure>
+              <PadHoles />
+              <figcaption class="mono">Fig. 3 · View B · 1:2.5</figcaption>
+            </figure>
+          </div>
+
+          <h3 class="page__h">
+            <span class="mono">3</span> Review{' '}
+            <span class="balloon" aria-label="Note 3">
+              3
+            </span>
+          </h3>
+          <div class="table-scroll" role="region" aria-label="Review" tabindex="0">
+            <table class="review">
+              <thead>
+                <tr>
+                  <th scope="col">Step</th>
+                  <th scope="col">By</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Written</th>
+                  <td>Trace</td>
+                  <td class="mono num">22 Sep 2026</td>
+                  <td>Done</td>
+                </tr>
+                <tr>
+                  <th scope="row">Checked</th>
+                  <td>–</td>
+                  <td>–</td>
+                  <td>Waiting for review</td>
+                </tr>
+                <tr>
+                  <th scope="row">Approved</th>
+                  <td>–</td>
+                  <td>–</td>
+                  <td>–</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="page__foot mono">
+            <span>TR-0142 Rev B</span>
+            <span>2 / 2</span>
+          </footer>
+        </article>
+      </div>
+      <figcaption class="spread__caption">
+        <span class="mono">Fig. 2</span> Design document TR-0142, Rev B, as Trace wrote it.
+      </figcaption>
+    </figure>
+
+    <div class="notes">
+      <p class="notes__title mono">Notes</p>
+      <ol class="notes__list">
+        {notes.map((note, i) => (
+          <li>
+            <span class="balloon" aria-hidden="true">
+              {i + 1}
+            </span>
+            <p>{note}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .spread {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .spread__head {
+    row-gap: var(--sp-3);
+    align-items: end;
+    margin-bottom: var(--sp-8);
+  }
+
+  .spread__head > * {
+    grid-column: 1 / -1;
+  }
+
+  .spread__head h2 {
+    font-size: clamp(var(--s4), 1.2rem + 2.6vw, 3.25rem);
+    line-height: 1.04;
+  }
+
+  .spread__lead {
+    max-width: 52ch;
+    font-size: var(--s1);
+    line-height: 1.5;
+  }
+
+  /* The two pages */
+  .pages {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+
+  /* Tables scroll on their own on narrow screens; relative keeps hidden labels inside. */
+  .table-scroll {
+    position: relative;
+    overflow-x: auto;
+  }
+
+  .table-scroll table {
+    min-width: 30rem;
+  }
+
+  .page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-5) var(--sp-3);
+    border: 1px solid var(--line-strong);
+    font-size: var(--s-1);
+    line-height: 1.55;
+  }
+
+  .page__head,
+  .page__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--s-2);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .page__head {
+    padding-bottom: 0.75rem;
+    border-bottom: 1.5px solid var(--text-strong);
+  }
+
+  .page__foot {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .page__rev {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .page__title {
+    margin-top: var(--sp-1);
+    font-family: var(--font-display);
+    font-size: clamp(var(--s3), 1.2rem + 1vw, 2.125rem);
+    font-weight: var(--display-weight);
+    font-stretch: 108%;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    word-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+
+  .page__meta {
+    font-size: var(--s-2);
+    color: var(--text-muted);
+  }
+
+  .toc {
+    display: grid;
+    gap: 0.2rem;
+    padding: var(--sp-2) 0;
+    border-block: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .toc li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .toc__dots {
+    flex: 1;
+    border-bottom: 1.5px dotted var(--line-strong);
+  }
+
+  .page__h {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: var(--sp-1);
+    font-family: var(--font-body);
+    font-size: var(--s0);
+    font-weight: 600;
+    font-stretch: 100%;
+    letter-spacing: 0;
+  }
+
+  .page__h .mono {
+    color: var(--text-muted);
+  }
+
+  .page__text {
+    max-width: 62ch;
+  }
+
+  .page__figure {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    padding: var(--sp-2) var(--sp-3) var(--sp-1);
+    border: 1px solid var(--line);
+  }
+
+  .page__figure :global(svg) {
+    width: 100%;
+    max-width: 27rem;
+  }
+
+  .page__figure .page__caption {
+    justify-self: start;
+  }
+
+  .page__caption,
+  .details figcaption {
+    font-size: var(--s-2);
+    color: var(--text-muted);
+  }
+
+  .specs {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+
+  .specs div {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    padding-block: 0.4rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .specs dt {
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-top: 0.15rem;
+  }
+
+  /* Change table and review block */
+  .changes,
+  .review {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid var(--text-strong);
+  }
+
+  .changes th,
+  .changes td,
+  .review th,
+  .review td {
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .changes thead th,
+  .review thead th {
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1.5px solid var(--text-strong);
+  }
+
+  .changes tbody th,
+  .review tbody th {
+    font-weight: 600;
+  }
+
+  .changes__source {
+    position: relative;
+  }
+
+  .changes__ref {
+    font-size: var(--s-2);
+    color: var(--change);
+    white-space: nowrap;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+  }
+
+  @media (min-width: 40rem) {
+    .details {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .details figure {
+    display: grid;
+    align-content: space-between;
+    gap: 0.25rem;
+    padding: var(--sp-1);
+    border: 1px solid var(--line);
+  }
+
+  /* Balloons: numbered circles in redline, as on a drawing. */
+  .balloon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1.5px solid var(--change);
+    border-radius: 50%;
+    background: var(--bg);
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--change);
+    vertical-align: middle;
+  }
+
+  .spread__caption {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: var(--sp-5);
+    font-size: var(--s-1);
+    color: var(--text-muted);
+  }
+
+  .spread__caption span {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  /* Notes */
+  .notes {
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .notes__title {
+    font-size: var(--s-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .notes__list {
+    display: grid;
+    gap: var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .notes__list li {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .notes__list p {
+    max-width: 40ch;
+  }
+
+  @media (min-width: 64rem) {
+    .spread__head h2 {
+      grid-column: 1 / span 11;
+    }
+
+    .spread__lead {
+      grid-column: 1 / span 9;
+    }
+
+    .pages {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--gutter);
+    }
+
+    /* Both pages take the taller page's height, never less than an A4 proportion. */
+    .page {
+      min-height: 50rem;
+      padding: var(--sp-5) var(--sp-5) var(--sp-3);
+    }
+
+    .notes {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: var(--gutter);
+    }
+
+    .notes__list {
+      grid-column: 2 / -1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--gutter);
+    }
+  }
+</style>

@@ -62,7 +62,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 760;
+  font-weight: var(--display-weight);
   font-stretch: 108%;
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -73,7 +73,7 @@ h4 {
 
 h3,
 h4 {
-  font-weight: 700;
+  font-weight: 600;
   font-stretch: 104%;
   line-height: 1.2;
   letter-spacing: -0.01em;
@@ -128,6 +128,17 @@ samp,
   max-width: calc(var(--container) + 2 * var(--page-pad));
   margin-inline: auto;
   padding-inline: var(--page-pad);
+}
+
+/*
+ * On desktop the container spans the sheet inside the frame, inset by half a
+ * gutter, so the gutters between column pairs sit on the frame's zone lines.
+ */
+@media (min-width: 64rem) {
+  .container {
+    max-width: none;
+    padding-inline: calc(var(--mat-x) + var(--gutter) / 2);
+  }
 }
 
 .grid {
@@ -271,10 +282,12 @@ samp,
   text-decoration: none;
 }
 
+/* Struck through in redline, the way a change is marked up on a drawing. */
 .old-value {
   color: var(--text-faint);
   text-decoration: line-through;
-  text-decoration-thickness: 1px;
+  text-decoration-color: var(--change);
+  text-decoration-thickness: 1.5px;
 }
 
 /* Accessibility helpers */
@@ -326,7 +339,7 @@ samp,
 .handles-hover {
   position: relative;
   z-index: 1;
-  --handle: 8px;
+  --handle: 10px;
   outline: 1.5px solid transparent;
   outline-offset: -1px;
   transition: outline-color 160ms var(--ease);
@@ -334,7 +347,7 @@ samp,
 
 .handles,
 .handles-hover:is(:hover, :focus-within) {
-  outline-color: var(--mark);
+  outline-color: var(--select);
 }
 
 /* Squares centered on the element's 1px border line. */
@@ -345,14 +358,14 @@ samp,
   inset: calc(var(--handle) / -2 - 0.5px);
   pointer-events: none;
   background:
-    linear-gradient(var(--mark) 0 0) 0 0,
-    linear-gradient(var(--mark) 0 0) 50% 0,
-    linear-gradient(var(--mark) 0 0) 100% 0,
-    linear-gradient(var(--mark) 0 0) 0 50%,
-    linear-gradient(var(--mark) 0 0) 100% 50%,
-    linear-gradient(var(--mark) 0 0) 0 100%,
-    linear-gradient(var(--mark) 0 0) 50% 100%,
-    linear-gradient(var(--mark) 0 0) 100% 100%;
+    linear-gradient(var(--select) 0 0) 0 0,
+    linear-gradient(var(--select) 0 0) 50% 0,
+    linear-gradient(var(--select) 0 0) 100% 0,
+    linear-gradient(var(--select) 0 0) 0 50%,
+    linear-gradient(var(--select) 0 0) 100% 50%,
+    linear-gradient(var(--select) 0 0) 0 100%,
+    linear-gradient(var(--select) 0 0) 50% 100%,
+    linear-gradient(var(--select) 0 0) 100% 100%;
   background-size: var(--handle) var(--handle);
   background-repeat: no-repeat;
   transition: opacity 160ms var(--ease);

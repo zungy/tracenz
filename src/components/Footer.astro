@@ -1,7 +1,8 @@
 ---
 /**
- * Footer laid out as a drawing's title block, bottom right as on a real
- * sheet. Each page is a sheet, so the block states which sheet this is.
+ * Footer laid out as a drawing's title block. On desktop the block sits in
+ * the bottom-right corner of the sheet border and shares its lines, as on a
+ * real sheet. Each page is a sheet, so the block states which one this is.
  */
 import Brand from './Brand.astro';
 import { nav, sheetCount, sheets, site, type SheetKey } from '../config/site';
@@ -58,7 +59,7 @@ const year = new Date().getFullYear();
       </div>
       <div class="cell">
         <dt class="label">Rev</dt>
-        <dd>A</dd>
+        <dd>B</dd>
       </div>
       <div class="cell">
         <dt class="label">Scale</dt>
@@ -78,7 +79,8 @@ const year = new Date().getFullYear();
 
 <style>
   .footer {
-    padding-block: var(--sp-8) var(--sp-5);
+    padding-top: var(--section-pad);
+    padding-bottom: var(--sp-5);
     background: var(--bg);
     border-top: 1px solid var(--line-strong);
   }
@@ -141,7 +143,7 @@ const year = new Date().getFullYear();
     align-content: start;
     gap: 0.25rem;
     min-width: 0;
-    padding: 0.625rem 0.875rem 0.75rem;
+    padding: 0.75rem var(--sp-2) 0.875rem;
     background: var(--bg);
   }
 
@@ -160,8 +162,8 @@ const year = new Date().getFullYear();
   .cell--title dd {
     font-family: var(--font-display);
     font-size: var(--s3);
-    font-weight: 760;
-    font-stretch: 112%;
+    font-weight: var(--display-weight);
+    font-stretch: 110%;
     line-height: 1.15;
   }
 
@@ -185,13 +187,25 @@ const year = new Date().getFullYear();
     }
   }
 
+  /*
+   * Desktop: the block reaches the sheet border on the right and at the bottom
+   * and uses the border as its own right and bottom lines.
+   */
   @media (min-width: 64rem) {
+    .footer {
+      padding-bottom: 0;
+    }
+
     .footer__about {
       grid-column: 1 / span 6;
+      padding-bottom: var(--sp-5);
     }
 
     .titleblock {
       grid-column: 9 / -1;
+      margin-inline: calc(var(--gutter) / -2);
+      border-right: 0;
+      border-bottom: 0;
     }
   }
 </style>
