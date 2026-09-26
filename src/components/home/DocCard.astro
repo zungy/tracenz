@@ -1,16 +1,11 @@
 ---
 /**
- * The design document Trace writes, as a sheet of paper in both themes.
- * Item 2.1 is the statement the hero traces back to the log.
+ * The design document Trace writes, as a sheet of paper in both themes. It
+ * keeps to LogPanel's row grid (a 44px bar and a 56px block), so the first
+ * change statement sits on the same line as the log entry it came from.
  */
 const changes = [
-  {
-    id: '2.1',
-    text: 'Motor mount wall thickened from 2.0 to 2.5 mm.',
-    ref: '09:12',
-    traced: true,
-    link: 'wall',
-  },
+  { id: '2.1', text: 'Motor mount wall thickened from 2.0 to 2.5 mm.', ref: '09:12', link: 'wall' },
   {
     id: '2.2',
     text: 'Housing material changed from ABS to PC-ABS.',
@@ -20,156 +15,166 @@ const changes = [
   {
     id: '2.3',
     text: 'Dust extraction moved from 6 to 8 holes, each Ø9.',
-    ref: '10:24',
+    ref: '10:24, 10:26',
     link: 'holes',
   },
 ];
 ---
 
-<article class="doc scheme-paper stacked" aria-label="Design document written by Trace">
-  <header class="doc__head">
-    <p class="doc__kind mono">Design document</p>
+<article class="doc scheme-paper" aria-label="Design document written by Trace">
+  <header class="doc__bar">
+    <span class="doc__kind mono">Design document</span>
+    <span class="doc__no mono num">TR-0142</span>
     <span class="rev-tag" role="img" aria-label="Revision B">
       <svg viewBox="0 0 24 21" aria-hidden="true">
-        <path d="M12 1 23 20H1Z"></path>
+        <path d="M12 1.5 22.5 19.5H1.5Z"></path>
       </svg>
       <span aria-hidden="true">B</span>
     </span>
   </header>
-  <p class="doc__title">Orbital sander housing</p>
-  <p class="doc__meta mono num">Rev B · 2026-09-22 · from 71 changes</p>
 
-  <div class="doc__section doc__line" style="--i: 0">
-    <p class="doc__heading">
-      <span class="mono">1</span> Overview
-    </p>
-    <p>
-      Two-piece PC-ABS housing around a 125 mm orbital pad. The motor sits on a bracket mated to the
-      housing boss.
-    </p>
+  <div class="doc__block doc__line" style="--i: 0">
+    <p class="doc__title">Orbital sander housing</p>
+    <p class="doc__meta mono num">Changes since Rev A · 22 Sep 2026</p>
   </div>
 
-  <div class="doc__section">
-    <p class="doc__heading doc__line" style="--i: 1">
-      <span class="mono">2</span> Changes since Rev A
-    </p>
-    <ol class="doc__changes">
-      {changes.map((c, i) => (
-        <li
-          class:list={['doc__line', c.traced && 'is-traced']}
-          style={`--i: ${i + 2}`}
-          data-trace={c.traced ? 'doc' : undefined}
-          data-link={c.link}
-        >
-          <span class="doc__id mono num">{c.id}</span> <span>{c.text}</span>{' '}
-          <span class="doc__ref mono num">
-            <span class="visually-hidden">From log entry </span>↳ {c.ref}
-          </span>
-        </li>
-      ))}
-    </ol>
-  </div>
+  <ol class="doc__items">
+    {changes.map((c, i) => (
+      <li
+        class:list={['doc__item', 'doc__line', c.link === 'wall' && 'is-active']}
+        style={`--i: ${i + 1}`}
+        data-trace="doc"
+        data-link={c.link}
+      >
+        <span class="doc__id mono num">{c.id}</span>
+        <span class="doc__text">{c.text}</span>
+        <span class="doc__ref mono num">
+          <span class="visually-hidden">From log entry </span>↳ {c.ref}
+        </span>
+      </li>
+    ))}
+  </ol>
+
+  <footer class="doc__foot mono">
+    <span>Written by Trace</span>
+    <span>Review: waiting</span>
+  </footer>
 </article>
 
 <style>
   .doc {
-    position: relative;
     display: grid;
-    align-content: start;
-    gap: 0.625rem;
-    padding: var(--sp-3) var(--sp-3) var(--sp-3);
-    border: 1px solid var(--line-strong);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 2.75rem 3.5rem 1fr auto;
+    border: 1px solid var(--text-strong);
     font-size: 0.8125rem;
-    line-height: 1.5;
+    line-height: 1.45;
   }
 
-  .doc__head {
+  .doc__bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.75rem;
+    padding-inline: var(--sp-2) 0.75rem;
+    border-bottom: 1px solid var(--line);
   }
 
-  .doc__kind {
+  .doc__kind,
+  .doc__no {
     font-size: var(--s-2);
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .doc__kind {
+    color: var(--text-strong);
+  }
+
+  .doc__no {
+    margin-left: auto;
+    letter-spacing: 0.02em;
+  }
+
+  .doc__block {
+    display: grid;
+    align-content: center;
+    gap: 0.125rem;
+    padding-inline: var(--sp-2);
+    border-bottom: 1px solid var(--line);
   }
 
   .doc__title {
-    font-family: var(--font-display);
-    font-size: var(--s2);
-    font-weight: var(--display-weight);
-    font-stretch: 108%;
-    line-height: 1.1;
-    letter-spacing: -0.015em;
-    word-spacing: 0.04em;
+    font-size: var(--s1);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
     color: var(--text-strong);
   }
 
   .doc__meta {
-    padding-bottom: 0.625rem;
-    border-bottom: 1px solid var(--line);
     font-size: var(--s-2);
+    line-height: 1.3;
     color: var(--text-muted);
   }
 
-  .doc__section {
+  .doc__items {
     display: grid;
-    gap: 0.375rem;
-  }
-
-  .doc__heading {
-    display: flex;
-    gap: 0.6rem;
-    font-weight: 600;
-    color: var(--text-strong);
-  }
-
-  .doc__heading .mono {
-    color: var(--text-muted);
-  }
-
-  .doc__changes {
-    display: grid;
-    gap: 0.25rem;
+    align-content: start;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .doc__changes li {
+  /* The first text line is centered 20px from the top, on the log's first row. */
+  .doc__item {
     display: grid;
-    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
-    align-items: baseline;
-    column-gap: 0.5rem;
-    padding: 0.2rem 0.375rem;
-    margin-inline: -0.375rem;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    column-gap: 0.25rem;
+    padding: 0.6rem var(--sp-2) 0.625rem;
+    border-bottom: 1px solid var(--line-soft);
   }
 
-  .doc__changes li.is-traced,
-  .doc__changes li:global(.is-linked) {
+  .doc__item:last-child {
+    border-bottom: 0;
+  }
+
+  .doc__item:global(.is-active) {
     background: var(--change-tint);
     box-shadow: inset 2px 0 0 var(--change);
   }
 
-  :global(.is-pointing) .doc__changes li.is-traced:not(:global(.is-linked)) {
-    background: none;
-    box-shadow: none;
-  }
-
-  .doc__id,
-  .doc__ref {
-    font-size: 0.6875rem;
+  .doc__id {
+    font-size: var(--s-2);
+    line-height: 1.6;
     color: var(--text-muted);
   }
 
+  .doc__text {
+    color: var(--text-strong);
+  }
+
   .doc__ref {
-    color: var(--change);
+    grid-column: 2;
+    font-size: var(--s-2);
+    color: var(--text-muted);
+  }
+
+  .doc__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    padding: 0.75rem var(--sp-2);
+    border-top: 1px solid var(--line);
+    font-size: var(--s-2);
+    color: var(--text-muted);
   }
 
   :global(.hero.is-playing) .doc__line {
     animation: write 380ms var(--ease) both;
-    animation-delay: calc(var(--play) + 150ms + var(--i) * 110ms);
+    animation-delay: calc(var(--play) + 150ms + var(--i) * 120ms);
   }
 
   @keyframes write {

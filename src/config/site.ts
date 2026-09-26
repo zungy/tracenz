@@ -36,13 +36,13 @@ export const nav = [
 ];
 
 /**
- * Each page is a "sheet" in the title-block footer.
+ * Each page is a "sheet" in the title-block footer, which also links them.
  * Login and signup share sheet 3.
  */
 export const sheets = {
-  home: { number: 1, title: 'Overview' },
-  pricing: { number: 2, title: 'Pricing' },
-  account: { number: 3, title: 'Account' },
+  home: { number: 1, title: 'Overview', href: '/' },
+  pricing: { number: 2, title: 'Pricing', href: '/pricing' },
+  account: { number: 3, title: 'Account', href: '/login' },
 } as const;
 
 export const sheetCount = 3;

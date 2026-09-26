@@ -1,0 +1,439 @@
+---
+/**
+ * Page 1 of the design document Trace writes, laid out as an A4 page
+ * (794 × 1123 px at 96 dpi). Every size is a multiple of --u, one page pixel,
+ * which the parent sets from its own width: the same page renders reduced on
+ * the sheet and at actual size in the detail view.
+ *
+ * The page keeps to fixed rows, so the parent can point at parts of it by
+ * page coordinates: the revision block (top right), the change table's
+ * source column, and the sign-off block at the foot.
+ */
+import PadHoles from '../drawings/PadHoles.astro';
+import WallSection from '../drawings/WallSection.astro';
+
+interface Props {
+  /** Id prefix for the drawings, so the page can appear twice. */
+  id: string;
+}
+
+const { id } = Astro.props;
+
+const changes = [
+  { id: '2.1', what: 'Motor mount wall', was: '2.0 mm', now: '2.5 mm', source: '09:12 Sketch 4' },
+  { id: '2.2', what: 'Housing material', was: 'ABS', now: 'PC-ABS', source: '10:20 Housing' },
+  { id: '2.3', what: 'Dust extraction', was: '6 × Ø8', now: '8 × Ø9', source: '10:24, 10:26' },
+];
+---
+
+<div class="page">
+  <header class="head">
+    <span>Design document</span>
+    <span class="num">TR-0142</span>
+    <span class="num">Page 1 of 3</span>
+  </header>
+
+  <div class="top">
+    <div class="titling">
+      <p class="title">Orbital sander housing</p>
+      <p class="meta num">Written by Trace from 71 changes in 16 sessions</p>
+      <p class="meta num">22 Sep 2026</p>
+    </div>
+    <table class="revs">
+      <thead>
+        <tr>
+          <th scope="col">Rev</th>
+          <th scope="col">Date</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A</td>
+          <td class="num">14 Aug 2026</td>
+          <td>First release</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="tri" aria-hidden="true">
+              <svg viewBox="0 0 24 21">
+                <path d="M12 1.5 22.5 19.5H1.5Z"></path>
+              </svg>
+              <span>B</span>
+            </span>
+            <span class="visually-hidden">B</span>
+          </td>
+          <td class="num">22 Sep 2026</td>
+          <td>Wall, material, holes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="block overview">
+    <h3 class="h">
+      <span class="num">1</span> Overview
+    </h3>
+    <p class="text">
+      A two-piece clamshell in PC-ABS around a 125 mm orbital pad. The motor sits on a bracket that
+      mates to the housing boss, and dust is drawn through eight holes in the pad into the rear
+      port. Wall thickness is 2.5 mm nominal throughout.
+    </p>
+    <dl class="specs">
+      <div>
+        <dt>Parts</dt>
+        <dd class="num">4</dd>
+      </div>
+      <div>
+        <dt>Pad</dt>
+        <dd class="num">Ø125</dd>
+      </div>
+      <div>
+        <dt>Wall</dt>
+        <dd class="num">2.5 mm</dd>
+      </div>
+      <div>
+        <dt>Material</dt>
+        <dd>PC-ABS</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="block changes">
+    <h3 class="h">
+      <span class="num">2</span> Changes since Rev A
+    </h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">No.</th>
+          <th scope="col">Change</th>
+          <th scope="col">Was</th>
+          <th scope="col">Now</th>
+          <th scope="col">Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {changes.map((c) => (
+          <tr>
+            <td class="num">{c.id}</td>
+            <th scope="row">{c.what}</th>
+            <td class="num">
+              <del class="old-value">{c.was}</del>
+            </td>
+            <td class="num">
+              <ins class="now">{c.now}</ins>
+            </td>
+            <td class="num src">↳ {c.source}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <div class="figs">
+      <figure>
+        <WallSection id={`${id}-wall`} />
+        <figcaption>Section A–A, 2:1</figcaption>
+      </figure>
+      <figure>
+        <PadHoles id={`${id}-holes`} />
+        <figcaption>View B, pad from below, 1:2.5</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <footer class="signoff">
+    <div>
+      <p class="k">Written</p>
+      <p class="v">Trace</p>
+      <p class="d num">22 Sep 2026</p>
+    </div>
+    <div>
+      <p class="k">Checked</p>
+      <p class="v">Waiting for review</p>
+      <p class="d">–</p>
+    </div>
+    <div>
+      <p class="k">Approved</p>
+      <p class="v">–</p>
+      <p class="d">–</p>
+    </div>
+  </footer>
+</div>
+
+<style>
+  /* Sizes are page pixels times --u; the parent sets --u. */
+  .page {
+    display: grid;
+    grid-template-rows:
+      calc(32 * var(--u)) calc(120 * var(--u)) calc(170 * var(--u))
+      calc(460 * var(--u)) 1fr calc(104 * var(--u));
+    row-gap: calc(26 * var(--u));
+    width: calc(794 * var(--u));
+    height: calc(1123 * var(--u));
+    padding: calc(56 * var(--u)) calc(64 * var(--u)) calc(48 * var(--u));
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: calc(13.5 * var(--u));
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .page :global(.drawing *) {
+    vector-effect: none;
+  }
+
+  .head {
+    display: flex;
+    gap: calc(24 * var(--u));
+    align-items: start;
+    border-bottom: calc(2 * var(--u)) solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: calc(11 * var(--u));
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .head span:nth-child(2) {
+    margin-left: auto;
+  }
+
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc(300 * var(--u));
+    gap: calc(32 * var(--u));
+  }
+
+  .titling {
+    display: grid;
+    align-content: start;
+    gap: calc(4 * var(--u));
+  }
+
+  .title {
+    margin-bottom: calc(8 * var(--u));
+    font-size: calc(30 * var(--u));
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: calc(11.5 * var(--u));
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  /* Tables: 1px rules, a heavier rule under the header row. */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: calc(12.5 * var(--u));
+  }
+
+  th,
+  td {
+    padding: calc(6 * var(--u)) calc(8 * var(--u));
+    border: calc(1 * var(--u)) solid var(--vellum);
+    text-align: left;
+    vertical-align: middle;
+    font-weight: 400;
+  }
+
+  thead th {
+    border-bottom: calc(1.5 * var(--u)) solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: calc(10.5 * var(--u));
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  .revs {
+    align-self: start;
+    border: calc(1.5 * var(--u)) solid var(--ink);
+  }
+
+  .revs td:first-child {
+    width: calc(44 * var(--u));
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .tri {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: calc(20 * var(--u));
+    height: calc(17.5 * var(--u));
+    vertical-align: middle;
+  }
+
+  .tri svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+  }
+
+  .tri span {
+    position: relative;
+    top: calc(2.5 * var(--u));
+    font-size: calc(10 * var(--u));
+  }
+
+  .block {
+    display: grid;
+    align-content: start;
+    gap: calc(12 * var(--u));
+  }
+
+  .h {
+    display: flex;
+    gap: calc(10 * var(--u));
+    font-family: var(--font-body);
+    font-size: calc(15 * var(--u));
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+
+  .h .num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: rgb(25 44 100 / 0.6);
+  }
+
+  .text {
+    max-width: calc(620 * var(--u));
+  }
+
+  .specs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: calc(4 * var(--u));
+    border-block: calc(1 * var(--u)) solid var(--vellum);
+  }
+
+  .specs div {
+    display: grid;
+    gap: calc(2 * var(--u));
+    padding: calc(10 * var(--u)) 0;
+  }
+
+  .specs div + div {
+    padding-left: calc(14 * var(--u));
+    border-left: calc(1 * var(--u)) solid var(--vellum);
+  }
+
+  .specs dt {
+    font-family: var(--font-mono);
+    font-size: calc(10.5 * var(--u));
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  .specs dd {
+    font-size: calc(15 * var(--u));
+    font-weight: 600;
+  }
+
+  .table {
+    border: calc(1.5 * var(--u)) solid var(--ink);
+  }
+
+  .table tbody th {
+    font-weight: 600;
+  }
+
+  .table td:first-child {
+    width: calc(44 * var(--u));
+    font-family: var(--font-mono);
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  .table td.num {
+    font-family: var(--font-mono);
+  }
+
+  .table .old-value {
+    color: rgb(25 44 100 / 0.66);
+  }
+
+  .now {
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .src {
+    white-space: nowrap;
+  }
+
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(16 * var(--u));
+    margin-top: calc(6 * var(--u));
+  }
+
+  .figs figure {
+    display: grid;
+    gap: calc(6 * var(--u));
+    padding: calc(10 * var(--u));
+    border: calc(1 * var(--u)) solid var(--vellum);
+  }
+
+  .figs figcaption {
+    font-family: var(--font-mono);
+    font-size: calc(10.5 * var(--u));
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  /* Sign-off block at the foot of the page, like a drawing's title block */
+  .signoff {
+    grid-row: 6;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: calc(1.5 * var(--u)) solid var(--ink);
+  }
+
+  .signoff div {
+    display: grid;
+    align-content: start;
+    gap: calc(4 * var(--u));
+    padding: calc(12 * var(--u)) calc(14 * var(--u));
+  }
+
+  .signoff div + div {
+    border-left: calc(1 * var(--u)) solid var(--vellum);
+  }
+
+  .k {
+    font-family: var(--font-mono);
+    font-size: calc(10.5 * var(--u));
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgb(25 44 100 / 0.75);
+  }
+
+  .v {
+    font-size: calc(15 * var(--u));
+    font-weight: 600;
+  }
+
+  .d {
+    font-family: var(--font-mono);
+    font-size: calc(11.5 * var(--u));
+    color: rgb(25 44 100 / 0.75);
+  }
+</style>

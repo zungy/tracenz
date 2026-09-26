@@ -1,10 +1,10 @@
 ---
 /**
- * Drawing-sheet border on desktop, after ISO 5457: an outer trim line, a
- * 1.5px border line, zone numbers top and bottom, zone letters left and
- * right, division ticks between the two lines and centering marks. It is
- * fixed to the viewport, so the page scrolls under it. The 8 zones match the
- * layout grid: every gutter between a pair of columns sits on a zone line.
+ * Drawing-sheet border on desktop, after ISO 5457: an outer trim line, a 2px
+ * border line, zone numbers top and bottom, zone letters left and right,
+ * division ticks between the two lines and centering marks. It is fixed to
+ * the viewport, so the page scrolls under it. The 8 zones match the layout
+ * grid: every gutter between a pair of columns sits on a zone line.
  */
 const numbers = Array.from({ length: 8 }, (_, i) => i + 1);
 const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -63,7 +63,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     bottom: var(--frame);
     left: var(--mat-x);
     right: var(--mat-x);
-    border: 1.5px solid var(--text-strong);
+    border: 2px solid var(--text-strong);
     box-shadow: 0 0 0 200vmax var(--bg);
   }
 
@@ -80,7 +80,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     position: absolute;
     display: grid;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     line-height: 1;
     color: var(--text-strong);
@@ -101,11 +101,11 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
   }
 
   .zones--top {
-    bottom: calc(100% + 1.5px);
+    bottom: calc(100% + 2px);
   }
 
   .zones--bottom {
-    top: calc(100% + 1.5px);
+    top: calc(100% + 2px);
   }
 
   .zones--left,
@@ -117,11 +117,11 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
   }
 
   .zones--left {
-    right: calc(100% + 1.5px);
+    right: calc(100% + 2px);
   }
 
   .zones--right {
-    left: calc(100% + 1.5px);
+    left: calc(100% + 2px);
   }
 
   /* Zone divisions run from the trim line to the border line. */
@@ -156,7 +156,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
   .center--top,
   .center--bottom {
     left: 50%;
-    width: 1.5px;
+    width: 2px;
     height: calc(var(--strip) + 10px);
     transform: translateX(-50%);
   }
@@ -172,7 +172,7 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
   .center--left,
   .center--right {
     top: 50%;
-    height: 1.5px;
+    height: 2px;
     width: calc(var(--strip) + 10px);
     transform: translateY(-50%);
   }

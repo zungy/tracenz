@@ -32,9 +32,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
         </nav>
 
         <div class="header__actions">
-          <div class="header__view">
-            <ThemeToggle id="header" />
-          </div>
           <a class="header__login" href="/login">
             Log in
           </a>
@@ -68,9 +65,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       </>
     ) : (
       <div class="header__actions">
-        <div class="header__view">
-          <ThemeToggle id="header" />
-        </div>
         <a class="header__back" href="/">
           <Icon name="arrow-left" size={18} />
           Back to home
@@ -133,8 +127,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     margin-left: auto;
   }
 
-  .header__login,
-  .header__view {
+  .header__login {
     display: none;
   }
 
@@ -200,20 +193,15 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     color: var(--text-strong);
     font-family: var(--font-display);
     font-size: var(--s2);
-    font-weight: 620;
-    font-stretch: 108%;
+    font-weight: 500;
+    letter-spacing: -0.015em;
     text-decoration: none;
   }
 
   @media (min-width: 64rem) {
     .header__nav,
-    .header__login,
-    .header__view {
+    .header__login {
       display: block;
-    }
-
-    .header__view {
-      margin-right: var(--sp-1);
     }
 
     .menu {

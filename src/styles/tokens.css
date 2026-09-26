@@ -2,10 +2,12 @@
  * Design tokens.
  *
  * The five palette colors carry the brand: ink for text, lines and actions,
- * cobalt, vellum, film and paper for the rest. One extra color, redline, is
- * reserved for change: revision clouds, delta tags, new values and trace
- * lines, the way red markup works on a drawing. It is never used for text
- * or buttons. Light theme is "Paper", dark theme is "Blueprint".
+ * cobalt, vellum, film and paper for the rest. The sheet itself is a light
+ * film tint, so paper-white panels and pages sit on it. One extra color,
+ * redline, is reserved for the change being traced: its revision cloud,
+ * delta tag, new value and trace line, the way red markup works on a
+ * drawing. It is never used for text or buttons. Light theme is "Paper",
+ * dark theme is "Blueprint".
  */
 
 :root {
@@ -20,7 +22,7 @@
   --redline: #d2401f;
 
   /* Semantic colors: Paper */
-  --bg: var(--paper);
+  --bg: #f4f5f9; /* film and paper, half and half */
   --bg-alt: var(--film);
   --surface: var(--paper);
   --text: var(--ink);
@@ -37,20 +39,19 @@
   --change: var(--redline);
   --change-tint: rgb(210 64 31 / 0.07);
   --on-change: var(--paper);
-  --mark: var(--change);
   --select: var(--cobalt);
   --focus: var(--cobalt);
   --tint: rgb(36 63 143 / 0.06);
   --band-bg: var(--ink);
   --band-surface: rgb(36 63 143 / 0.55);
 
-  /* Type */
-  --font-display: 'Archivo Variable', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  /* Type: one family, IBM Plex, in sans for words and mono for values */
   --font-body:
     'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto,
     sans-serif;
+  --font-display: var(--font-body);
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  --display-weight: 640;
+  --display-weight: 500;
 
   /* Type scale: ratio 2^(1/4), so every second step is x sqrt2 and every fourth doubles */
   --s-2: 0.75rem;
@@ -76,11 +77,13 @@
   /*
    * Layout. On desktop the page is a drawing sheet: --frame is the border
    * margin, --mat-x the side margin (wider on very wide screens, where the
-   * sheet stops at 100rem), and the 16 columns line up with the frame's 8
-   * zones, a gutter centered on every zone line.
+   * sheet stops at 100rem) and --edge the extra clearance inside the border.
+   * The 16 columns line up with the frame's 8 zones, a gutter centered on
+   * every zone line (see .grid in global.css).
    */
   --frame: 0px;
   --mat-x: 0px;
+  --edge: 0px;
   --container: 80rem;
   --gutter: 1rem;
   --page-pad: clamp(1rem, 4vw, 2.5rem);
@@ -104,8 +107,9 @@
     --cols: 16;
     --frame: 1.5rem;
     --mat-x: max(var(--frame), calc((100% - 100rem) / 2));
+    --edge: 1.5rem;
     --gutter: 2.5rem;
-    --section-pad: 6rem;
+    --section-pad: 6.5rem;
   }
 }
 
@@ -131,7 +135,6 @@
     --change: var(--redline);
     --change-tint: rgb(255 122 89 / 0.12);
     --on-change: var(--ink);
-    --mark: var(--change);
     --select: var(--paper);
     --focus: var(--paper);
     --tint: rgb(233 235 243 / 0.08);
@@ -161,7 +164,6 @@
   --change: var(--redline);
   --change-tint: rgb(255 122 89 / 0.12);
   --on-change: var(--ink);
-  --mark: var(--change);
   --select: var(--paper);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
@@ -194,7 +196,6 @@
   --change: var(--redline);
   --change-tint: rgb(255 122 89 / 0.12);
   --on-change: var(--ink);
-  --mark: var(--change);
   --select: var(--paper);
   --focus: var(--paper);
   --tint: rgb(233 235 243 / 0.08);
@@ -222,7 +223,6 @@
   --change: var(--redline);
   --change-tint: rgb(210 64 31 / 0.07);
   --on-change: var(--paper);
-  --mark: var(--change);
   --select: var(--cobalt);
   --focus: var(--cobalt);
   --tint: rgb(36 63 143 / 0.06);

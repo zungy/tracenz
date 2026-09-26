@@ -2,6 +2,8 @@
 /**
  * Section A–A, enlarged: the motor-mount rib where it meets the housing wall.
  * The rib's old top edge (2.0 mm) is a hidden line under the new one (2.5 mm).
+ * Drawn in ink only: it illustrates the design document, where no change is
+ * being traced.
  */
 const s = 8; // SVG units per millimetre
 const wallX = 236; // inner face of the housing wall
@@ -10,15 +12,22 @@ const ribTop = ribBottom - 2.5 * s; // 112
 const oldTop = ribBottom - 2.0 * s; // 116
 const bossX = 44;
 const dimX = 150;
+
+interface Props {
+  /** Id prefix, so the drawing can appear twice on a page. */
+  id?: string;
+}
+
+const { id = 'wall' } = Astro.props;
 ---
 
-<svg class="drawing" viewBox="0 0 320 220" role="img" aria-labelledby="wall-title">
-  <title id="wall-title">
+<svg class="drawing" viewBox="0 0 320 220" role="img" aria-labelledby={`${id}-title`}>
+  <title id={`${id}-title`}>
     Section through the motor mount rib: the rib is now 2.5 millimetres thick, up from 2.0.
   </title>
   <defs>
     <pattern
-      id="wall-hatch"
+      id={`${id}-hatch`}
       width="7"
       height="7"
       patternUnits="userSpaceOnUse"
@@ -31,7 +40,7 @@ const dimX = 150;
   <!-- Housing wall, cut top and bottom with break lines -->
   <path
     class="cut"
-    fill="url(#wall-hatch)"
+    fill={`url(#${id}-hatch)`}
     d={`M${wallX} 18 L${wallX + 20} 18 L${wallX + 20} 202 L${wallX} 202 Z`}
   ></path>
   <path class="break" d={`M${wallX - 6} 18 l6 -5 l10 10 l10 -10 l6 5`}></path>
@@ -40,7 +49,7 @@ const dimX = 150;
   <!-- Rib and boss, with fillets into the wall -->
   <path
     class="cut"
-    fill="url(#wall-hatch)"
+    fill={`url(#${id}-hatch)`}
     d={`M${bossX} ${ribTop} H${wallX - 10} Q${wallX} ${ribTop} ${wallX} ${ribTop - 10} V${ribBottom + 10} Q${wallX} ${ribBottom} ${wallX - 10} ${ribBottom} H${bossX + 20} V196 H${bossX} Z`}
   ></path>
   <path class="break" d={`M${bossX - 6} 196 l6 -5 l10 10 l10 -10 l6 5`}></path>
@@ -111,8 +120,8 @@ const dimX = 150;
 
   .hidden {
     fill: none;
-    stroke: var(--change);
-    stroke-width: 1.25;
+    stroke: var(--text-muted);
+    stroke-width: 1;
     stroke-dasharray: 5 3;
   }
 
@@ -128,32 +137,35 @@ const dimX = 150;
   }
 
   .strike {
-    stroke: var(--change);
-    stroke-width: 1.5;
+    stroke: var(--text-muted);
+    stroke-width: 1;
   }
 
   .chip,
   .tag {
-    fill: var(--change);
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
   }
 
   .new {
     font-family: var(--font-mono);
     font-size: 15px;
     font-weight: 600;
-    fill: var(--on-change);
+    fill: var(--text-strong);
   }
 
   .tag-letter {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
-    fill: var(--on-change);
+    fill: var(--text-strong);
   }
 
   .callout {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.06em;
     fill: var(--text-muted);

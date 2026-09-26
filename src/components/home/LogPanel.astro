@@ -1,9 +1,14 @@
 ---
 /**
  * The change log as Trace shows it: a session timeline and the latest
- * changes, each with its value before and after. Row 1 is the change the hero
- * traces through to the document. Plays in when the parent .hero has
- * `is-playing`; otherwise it shows its finished state.
+ * changes, each with its value before and after. Rows that share a `link`
+ * key with the drawing and the document light up together; the active one
+ * (the motor mount wall, until the visitor points at another) is drawn in
+ * redline. Plays in when the parent .hero has `is-playing`; otherwise it
+ * shows its finished state.
+ *
+ * The panel keeps to the same row grid as DocCard: a 44px bar, a 56px block
+ * and 40px rows, so a change and its document statement sit on one line.
  */
 import Icon from '../Icon.astro';
 
@@ -15,15 +20,7 @@ const sessions = [
 ];
 
 const rows = [
-  {
-    time: '09:12',
-    feature: 'Sketch 4',
-    param: 'D3',
-    from: '2.0',
-    to: '2.5 mm',
-    traced: true,
-    link: 'wall',
-  },
+  { time: '09:12', feature: 'Sketch 4', param: 'D3', from: '2.0', to: '2.5 mm', link: 'wall' },
   { time: '09:31', feature: 'Fillet 7', param: 'Radius', from: 'R1.5', to: 'R2' },
   { time: '10:02', feature: 'Motor bracket', param: 'Part', added: true },
   {
@@ -67,9 +64,9 @@ const recent = sessions.slice(-rows.length);
   <ol class="log__rows" aria-label="Latest changes">
     {rows.map((row, i) => (
       <li
-        class:list={['row', row.traced && 'row--traced']}
+        class:list={['row', row.link === 'wall' && 'is-active']}
         style={`--at: ${recent[i]}`}
-        data-trace={row.traced ? 'log' : undefined}
+        data-trace={row.link ? 'log' : undefined}
         data-link={row.link}
       >
         <time class="row__time num">{row.time}</time>{' '}
@@ -95,6 +92,11 @@ const recent = sessions.slice(-rows.length);
       </li>
     ))}
   </ol>
+
+  <div class="log__foot mono">
+    <span class="num">6 of 71 changes</span>
+    <span class="num">Last saved 10:26</span>
+  </div>
 </div>
 
 <style>
@@ -102,23 +104,23 @@ const recent = sessions.slice(-rows.length);
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    align-content: start;
+    grid-template-rows: 2.75rem 3.5rem 1fr auto;
     background: var(--surface);
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--text-strong);
   }
 
   .log__bar {
     display: flex;
     align-items: center;
     gap: var(--sp-2);
-    min-height: 2.75rem;
     padding-inline: var(--sp-2);
     border-bottom: 1px solid var(--line);
   }
 
   .log__file {
     overflow: hidden;
-    font-size: var(--s-1);
+    font-size: var(--s-2);
+    font-weight: 500;
     color: var(--text-strong);
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -138,7 +140,7 @@ const recent = sessions.slice(-rows.length);
     width: 0.4375rem;
     height: 0.4375rem;
     border-radius: 50%;
-    background: var(--change);
+    background: var(--select);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -178,13 +180,15 @@ const recent = sessions.slice(-rows.length);
 
   /* Session timeline */
   .timeline {
-    padding: 0.875rem var(--sp-2) 0.625rem;
+    display: grid;
+    align-content: center;
+    padding-inline: var(--sp-2);
     border-bottom: 1px solid var(--line);
   }
 
   .timeline__track {
     position: relative;
-    height: 1rem;
+    height: 0.875rem;
     border-bottom: 1px solid var(--line-strong);
   }
 
@@ -204,14 +208,15 @@ const recent = sessions.slice(-rows.length);
     bottom: -0.25rem;
     left: 100%;
     width: 1px;
-    background: var(--change);
+    background: var(--select);
   }
 
   .timeline__labels {
     display: flex;
     justify-content: space-between;
-    padding-top: 0.375rem;
+    padding-top: 0.3rem;
     font-size: var(--s-2);
+    line-height: 1.2;
     color: var(--text-muted);
   }
 
@@ -224,37 +229,41 @@ const recent = sessions.slice(-rows.length);
 
   .row {
     display: grid;
-    grid-template-columns: 2.625rem minmax(0, 1fr) auto;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
     align-items: center;
     column-gap: 0.75rem;
-    min-height: 2.5rem;
-    padding: 0.35rem var(--sp-2);
+    height: 2.5rem;
+    padding-inline: var(--sp-2);
     border-bottom: 1px solid var(--line-soft);
     font-size: var(--s-1);
-  }
-
-  .row:last-child {
-    border-bottom: 0;
-  }
-
-  .row--traced,
-  .row:global(.is-linked) {
-    background: var(--change-tint);
-    box-shadow: inset 2px 0 0 var(--change);
-  }
-
-  :global(.is-pointing) .row--traced:not(:global(.is-linked)) {
-    background: none;
-    box-shadow: none;
   }
 
   .row[data-link] {
     cursor: default;
   }
 
+  /* The active change: a redline bar, its new value on a red chip. */
+  .row:global(.is-active) {
+    background: var(--change-tint);
+    box-shadow: inset 2px 0 0 var(--change);
+  }
+
+  .row:global(.is-active) .new-value {
+    border-color: var(--change);
+    background: var(--change);
+    color: var(--on-change);
+  }
+
+  /* Muted rather than faint: the tinted row needs the extra contrast. */
+  .row:global(.is-active) .old-value {
+    color: var(--text-muted);
+    text-decoration-color: var(--change);
+    text-decoration-thickness: 1.5px;
+  }
+
   .row__time {
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--s-2);
     color: var(--text-muted);
   }
 
@@ -281,12 +290,26 @@ const recent = sessions.slice(-rows.length);
     align-items: center;
     gap: 0.35rem;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--s-2);
     white-space: nowrap;
+  }
+
+  .row__change .new-value {
+    padding-block: 0.05rem;
   }
 
   .row__arrow {
     color: var(--text-faint);
+  }
+
+  .log__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    padding: 0.75rem var(--sp-2);
+    border-top: 1px solid var(--line);
+    font-size: var(--s-2);
+    color: var(--text-muted);
   }
 
   /* Playback: each element starts dimmed, never hidden, then settles. */

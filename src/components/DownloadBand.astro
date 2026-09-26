@@ -1,199 +1,105 @@
 ---
 /**
- * Closing band on the home and pricing pages, laid out as a blueprint sheet:
- * the heading at top left, the part drawn in white linework, drawing notes
- * bottom left and a title block bottom right that holds the download.
+ * Closing band on the home and pricing pages: a blueprint sheet with the
+ * download on the left and, on the right, a line drawing of Trace docked
+ * next to the model it is logging.
  */
-import DownloadButton from './DownloadButton.astro';
-import SanderElevation from './drawings/SanderElevation.astro';
+import DownloadButtons from './DownloadButtons.astro';
+import AppSketch from './drawings/AppSketch.astro';
 ---
 
 <section id="download" class="band scheme-blueprint" aria-labelledby="download-title">
   <div class="container grid band__grid">
     <div class="band__copy">
       <h2 id="download-title">Put Trace next to Autodesk Fusion.</h2>
-      <p>Install the desktop app, sign in and open a project. Logging starts on its own.</p>
+      <p class="band__text">
+        Install the desktop app, sign in and open a project. Trace logs from the first change, and
+        writes the document when you ask for it.
+      </p>
+      <DownloadButtons class="band__buttons" />
+      <p class="band__small">
+        Free for one project. Needs a Trace account: <a href="/signup">create one</a> or{' '}
+        <a href="/login">log in</a>.
+      </p>
     </div>
 
-    <div class="band__drawing">
-      <SanderElevation id="band-elev" />
-    </div>
-
-    <div class="band__notes">
-      <p class="mono band__label">Notes</p>
-      <ol>
-        <li>Free for one project. No card needed.</li>
-        <li>
-          Needs a Trace account. <a href="/signup">Create one here</a>.
-        </li>
-        <li>Windows and macOS.</li>
-      </ol>
-    </div>
-
-    <dl class="band__block">
-      <div class="cell cell--wide">
-        <dt class="mono">Title</dt>
-        <dd>Trace desktop app</dd>
-      </div>
-      <div class="cell">
-        <dt class="mono">Works with</dt>
-        <dd>Autodesk Fusion</dd>
-      </div>
-      <div class="cell">
-        <dt class="mono">Rev</dt>
-        <dd>B</dd>
-      </div>
-      <div class="cell cell--wide cell--action">
-        <dt class="visually-hidden">Download</dt>
-        <dd>
-          <DownloadButton other />
-        </dd>
-      </div>
-    </dl>
+    <figure class="band__drawing">
+      <AppSketch />
+    </figure>
   </div>
 </section>
 
 <style>
-  /* Blueprint sheet: a square grid of 32px, four 8px units per square. */
+  /*
+   * Blueprint ground with a fine square grid: 16px squares, every fifth line
+   * heavier, both faint enough to stay behind the drawing.
+   */
   .band {
     padding-block: var(--section-pad);
     background-image:
-      linear-gradient(var(--line-soft) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(rgb(233 235 243 / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(233 235 243 / 0.1) 1px, transparent 1px),
+      linear-gradient(rgb(233 235 243 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(233 235 243 / 0.05) 1px, transparent 1px);
+    background-size:
+      80px 80px,
+      80px 80px,
+      16px 16px,
+      16px 16px;
     background-position: center -1px;
   }
 
   .band__grid {
-    row-gap: var(--sp-5);
+    row-gap: var(--sp-8);
+    align-items: center;
   }
 
   .band__copy,
-  .band__drawing,
-  .band__notes,
-  .band__block {
+  .band__drawing {
     grid-column: 1 / -1;
   }
 
   .band__copy {
     display: grid;
     align-content: start;
-    gap: var(--sp-2);
+    gap: var(--sp-3);
   }
 
   .band__copy h2 {
-    font-size: clamp(var(--s4), 1.2rem + 2.8vw, 3.25rem);
-    font-stretch: 110%;
+    font-size: clamp(var(--s4), 1.2rem + 2.4vw, 3.25rem);
   }
 
-  .band__copy p {
-    max-width: 36ch;
+  .band__text {
+    max-width: 40ch;
     font-size: var(--s1);
     line-height: 1.5;
   }
 
-  .band__drawing {
-    max-width: 40rem;
+  /* Solid paper buttons on the blueprint. */
+  .band__copy :global(.band__buttons) {
+    --accent: var(--paper);
+    --accent-hover: var(--film);
+    --on-accent: var(--ink);
+    max-width: 26rem;
+    margin-top: var(--sp-1);
   }
 
-  .band__label {
-    font-size: var(--s-2);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-strong);
-  }
-
-  .band__notes {
-    display: grid;
-    align-content: end;
-    gap: var(--sp-1);
-  }
-
-  .band__notes ol {
-    display: grid;
-    gap: 0.25rem;
-    padding-left: 1.25rem;
-    color: var(--text);
-  }
-
-  /* Title block with the download in its last row */
-  .band__block {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-self: end;
-    gap: 1px;
-    background: var(--line-strong);
-    border: 1.5px solid var(--text-strong);
-  }
-
-  .cell {
-    display: grid;
-    gap: 0.25rem;
-    padding: 0.625rem var(--sp-2);
-    background: var(--band-bg, var(--bg));
-  }
-
-  .cell--wide {
-    grid-column: 1 / -1;
-  }
-
-  .cell dt {
-    font-size: var(--s-2);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .band__small {
+    font-size: var(--s-1);
     color: var(--text-muted);
   }
 
-  .cell dd {
-    font-family: var(--font-mono);
-    font-size: var(--s0);
-    font-weight: 500;
-    color: var(--text-strong);
+  .band__drawing {
+    margin: 0;
   }
 
-  .cell--wide:first-child dd {
-    font-family: var(--font-display);
-    font-size: var(--s2);
-    font-weight: var(--display-weight);
-    font-stretch: 110%;
-  }
-
-  .cell--action {
-    padding-block: var(--sp-2);
-  }
-
-  /*
-   * Desktop: laid out like a sheet. The drawing takes the main field; the
-   * right-hand column holds the heading, the notes and, at the bottom, the
-   * title block with the download.
-   */
   @media (min-width: 64rem) {
-    .band__grid {
-      grid-template-rows: auto 1fr auto;
-      row-gap: var(--sp-3);
+    .band__copy {
+      grid-column: 1 / span 6;
     }
 
     .band__drawing {
-      grid-column: 1 / span 9;
-      grid-row: 1 / span 3;
-      align-self: center;
-      max-width: none;
-    }
-
-    .band__copy {
-      grid-column: 11 / -1;
-      grid-row: 1;
-    }
-
-    .band__notes {
-      grid-column: 11 / -1;
-      grid-row: 2;
-      align-content: start;
-    }
-
-    .band__block {
-      grid-column: 11 / -1;
-      grid-row: 3;
+      grid-column: 8 / -1;
     }
   }
 </style>

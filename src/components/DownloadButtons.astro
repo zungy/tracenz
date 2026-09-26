@@ -1,0 +1,67 @@
+---
+/**
+ * The primary action: download the desktop app. Windows and macOS get equal
+ * buttons; a small script puts the visitor's own system first. While a
+ * download URL in src/config/site.ts is null, clicking explains that the
+ * download isn't available yet.
+ */
+import Icon from './Icon.astro';
+import { site } from '../config/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const systems = [
+  { os: 'windows', label: 'Windows', icon: 'brand-windows', url: site.downloads.windows },
+  { os: 'macos', label: 'macOS', icon: 'brand-apple', url: site.downloads.macos },
+];
+---
+
+<div class:list={['downloads', className]} data-downloads>
+  {systems.map((s) => (
+    <a
+      class="btn btn--primary downloads__btn"
+      href={s.url ?? '#download'}
+      data-os={s.os}
+      data-pending={s.url ? undefined : `The ${s.label} download isn't available yet.`}
+    >
+      <Icon name={s.icon} size={20} />
+      <span>
+        <span class="visually-hidden">Download for </span>
+        {s.label}
+      </span>
+    </a>
+  ))}
+</div>
+
+<script>
+  // Offer the visitor's own system first.
+  const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
+  const platform = nav.userAgentData?.platform || navigator.platform || navigator.userAgent;
+  if (/mac/i.test(platform)) {
+    for (const group of document.querySelectorAll<HTMLElement>('[data-downloads]')) {
+      group.classList.add('is-mac');
+    }
+  }
+</script>
+
+<style>
+  .downloads {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .downloads__btn {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding-inline: var(--sp-2) var(--sp-3);
+  }
+
+  .downloads.is-mac [data-os='macos'] {
+    order: -1;
+  }
+</style>

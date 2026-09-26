@@ -1,7 +1,8 @@
 ---
 /**
  * View B: the sanding pad from below. The new pattern of eight Ø9 holes is
- * drawn solid; the old pattern of six Ø8 holes stays as hidden lines.
+ * drawn solid; the old pattern of six Ø8 holes stays as hidden lines. Drawn
+ * in ink only, like WallSection.
  */
 const cx = 118;
 const cy = 110;
@@ -20,10 +21,17 @@ const oldHoles = ring(6, 0, 4 * mm);
 const called = newHoles[7]; // upper right
 const f = (n: number) => n.toFixed(1);
 const tip = { x: called.x + 4.5 * mm * 0.7, y: called.y - 4.5 * mm * 0.7 };
+
+interface Props {
+  /** Id prefix, so the drawing can appear twice on a page. */
+  id?: string;
+}
+
+const { id = 'holes' } = Astro.props;
 ---
 
-<svg class="drawing" viewBox="0 0 320 220" role="img" aria-labelledby="holes-title">
-  <title id="holes-title">
+<svg class="drawing" viewBox="0 0 320 220" role="img" aria-labelledby={`${id}-title`}>
+  <title id={`${id}-title`}>
     Pad seen from below: eight 9 millimetre dust holes, equally spaced, replacing six 8
     millimetre holes.
   </title>
@@ -101,12 +109,12 @@ const tip = { x: called.x + 4.5 * mm * 0.7, y: called.y - 4.5 * mm * 0.7 };
 
   .leader {
     fill: none;
-    stroke: var(--change);
+    stroke: var(--text-muted);
     stroke-width: 1;
   }
 
   .dot {
-    fill: var(--change);
+    fill: var(--text-muted);
   }
 
   .old,
@@ -117,38 +125,41 @@ const tip = { x: called.x + 4.5 * mm * 0.7, y: called.y - 4.5 * mm * 0.7 };
   }
 
   .note {
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     fill: var(--text-muted);
   }
 
   .strike {
-    stroke: var(--change);
-    stroke-width: 1.5;
+    stroke: var(--text-muted);
+    stroke-width: 1;
   }
 
   .chip,
   .tag {
-    fill: var(--change);
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
   }
 
   .new {
     font-family: var(--font-mono);
     font-size: 13px;
     font-weight: 600;
-    fill: var(--on-change);
+    fill: var(--text-strong);
   }
 
   .tag-letter {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
-    fill: var(--on-change);
+    fill: var(--text-strong);
   }
 
   .callout {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.06em;
     fill: var(--text-muted);

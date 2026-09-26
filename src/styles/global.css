@@ -63,10 +63,8 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-stretch: 108%;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  word-spacing: 0.04em;
+  line-height: 1.06;
+  letter-spacing: -0.028em;
   color: var(--text-strong);
   text-wrap: balance;
 }
@@ -74,8 +72,7 @@ h4 {
 h3,
 h4 {
   font-weight: 600;
-  font-stretch: 104%;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: -0.01em;
 }
 
@@ -132,12 +129,12 @@ samp,
 
 /*
  * On desktop the container spans the sheet inside the frame, inset by half a
- * gutter, so the gutters between column pairs sit on the frame's zone lines.
+ * gutter plus --edge, so content keeps clear of the border line.
  */
 @media (min-width: 64rem) {
   .container {
     max-width: none;
-    padding-inline: calc(var(--mat-x) + var(--gutter) / 2);
+    padding-inline: calc(var(--mat-x) + var(--gutter) / 2 + var(--edge));
   }
 }
 
@@ -145,6 +142,22 @@ samp,
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   column-gap: var(--gutter);
+}
+
+/*
+ * Desktop: 16 columns in the frame's 8 zones, the gutter between each pair
+ * centered on a zone line. --unit is the column width the grid would have if
+ * it reached half a gutter from the border; the two outer columns give up
+ * --edge, which keeps every zone line in place.
+ */
+@media (min-width: 64rem) {
+  .grid {
+    --unit: calc((100% + 2 * var(--edge) + var(--gutter)) / 16 - var(--gutter));
+    grid-template-columns:
+      calc(var(--unit) - var(--edge))
+      repeat(14, var(--unit))
+      calc(var(--unit) - var(--edge));
+  }
 }
 
 .section {
@@ -242,16 +255,17 @@ samp,
 }
 
 /*
- * Change marks, the one place cobalt appears: a filled revision tag and a new
- * value set on a cobalt chip.
+ * Change marks. A delta tag carries the revision letter; a new value sits in
+ * a chip and the old one is struck through. They are drawn in ink. Only the
+ * change being traced (`--change` variants) is drawn in redline.
  */
 .rev-tag {
   position: relative;
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 1.5rem;
-  height: 1.3rem;
+  width: 1.625rem;
+  height: 1.4rem;
   vertical-align: middle;
 }
 
@@ -260,32 +274,54 @@ samp,
   inset: 0;
   width: 100%;
   height: 100%;
-  fill: var(--change);
+  overflow: visible;
+  fill: none;
+  stroke: var(--text-strong);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
 
 .rev-tag span {
   position: relative;
-  top: 0.16rem;
+  top: 0.2rem;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1;
+  color: var(--text-strong);
+}
+
+.rev-tag--change svg {
+  fill: var(--change);
+  stroke: var(--change);
+}
+
+.rev-tag--change span {
   color: var(--on-change);
 }
 
 .new-value {
-  padding: 0.05em 0.35em;
+  padding: 0 0.35em;
+  border: 1px solid var(--text-strong);
   border-radius: 1px;
-  background: var(--change);
-  color: var(--on-change);
+  color: var(--text-strong);
   font-weight: 600;
   text-decoration: none;
 }
 
-/* Struck through in redline, the way a change is marked up on a drawing. */
+.new-value--change {
+  border-color: var(--change);
+  background: var(--change);
+  color: var(--on-change);
+}
+
 .old-value {
   color: var(--text-faint);
   text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.old-value--change {
   text-decoration-color: var(--change);
   text-decoration-thickness: 1.5px;
 }
@@ -373,11 +409,4 @@ samp,
 
 .handles-hover:not(:hover, :focus-within)::after {
   opacity: 0;
-}
-
-/* A sheet of paper lying on another: a hard offset outline, no blur. */
-.stacked {
-  box-shadow:
-    6px 6px 0 0 var(--bg),
-    6px 6px 0 1px var(--line-strong);
 }

@@ -31,13 +31,13 @@ import Base from '../layouts/Base.astro';
     row-gap: var(--sp-3);
   }
 
-  .missing__grid > * {
+  .missing__grid > :global(*) {
     grid-column: 1 / -1;
   }
 
   h1 {
     font-size: clamp(2.5rem, 1.2rem + 5vw, var(--s8));
-    font-stretch: 114%;
+    letter-spacing: -0.035em;
     max-width: 14ch;
   }
 

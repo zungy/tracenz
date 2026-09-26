@@ -1,10 +1,13 @@
 ---
 /**
- * Footer laid out as a drawing's title block. On desktop the block sits in
- * the bottom-right corner of the sheet border and shares its lines, as on a
- * real sheet. Each page is a sheet, so the block states which one this is.
+ * Footer laid out as a drawing's title block, and every cell does a job: the
+ * title and sheet number say where you are, the sheet row moves between the
+ * site's three sheets, and the view cell switches Paper and Blueprint. On
+ * desktop the block sits in the bottom-right corner of the sheet border and
+ * shares its lines, as on a real sheet.
  */
 import Brand from './Brand.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { nav, sheetCount, sheets, site, type SheetKey } from '../config/site';
 
 interface Props {
@@ -14,6 +17,7 @@ interface Props {
 const { sheet } = Astro.props;
 const current = sheet ? sheets[sheet] : null;
 const year = new Date().getFullYear();
+const index = (Object.keys(sheets) as SheetKey[]).map((key) => ({ key, ...sheets[key] }));
 ---
 
 <footer class="footer">
@@ -21,59 +25,58 @@ const year = new Date().getFullYear();
     <div class="footer__about">
       <Brand />
       <p>{site.description}</p>
-      <div class="footer__links">
-        <nav aria-label="Product">
-          <ul>
-            {nav.map((item) => (
-              <li>
-                <a href={item.href}>{item.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <nav aria-label="Account">
-          <ul>
+      <nav class="footer__links" aria-label="Footer">
+        <ul>
+          {nav.map((item) => (
             <li>
-              <a href="/login">Log in</a>
+              <a href={item.href}>{item.label}</a>
             </li>
-            <li>
-              <a href="/signup">Sign up</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+          ))}
+          <li>
+            <a href="/login">Log in</a>
+          </li>
+          <li>
+            <a href="/signup">Sign up</a>
+          </li>
+        </ul>
+      </nav>
     </div>
 
-    <dl class="titleblock">
+    <div class="titleblock">
       <div class="cell cell--title">
-        <dt class="label">Title</dt>
-        <dd>{current ? current.title : 'Not found'}</dd>
-      </div>
-      <div class="cell cell--company">
-        <dt class="label">Company</dt>
-        <dd>Trace</dd>
+        <p class="label">Title</p>
+        <p class="cell__title">{current ? current.title : 'Page not found'}</p>
       </div>
       <div class="cell">
-        <dt class="label">Sheet</dt>
-        <dd class="num">{current ? `${current.number} of ${sheetCount}` : `– of ${sheetCount}`}</dd>
+        <p class="label">Sheet</p>
+        <p class="cell__value num">
+          {current ? `${current.number} of ${sheetCount}` : `– of ${sheetCount}`}
+        </p>
       </div>
-      <div class="cell">
-        <dt class="label">Rev</dt>
-        <dd>B</dd>
-      </div>
-      <div class="cell">
-        <dt class="label">Scale</dt>
-        <dd class="num">1:1</dd>
-      </div>
-      <div class="cell">
-        <dt class="label">Units</dt>
-        <dd>mm</dd>
+
+      <nav class="cell cell--sheets" aria-label="Sheets">
+        <ul>
+          {index.map((s) => (
+            <li>
+              <a href={s.href} aria-current={sheet === s.key ? 'page' : undefined}>
+                <span class="num">{s.number}</span>
+                {s.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="cell cell--view">
+        <p class="label" aria-hidden="true">
+          View
+        </p>
+        <ThemeToggle id="footer" />
       </div>
       <div class="cell cell--copy">
-        <dt class="visually-hidden">Copyright</dt>
-        <dd class="num">© {year} Trace. All rights reserved.</dd>
+        <p class="num">© {year} Trace</p>
       </div>
-    </dl>
+    </div>
   </div>
 </footer>
 
@@ -102,24 +105,21 @@ const year = new Date().getFullYear();
   }
 
   .footer__about > p {
-    max-width: 36ch;
+    max-width: 38ch;
     color: var(--text-muted);
   }
 
-  .footer__links {
-    display: flex;
-    gap: var(--sp-8);
-    margin-top: var(--sp-1);
-  }
-
   .footer__links ul {
-    display: grid;
-    gap: var(--sp-1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    margin-top: var(--sp-1);
     padding: 0;
     list-style: none;
   }
 
   .footer__links a {
+    font-size: var(--s-1);
     color: var(--text);
     text-decoration: none;
   }
@@ -132,59 +132,100 @@ const year = new Date().getFullYear();
   /* Title block: the 1px gaps over a line-colored ground draw the cell rules. */
   .titleblock {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
     background: var(--line);
-    border: 1.5px solid var(--text-strong);
+    border: 2px solid var(--text-strong);
   }
 
   .cell {
     display: grid;
     align-content: start;
-    gap: 0.25rem;
+    gap: 0.375rem;
     min-width: 0;
     padding: 0.75rem var(--sp-2) 0.875rem;
     background: var(--bg);
   }
 
-  .cell dd {
+  .cell--title {
+    grid-column: span 2;
+  }
+
+  .cell__title {
+    font-size: var(--s3);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-strong);
+  }
+
+  .cell__value {
     font-family: var(--font-mono);
     font-size: var(--s0);
     font-weight: 500;
     color: var(--text-strong);
   }
 
-  .cell--title,
-  .cell--copy {
+  /* The sheet row is navigation; the current sheet is filled. */
+  .cell--sheets {
     grid-column: 1 / -1;
+    padding: 0;
   }
 
-  .cell--title dd {
-    font-family: var(--font-display);
-    font-size: var(--s3);
-    font-weight: var(--display-weight);
-    font-stretch: 110%;
-    line-height: 1.15;
+  .cell--sheets ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    height: 100%;
+    padding: 0;
+    background: var(--line);
+    list-style: none;
   }
 
-  .cell--copy dd {
+  .cell--sheets a {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    height: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem var(--sp-2);
+    background: var(--bg);
+    font-size: var(--s-1);
+    font-weight: 500;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .cell--sheets a .num {
+    font-family: var(--font-mono);
     font-size: var(--s-2);
-    font-weight: 400;
     color: var(--text-muted);
   }
 
-  @media (min-width: 40rem) {
-    .titleblock {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+  .cell--sheets a:hover {
+    background: var(--tint);
+  }
 
-    .cell--title {
-      grid-column: span 3;
-    }
+  .cell--sheets a[aria-current='page'] {
+    background: var(--text-strong);
+    color: var(--bg);
+  }
 
-    .cell--company {
-      grid-column: span 1;
-    }
+  .cell--sheets a[aria-current='page'] .num {
+    color: inherit;
+  }
+
+  .cell--view {
+    grid-column: span 2;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cell--copy {
+    align-content: center;
+    font-size: var(--s-2);
+    color: var(--text-muted);
   }
 
   /*
@@ -203,7 +244,7 @@ const year = new Date().getFullYear();
 
     .titleblock {
       grid-column: 9 / -1;
-      margin-inline: calc(var(--gutter) / -2);
+      margin-right: calc((var(--gutter) / 2 + var(--edge)) * -1);
       border-right: 0;
       border-bottom: 0;
     }

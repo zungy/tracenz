@@ -13,8 +13,8 @@ import { comparison, plans } from '../../config/pricing';
     <table>
       <colgroup>
         <col class="col-feature" />
-        {plans.map((plan) => (
-          <col class:list={[plan.recommended && 'col-recommended']} />
+        {plans.map(() => (
+          <col />
         ))}
       </colgroup>
       <thead>
@@ -93,10 +93,6 @@ import { comparison, plans } from '../../config/pricing';
     width: 34%;
   }
 
-  .col-recommended {
-    background: var(--tint);
-  }
-
   th,
   td {
     padding: 0.75rem var(--sp-2);
@@ -112,8 +108,7 @@ import { comparison, plans } from '../../config/pricing';
   thead th {
     font-family: var(--font-display);
     font-size: var(--s1);
-    font-weight: 650;
-    font-stretch: 110%;
+    font-weight: 600;
     color: var(--text-strong);
     border-bottom: 1px solid var(--line-strong);
   }

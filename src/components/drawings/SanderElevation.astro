@@ -2,9 +2,17 @@
 /**
  * Orbital sander housing, front elevation in half section: exterior on the
  * left, section on the right showing the wall and the motor-mount rib, whose
- * thickness changed in revision B. Coordinates are in millimetres (y up from
+ * thickness changed in revision B. The change is marked the drafting way: a
+ * revision cloud around the rib, a delta tag with the revision letter, and a
+ * note with the old and new value. Coordinates are in millimetres (y up from
  * the underside of the pad) and mapped to SVG units below.
+ *
+ * Elements with `data-link` light up when the visitor points at the same
+ * change in the log or the document; `data-source` marks where the hero's
+ * trace line leaves the drawing for each change.
  */
+import { cloudAround } from '../../scripts/revision-cloud';
+
 interface Props {
   /** Id prefix so two drawings can share a page. */
   id?: string;
@@ -12,12 +20,13 @@ interface Props {
 
 const { id = 'elev' } = Astro.props;
 
-const k = 2.2; // SVG units per millimetre
-const cx = 232; // centerline
-const base = 336; // underside of the pad
+const k = 2.5; // SVG units per millimetre
+const cx = 252; // centerline
+const base = 370; // underside of the pad
 const X = (mm: number) => +(cx + mm * k).toFixed(1);
 const Y = (mm: number) => +(base - mm * k).toFixed(1);
 const P = (x: number, y: number) => `${X(x)} ${Y(y)}`;
+const f = (n: number) => n.toFixed(1);
 
 // Housing profile: skirt, tapered body, dome. Wall thickness t.
 const t = 2.5;
@@ -26,58 +35,58 @@ const sectionWall =
   `M${P(0, 125)} A${47 * k} ${29 * k} 0 0 1 ${P(47, 96)} Q${P(58.5, 80)} ${P(60, 44)} L${P(60, 16)} ` +
   `L${P(60 - t, 16)} L${P(60 - t, 44)} Q${P(58.5 - t, 80)} ${P(47 - t, 96)} ` +
   `A${(47 - t) * k} ${(29 - t) * k} 0 0 0 ${P(0, 125 - t)} Z`;
-const rib = `M${P(12, 60)} H${X(54)} V${Y(60 + t)} H${X(12)} Z`;
+const rib = `M${P(12, 60)} H${X(58)} V${Y(60 + t)} H${X(12)} Z`;
 const boss = `M${P(12, 44)} H${X(12 + t)} V${Y(60)} H${X(12)} Z`;
 
-// Callout for the changed wall, placed to the right of the housing.
-const ribTarget = { x: X(34), y: Y(60 + t) };
-const note = { x: 382, y: 44 };
-const leaderStart = { x: note.x - 6, y: note.y + 26 };
+// Revision cloud around the rib, and its delta tag at the upper left.
+const cloud = { x: X(7), y: Y(68), w: X(55) - X(7), h: Y(54.5) - Y(68) };
+const cloudD = cloudAround(cloud.x, cloud.y, cloud.w, cloud.h, 12);
+const tag = { x: cloud.x + 9, y: cloud.y - 15 };
+
+// Note to the right of the housing; its leader lands on the cloud.
+const note = { x: 424, y: 112 };
+const shoulder = { x: note.x - 8, y: note.y + 21 };
+const leaderEnd = { x: X(44), y: cloud.y - 3.4 };
 
 // Filled arrowhead with its tip on `to`, aligned with the line from `from`.
 function arrowhead(from: { x: number; y: number }, to: { x: number; y: number }) {
   const len = Math.hypot(to.x - from.x, to.y - from.y);
   const ux = (to.x - from.x) / len;
   const uy = (to.y - from.y) / len;
-  const bx = to.x - ux * 10;
-  const by = to.y - uy * 10;
-  const f = (n: number) => n.toFixed(1);
-  return `M${f(to.x)} ${f(to.y)}L${f(bx - uy * 3.2)} ${f(by + ux * 3.2)}L${f(bx + uy * 3.2)} ${f(by - ux * 3.2)}Z`;
+  const bx = to.x - ux * 9;
+  const by = to.y - uy * 9;
+  return `M${f(to.x)} ${f(to.y)}L${f(bx - uy * 3)} ${f(by + ux * 3)}L${f(bx + uy * 3)} ${f(by - ux * 3)}Z`;
 }
-const leaderEnd = (() => {
-  const len = Math.hypot(ribTarget.x - leaderStart.x, ribTarget.y - leaderStart.y);
-  return {
-    x: ribTarget.x - ((ribTarget.x - leaderStart.x) / len) * 9,
-    y: ribTarget.y - ((ribTarget.y - leaderStart.y) / len) * 9,
-  };
-})();
+const elbow = { x: shoulder.x - 14, y: shoulder.y };
 ---
 
-<svg class="elev" viewBox="0 0 520 400" role="img" aria-labelledby={`${id}-title ${id}-desc`}>
+<svg class="elev" viewBox="4 48 516 352" role="img" aria-labelledby={`${id}-title ${id}-desc`}>
   <title id={`${id}-title`}>Orbital sander housing, front elevation in half section</title>
   <desc id={`${id}-desc`}>
-    The right half is cut away to show the housing wall and the motor mount rib, whose wall was
-    thickened from 2.0 to 2.5 millimetres in revision B. The pad is 125 millimetres across.
+    The right half is cut away to show the housing wall and the motor mount rib. A revision cloud
+    marks the rib, whose wall was thickened from 2.0 to 2.5 millimetres in revision B. The pad is
+    125 millimetres across.
   </desc>
   <defs>
     <pattern
       id={`${id}-hatch`}
-      width="6"
-      height="6"
+      width="5"
+      height="5"
       patternUnits="userSpaceOnUse"
       patternTransform="rotate(45)"
     >
-      <line x1="0" y1="0" x2="0" y2="6" class="hatch"></line>
+      <line x1="0" y1="0" x2="0" y2="5" class="hatch"></line>
     </pattern>
   </defs>
 
   <!-- Centerline -->
-  <path class="chain" d={`M${X(0)} ${Y(-8)}V${Y(133)}`}></path>
+  <path class="chain" d={`M${X(0)} ${Y(-6)}V${Y(131)}`}></path>
 
   <!-- Pad and hub (not sectioned) -->
   <path
     class="visible"
     data-link="holes"
+    data-source="holes"
     d={`M${X(-62.5)} ${Y(12)} V${Y(1.5)} Q${P(-62.5, 0)} ${P(-61, 0)} H${X(61)} Q${P(62.5, 0)} ${P(62.5, 1.5)} V${Y(12)} Z`}
   ></path>
   <path class="thin" d={`M${P(-62.5, 3.5)} H${X(62.5)}`}></path>
@@ -98,46 +107,57 @@ const leaderEnd = (() => {
     class="visible"
     d={`M${P(-59.5, 22)} H${X(-88)} V${Y(20)} H${X(-92)} V${Y(42)} H${X(-88)} V${Y(40)} H${X(-59.8)}`}
   ></path>
-  <path class="chain" d={`M${P(-98, 31)} H${X(-52)}`}></path>
+  <path class="chain" d={`M${P(-97, 31)} H${X(-52)}`}></path>
 
   <!-- Section half (right): wall, rib and boss, hatched -->
-  <path class="section" d={sectionWall} fill={`url(#${id}-hatch)`} data-link="material"></path>
+  <path
+    class="section"
+    d={sectionWall}
+    fill={`url(#${id}-hatch)`}
+    data-link="material"
+    data-source="material"
+  ></path>
   <path class="section" d={rib} fill={`url(#${id}-hatch)`} data-link="wall"></path>
   <path class="section" d={boss} fill={`url(#${id}-hatch)`} data-link="wall"></path>
   <path class="visible" d={`M${P(0, 16)} H${X(60)}`}></path>
 
   <!-- Pad diameter -->
-  <path class="thin" d={`M${P(-62.5, -1)} V${Y(-12)} M${P(62.5, -1)} V${Y(-12)}`}></path>
-  <path class="thin" d={`M${X(-62.5) + 9} ${Y(-9)} H${X(62.5) - 9}`}></path>
-  <path class="arrow" d={`M${X(-62.5)} ${Y(-9)} l9 -3v6z M${X(62.5)} ${Y(-9)} l-9 -3v6z`}></path>
-  <text class="dim" x={X(0) + 8} y={Y(-9) - 6}>
+  <path class="thin" d={`M${P(-62.5, -1)} V${Y(-11)} M${P(62.5, -1)} V${Y(-11)}`}></path>
+  <path class="thin" d={`M${X(-62.5) + 9} ${Y(-8)} H${X(62.5) - 9}`}></path>
+  <path class="arrow" d={`M${X(-62.5)} ${Y(-8)} l9 -3v6z M${X(62.5)} ${Y(-8)} l-9 -3v6z`}></path>
+  <text class="dim" x={X(0) + 8} y={Y(-8) - 5}>
     Ø125
   </text>
 
-  <!-- Change callout: leader, note, revision tag -->
+  <!-- Revision B: cloud, delta tag, and the note with its leader -->
+  <g class="rev" data-rev="wall">
+    <path class="cloud" d={cloudD} pathLength="1"></path>
+    <path class="tag" d={`M${f(tag.x)} ${f(tag.y - 11)}l11 19h-22z`}></path>
+    <text class="tag__letter" x={f(tag.x)} y={f(tag.y + 5.5)} text-anchor="middle">
+      B
+    </text>
+  </g>
+
   <path
     class="leader"
-    d={`M${leaderStart.x} ${leaderStart.y} L${leaderEnd.x.toFixed(1)} ${leaderEnd.y.toFixed(1)}`}
+    d={`M${f(shoulder.x + 6)} ${f(shoulder.y)} H${f(elbow.x)} L${f(leaderEnd.x)} ${f(leaderEnd.y)}`}
   ></path>
-  <path class="arrow arrow--change" d={arrowhead(leaderStart, ribTarget)}></path>
+  <path class="arrow" d={arrowhead(elbow, leaderEnd)}></path>
+
   <g class="note" transform={`translate(${note.x} ${note.y})`}>
     <text class="note__label" x="0" y="0">
-      MOTOR MOUNT WALL
+      MOUNT WALL
     </text>
     <text class="note__old" x="0" y="26">
       2.0
     </text>
-    <path class="note__strike" d="M-1 21.5H24"></path>
-    <path class="note__arrow" d="M31 22H45M41 18.5l4 3.5l-4 3.5"></path>
-    <rect class="note__chip" x="51" y="10" width="36" height="21" rx="1"></rect>
-    <text class="note__new" x="69" y="25.5" text-anchor="middle">
+    <path class="note__strike" d="M-1 21.5H25"></path>
+    <path class="note__arrow" d="M32 21.5H46M42 18l4 3.5l-4 3.5"></path>
+    <rect class="note__chip" x="52" y="10" width="38" height="22" rx="1"></rect>
+    <text class="note__new" x="71" y="26" text-anchor="middle">
       2.5
     </text>
-    <path class="note__tag" d="M103 8.5l10.5 18h-21z"></path>
-    <text class="note__tag-letter" x="103" y="24" text-anchor="middle">
-      B
-    </text>
-    <rect x="51" y="8" width="64" height="23" fill="none" data-trace="source"></rect>
+    <rect x="52" y="10" width="38" height="22" fill="none" data-source="wall"></rect>
   </g>
 </svg>
 
@@ -182,22 +202,11 @@ const leaderEnd = (() => {
     stroke-width: 1;
   }
 
-  .leader {
-    stroke: var(--change);
-  }
-
   .chain {
     fill: none;
     stroke: var(--text-muted);
-    stroke-width: 1;
+    stroke-width: 0.75;
     stroke-dasharray: 18 4 3 4;
-  }
-
-  .hidden {
-    fill: none;
-    stroke: var(--text-faint);
-    stroke-width: 1;
-    stroke-dasharray: 4 3;
   }
 
   .hatch {
@@ -209,10 +218,6 @@ const leaderEnd = (() => {
     fill: var(--text-muted);
   }
 
-  .arrow--change {
-    fill: var(--change);
-  }
-
   .dim {
     font-family: var(--font-mono);
     font-size: 13px;
@@ -220,17 +225,64 @@ const leaderEnd = (() => {
     fill: var(--text-strong);
   }
 
-  .note__label {
+  /* Revision mark, in redline while this change is the one being traced. */
+  .cloud {
+    fill: none;
+    stroke: var(--change);
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 160ms var(--ease);
+  }
+
+  .tag {
+    fill: var(--change);
+    transition: fill 160ms var(--ease);
+  }
+
+  .tag__letter {
     font-family: var(--font-mono);
     font-size: 12px;
+    font-weight: 600;
+    fill: var(--on-change);
+  }
+
+  :global([data-active]:not([data-active='wall'])) .cloud {
+    stroke: var(--text-faint);
+  }
+
+  :global([data-active]:not([data-active='wall'])) .tag {
+    fill: var(--text-faint);
+  }
+
+  /* While another change is traced, the note's new value drops to an ink chip. */
+  :global([data-active]:not([data-active='wall'])) .note__chip {
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 1.25;
+  }
+
+  :global([data-active]:not([data-active='wall'])) .note__new {
+    fill: var(--text-strong);
+  }
+
+  :global([data-active]:not([data-active='wall'])) .note__strike {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+  }
+
+  .note__label {
+    font-family: var(--font-mono);
+    font-size: 13px;
     font-weight: 500;
-    letter-spacing: 0.06em;
-    fill: var(--text-muted);
+    letter-spacing: 0.04em;
+    fill: var(--text-strong);
   }
 
   .note__old {
     font-family: var(--font-mono);
-    font-size: 15px;
+    font-size: 16px;
     fill: var(--text-faint);
   }
 
@@ -251,18 +303,7 @@ const leaderEnd = (() => {
 
   .note__new {
     font-family: var(--font-mono);
-    font-size: 15px;
-    font-weight: 600;
-    fill: var(--on-change);
-  }
-
-  .note__tag {
-    fill: var(--change);
-  }
-
-  .note__tag-letter {
-    font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 16px;
     font-weight: 600;
     fill: var(--on-change);
   }

@@ -73,16 +73,17 @@ import { site } from '../config/site';
     row-gap: var(--sp-2);
   }
 
-  .intro__grid > * {
+  .intro__eyebrow,
+  h1,
+  .intro__lead {
     grid-column: 1 / -1;
   }
 
   h1 {
     font-size: clamp(3rem, 1.4rem + 6.4vw, var(--s10));
     font-weight: var(--display-weight);
-    font-stretch: 116%;
     line-height: 1;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
   }
 
   .intro__lead {
