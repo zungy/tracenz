@@ -271,7 +271,10 @@ const recent = sessions.slice(-rows.length);
     white-space: nowrap;
   }
 
+  /* When the row is short of room, the parameter gives way before the feature. */
   .row__feature {
+    flex: none;
+    max-width: 100%;
     overflow: hidden;
     font-weight: 600;
     color: var(--text-strong);
@@ -279,7 +282,10 @@ const recent = sessions.slice(-rows.length);
   }
 
   .row__param {
+    min-width: 0;
+    overflow: hidden;
     color: var(--text-muted);
+    text-overflow: ellipsis;
   }
 
   /* Old value struck through in light mono, then the new value in bold mono. */

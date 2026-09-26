@@ -26,6 +26,43 @@ import LogPanel from './LogPanel.astro';
       </div>
     </div>
 
+    <div class="revs">
+      <p class="revs__head mono" aria-hidden="true">
+        <span>Revisions</span>
+        <span class="num">TR-0142</span>
+      </p>
+      <table>
+        <caption class="visually-hidden">Revisions of design document TR-0142</caption>
+        <thead>
+          <tr>
+            <th scope="col">Rev</th>
+            <th scope="col">Date</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="revs__rev">A</td>
+            <td class="num">14 Aug 2026</td>
+            <td>First release</td>
+          </tr>
+          <tr>
+            <td class="revs__rev">
+              <span class="rev-tag rev-tag--change" aria-hidden="true">
+                <svg viewBox="0 0 24 21">
+                  <path d="M12 1.5 22.5 19.5H1.5Z"></path>
+                </svg>
+                <span>B</span>
+              </span>
+              <span class="visually-hidden">B</span>
+            </td>
+            <td class="num">22 Sep 2026</td>
+            <td>Wall, fillet, material, seat</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <figure class="figure" data-trace-figure data-active="wall">
       <div class="grid figure__band">
         <div class="cell cell--model">
@@ -113,6 +150,80 @@ import LogPanel from './LogPanel.astro';
     font-weight: 500;
   }
 
+  /*
+   * Revision block: on wide desktops, the sheet's revision table, in the top
+   * right corner against the border as on a drawing, level with the title.
+   * It lists the revisions of the document the page follows.
+   */
+  .revs {
+    display: none;
+  }
+
+  @media (min-width: 82rem) {
+    .revs {
+      position: absolute;
+      top: var(--sp-8);
+      right: 0;
+      display: block;
+      width: 25%;
+      border-block: var(--rule) solid var(--text-strong);
+      border-left: var(--rule) solid var(--text-strong);
+      background: var(--surface);
+    }
+  }
+
+  .revs__head {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--s-2);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .revs table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--s-1);
+  }
+
+  .revs th,
+  .revs td {
+    padding: 0.4375rem 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+    color: var(--text-strong);
+  }
+
+  .revs th {
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .revs td.num {
+    font-family: var(--font-mono);
+    font-size: var(--s-2);
+    white-space: nowrap;
+  }
+
+  .revs tbody tr + tr td {
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .revs__rev {
+    width: 3rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
   /* Figure: model, log and document, joined by the trace line */
   .figure {
     position: relative;
@@ -177,8 +288,9 @@ import LogPanel from './LogPanel.astro';
 
   /*
    * Desktop: the figure is a band across the sheet, cut into cells on the
-   * zone lines: the model in zones 1 to 3, the log in 4 and 5, the document
-   * in 6 to 8. The cells share their rules, as the blocks of a drawing do.
+   * zone lines. The cells share their rules, as the blocks of a drawing do.
+   * On narrower desktops the model takes a row of its own, with the log and
+   * the document side by side under it.
    */
   @media (min-width: 64rem) {
     .hero {
@@ -200,8 +312,32 @@ import LogPanel from './LogPanel.astro';
     }
 
     .cell--model {
-      grid-column: 1 / span 3;
       padding: var(--sp-3) var(--pad) var(--sp-2);
+      border-bottom: var(--rule) solid var(--text-strong);
+    }
+
+    .cell--model :global(.model) {
+      justify-self: center;
+      width: min(100%, 36rem);
+    }
+
+    .cell--doc {
+      border-left: var(--rule) solid var(--text-strong);
+    }
+  }
+
+  /*
+   * Wide desktops: one row, the model in zones 1 to 3, the log in 4 and 5,
+   * the document in 6 to 8, and the trace line joining them.
+   */
+  @media (min-width: 82rem) {
+    .cell--model {
+      grid-column: 1 / span 3;
+      border-bottom: 0;
+    }
+
+    .cell--model :global(.model) {
+      width: 100%;
     }
 
     .cell--log {
@@ -211,7 +347,6 @@ import LogPanel from './LogPanel.astro';
 
     .cell--doc {
       grid-column: 6 / -1;
-      border-left: var(--rule) solid var(--text-strong);
     }
 
     .trace {

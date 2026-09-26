@@ -115,6 +115,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     color: var(--text);
     font-weight: 500;
     text-decoration: none;
+    white-space: nowrap;
   }
 
   .header__nav a:hover,
@@ -241,6 +242,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     }
 
     .menu {
+      display: none;
+    }
+  }
+
+  /* Narrow desktops: the site header leaves the view switch to the footer. */
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .header__actions:has(.header__login) .header__view {
       display: none;
     }
   }

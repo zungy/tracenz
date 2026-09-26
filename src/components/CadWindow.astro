@@ -43,117 +43,124 @@ const tools = [
 ];
 ---
 
-<div
-  class="cad scheme-paper"
-  role="img"
-  aria-label="A CAD window with the sander housing open and Trace docked beside it, showing the design document it has written for revision B."
->
-  <div class="cad__tabs" aria-hidden="true">
-    <span class="cad__tab">
-      orbital-sander <span class="num">v14</span>
-    </span>
-    <span class="cad__space">Design</span>
-  </div>
-
-  <div class="cad__tools" aria-hidden="true">
-    {tools.map((t) => (
-      <div class="cad__group">
-        <span class="cad__group-name">{t.group}</span>
-        <span class="cad__icons">
-          {t.glyphs.map((g) => (
-            <svg viewBox="0 0 16 16">
-              <path d={glyphs[g]} />
-            </svg>
-          ))}
-        </span>
-      </div>
-    ))}
-  </div>
-
-  <div class="cad__body" aria-hidden="true">
-    <div class="cad__tree">
-      <p class="cad__panel-title">Browser</p>
-      <ul>
-        <li class="open">Orbital sander v14</li>
-        <li class="lvl">Origin</li>
-        <li class="lvl open">Bodies</li>
-        <li class="lvl2">Housing</li>
-        <li class="lvl">Sketches</li>
-        <li class="lvl open">Components</li>
-        <li class="lvl2">Motor bracket</li>
-        <li class="lvl2">Pad</li>
-      </ul>
+<div class="cad-frame">
+  <div
+    class="cad scheme-paper"
+    role="img"
+    aria-label="A CAD window with the sander housing open and Trace docked beside it, showing the design document it has written for revision B."
+  >
+    <div class="cad__tabs" aria-hidden="true">
+      <span class="cad__tab">
+        orbital-sander <span class="num">v14</span>
+      </span>
+      <span class="cad__space">Design</span>
     </div>
 
-    <div class="cad__view">
-      <ModelView alt="" view="cad" tone="light" />
-      <svg class="cad__cube" viewBox="0 0 40 40">
-        <path class="face" d="M20 4 34 12 20 20 6 12Z"></path>
-        <path d="M20 4 34 12 20 20 6 12ZM6 12v15l14 8V20M34 12v15l-14 8"></path>
-      </svg>
-      <svg class="cad__axes" viewBox="0 0 44 44">
-        <path d="M8 36V12M8 36l22-6M8 36l-5 5"></path>
-        <text x="8" y="8">
-          Z
-        </text>
-        <text x="33" y="31">
-          X
-        </text>
-      </svg>
-    </div>
-
-    <div class="cad__trace scheme-paper">
-      <p class="cad__trace-head">
-        <span class="cad__logo"></span>
-        <span class="cad__trace-name">Trace</span>
-        <span class="cad__live">Logging</span>
-      </p>
-      <div class="cad__doc">
-        <p class="cad__label">Design document</p>
-        <p class="cad__doc-title num">TR-0142 · Rev B</p>
-        <p class="cad__status">Ready for review</p>
-        <dl class="cad__facts">
-          <div>
-            <dt>Changes since Rev A</dt>
-            <dd class="num">4</dd>
-          </div>
-          <div>
-            <dt>Logged this revision</dt>
-            <dd class="num">71</dd>
-          </div>
-          <div>
-            <dt>Written</dt>
-            <dd class="num">10:31</dd>
-          </div>
-        </dl>
-        <span class="cad__button">Open document</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="cad__timeline" aria-hidden="true">
-    <span class="cad__controls">
-      <svg viewBox="0 0 16 16">
-        <path d="M4 3v10M13 3 6 8l7 5z"></path>
-      </svg>
-      <svg viewBox="0 0 16 16">
-        <path d="M5 3l7 5-7 5z"></path>
-      </svg>
-    </span>
-    <span class="cad__steps">
-      {timeline.map((step) => (
-        <span class:list={['cad__step', step.rev && 'is-rev']}>
-          <svg viewBox="0 0 16 16">
-            <path d={glyphs[step.glyph]} />
-          </svg>
-        </span>
+    <div class="cad__tools" aria-hidden="true">
+      {tools.map((t) => (
+        <div class="cad__group">
+          <span class="cad__group-name">{t.group}</span>
+          <span class="cad__icons">
+            {t.glyphs.map((g) => (
+              <svg viewBox="0 0 16 16">
+                <path d={glyphs[g]} />
+              </svg>
+            ))}
+          </span>
+        </div>
       ))}
-      <span class="cad__marker"></span>
-    </span>
+    </div>
+
+    <div class="cad__body" aria-hidden="true">
+      <div class="cad__tree">
+        <p class="cad__panel-title">Browser</p>
+        <ul>
+          <li class="open">Orbital sander v14</li>
+          <li class="lvl">Origin</li>
+          <li class="lvl open">Bodies</li>
+          <li class="lvl2">Housing</li>
+          <li class="lvl">Sketches</li>
+          <li class="lvl open">Components</li>
+          <li class="lvl2">Motor bracket</li>
+          <li class="lvl2">Pad</li>
+        </ul>
+      </div>
+
+      <div class="cad__view">
+        <ModelView alt="" view="cad" tone="light" />
+        <svg class="cad__cube" viewBox="0 0 40 40">
+          <path class="face" d="M20 4 34 12 20 20 6 12Z"></path>
+          <path d="M20 4 34 12 20 20 6 12ZM6 12v15l14 8V20M34 12v15l-14 8"></path>
+        </svg>
+        <svg class="cad__axes" viewBox="0 0 44 44">
+          <path d="M8 36V12M8 36l22-6M8 36l-5 5"></path>
+          <text x="8" y="8">
+            Z
+          </text>
+          <text x="33" y="31">
+            X
+          </text>
+        </svg>
+      </div>
+
+      <div class="cad__trace scheme-paper">
+        <p class="cad__trace-head">
+          <span class="cad__logo"></span>
+          <span class="cad__trace-name">Trace</span>
+          <span class="cad__live">Logging</span>
+        </p>
+        <div class="cad__doc">
+          <p class="cad__label">Design document</p>
+          <p class="cad__doc-title num">TR-0142 · Rev B</p>
+          <p class="cad__status">Ready for review</p>
+          <dl class="cad__facts">
+            <div>
+              <dt>Changes since Rev A</dt>
+              <dd class="num">4</dd>
+            </div>
+            <div>
+              <dt>Logged this revision</dt>
+              <dd class="num">71</dd>
+            </div>
+            <div>
+              <dt>Written</dt>
+              <dd class="num">10:31</dd>
+            </div>
+          </dl>
+          <span class="cad__button">Open document</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cad__timeline" aria-hidden="true">
+      <span class="cad__controls">
+        <svg viewBox="0 0 16 16">
+          <path d="M4 3v10M13 3 6 8l7 5z"></path>
+        </svg>
+        <svg viewBox="0 0 16 16">
+          <path d="M5 3l7 5-7 5z"></path>
+        </svg>
+      </span>
+      <span class="cad__steps">
+        {timeline.map((step) => (
+          <span class:list={['cad__step', step.rev && 'is-rev']}>
+            <svg viewBox="0 0 16 16">
+              <path d={glyphs[step.glyph]} />
+            </svg>
+          </span>
+        ))}
+        <span class="cad__marker"></span>
+      </span>
+    </div>
   </div>
 </div>
 
 <style>
+  /* The window lays itself out by its own width (see the container queries below). */
+  .cad-frame {
+    container-type: inline-size;
+  }
+
   .cad {
     display: grid;
     grid-template-rows: 2.25rem 2.75rem minmax(0, 1fr) 3.25rem;
@@ -537,12 +544,27 @@ const tools = [
     background: var(--cobalt);
   }
 
+  /* A narrower window drops the browser tree first, and grows taller. */
+  @container (max-width: 40rem) {
+    .cad {
+      aspect-ratio: 4 / 3;
+    }
+
+    .cad__tree {
+      display: none;
+    }
+
+    .cad__body {
+      grid-template-columns: minmax(0, 1fr) 34%;
+    }
+  }
+
   /*
-   * Phones: the window stacks instead of shrinking. The browser tree and the
-   * tool group names drop out, the viewport takes the full width with Trace
-   * docked under it, and the timeline shows as many steps as fit.
+   * Phone-sized windows stack instead of shrinking. The tool group names drop
+   * out, the viewport takes the full width with Trace docked under it, and
+   * the timeline shows as many steps as fit.
    */
-  @media (max-width: 39.99rem) {
+  @container (max-width: 30rem) {
     .cad {
       grid-template-rows: 2.25rem 2.75rem auto 3.25rem;
       aspect-ratio: auto;

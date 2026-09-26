@@ -50,7 +50,13 @@ const notes = [
       </div>
       <figcaption class="spread__caption">
         <span class="mono">Fig. 2</span>
-        <span>Design document TR-0142, Rev B, as Trace wrote it. Shown at 80%.</span>
+        <span>
+          Design document TR-0142, Rev B, as Trace wrote it. Shown at{' '}
+          <span class="num" data-scale>
+            80%
+          </span>
+          .
+        </span>
       </figcaption>
     </figure>
 
@@ -281,6 +287,16 @@ const notes = [
 </style>
 
 <script>
+  // The caption gives the page's true scale: it is set at A4 width, 794 CSS
+  // pixels, and shrinks with its column.
+  for (const scale of document.querySelectorAll<HTMLElement>('[data-scale]')) {
+    const page = scale.closest('figure')?.querySelector<HTMLElement>('.spread__page');
+    if (!page) continue;
+    new ResizeObserver(() => {
+      scale.textContent = `${Math.round((page.clientWidth / 794) * 100)}%`;
+    }).observe(page);
+  }
+
   // Leaders: from each note's balloon, a short shoulder to the left, then a
   // straight run to a dot on the part of the page it describes.
   for (const root of document.querySelectorAll<HTMLElement>('[data-leaders]')) {
