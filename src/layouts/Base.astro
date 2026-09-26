@@ -55,7 +55,7 @@ const { title, description = site.description, sheet, header = 'site' } = Astro.
     <main id="main">
       <slot />
     </main>
-    <Footer sheet={sheet} />
+    <Footer sheet={sheet} pageTitle={title.replace(/\s+[·—]\s+Trace$/, '')} />
     <SheetFrame />
     <p class="toast" role="status" aria-live="polite" data-toast></p>
 
