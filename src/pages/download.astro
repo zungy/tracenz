@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config/site';
+---
+
+<Base
+  title="Download Trace for Windows"
+  description="Capture design decisions in Autodesk Fusion and view the same history in Trace desktop and on the web."
+  sheet={null}
+>
+  <section class="download-page container" data-row>
+    <div class="download-intro">
+      <p class="mono eyebrow">TRACE DESKTOP / WINDOWS</p>
+      <h1>
+        Keep the story
+        <br />
+        with the design.
+      </h1>
+      <p class="lead">
+        Capture your work in Autodesk Fusion. Find the same checkpoints, reasoning and screenshots
+        on your desktop and here on the web.
+      </p>
+      <a class="btn btn--primary" href={site.downloads.windows}>
+        <Icon name="brand-windows" size={20} />
+        Download for Windows
+      </a>
+      <p class="release mono">v0.6.1 · Windows x64 · Portable ZIP</p>
+      <p>
+        Already have an account? <a href="/app">View your documents →</a>
+      </p>
+    </div>
+    <div class="setup">
+      <h2>From download to first checkpoint</h2>
+      <ol>
+        <li>
+          <span class="mono step">01</span>
+          <div>
+            <h3>Extract and open</h3>
+            <p>
+              Extract the entire ZIP, then open Trace.exe inside the extracted folder. Keep the
+              files together. If an older Trace is running, quit it from the system tray first.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="mono step">02</span>
+          <div>
+            <h3>Use one Trace account</h3>
+            <p>
+              <a href="/signup">Create an account</a>, then sign in inside the desktop app. Use the
+              same email and password on the website to view your design history.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="mono step">03</span>
+          <div>
+            <h3>Connect Autodesk Fusion</h3>
+            <p>
+              Close Fusion. In Trace, open Fusion and choose Install / update Fusion add-in. Restart
+              Fusion, finish your modeling command, then press Ctrl+Alt+S to record a checkpoint.
+              Trace handles the connection automatically.
+            </p>
+          </div>
+        </li>
+      </ol>
+      <p class="setup-note">
+        Keep Trace running while you design. Closing its window keeps it in the system tray; signing
+        out pauses uploads. This preview is an unsigned portable app, with manual updates.
+      </p>
+    </div>
+  </section>
+</Base>
+<style>
+  .download-page {
+    display: grid;
+    gap: var(--sp-8);
+    padding-block: var(--section-pad);
+  }
+  .download-intro {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+  }
+  .download-intro h1 {
+    font-size: clamp(2.75rem, 5vw, 4.5rem);
+  }
+  .download-intro .btn {
+    justify-self: start;
+  }
+  .lead {
+    max-width: 44ch;
+    color: var(--text-muted);
+    font-size: var(--s1);
+  }
+  .eyebrow,
+  .release {
+    color: var(--text-muted);
+    font-size: var(--s-2);
+  }
+  .setup {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    padding: var(--sp-4);
+  }
+  .setup h2 {
+    font-size: var(--s3);
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--line);
+  }
+  ol {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    display: flex;
+    gap: var(--sp-3);
+    padding-block: var(--sp-3);
+    border-bottom: 1px solid var(--line);
+  }
+  li p {
+    color: var(--text-muted);
+    margin-top: var(--sp-1);
+  }
+  .step {
+    color: var(--text-muted);
+    font-size: var(--s-2);
+    padding-top: 0.3rem;
+  }
+  .setup-note {
+    font-size: var(--s-1);
+    margin-top: var(--sp-3);
+    color: var(--text-muted);
+  }
+  @media (min-width: 64rem) {
+    .download-page {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+</style>

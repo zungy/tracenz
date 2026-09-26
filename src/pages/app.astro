@@ -1,0 +1,145 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import '../styles/history.css';
+---
+
+<Base
+  title="Your documents — Trace"
+  description="Your design history, captured in context."
+  sheet={null}
+  header="auth"
+>
+  <section class="history" aria-label="Your design history" data-row>
+    <div class="history__gate" id="history-gate" role="status">
+      <span class="label">Your account</span>
+      <h1 class="title">Opening your design history…</h1>
+      <p>Connecting to Trace.</p>
+      <button id="history-retry" class="btn btn--secondary" type="button" hidden>
+        Try again
+      </button>
+    </div>
+
+    <div id="history-content" hidden>
+      <div class="history__account">
+        <p class="label">Design archive</p>
+        <div class="history__account-actions">
+          <span id="history-email"></span>
+          <button class="history__text-button" id="history-signout" type="button">
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <div id="documents-view">
+        <div class="history__heading">
+          <div>
+            <h1 class="title" tabindex="-1" id="documents-title">
+              Your documents
+            </h1>
+            <p>The decisions behind your designs, in one place.</p>
+          </div>
+          <a class="btn btn--secondary" href="/download">
+            <Icon name="download" size={18} />
+            Get the desktop app
+          </a>
+        </div>
+        <div class="history__toolbar">
+          <label class="history__search">
+            <span class="visually-hidden">Search documents</span>
+            <Icon name="search" size={18} />
+            <input
+              type="search"
+              id="document-search"
+              placeholder="Search documents…"
+              maxlength="300"
+              autocomplete="off"
+            />
+          </label>
+          <span class="history__count label" id="document-count" aria-live="polite"></span>
+          <button type="button" class="btn btn--secondary btn--sm" id="documents-refresh">
+            <Icon name="refresh" size={16} />
+            Refresh
+          </button>
+        </div>
+        <div id="documents-error" class="history__notice" role="alert" hidden></div>
+        <div class="history__documents" id="document-grid" aria-busy="true"></div>
+      </div>
+
+      <div id="timeline-view" hidden>
+        <button class="history__back history__text-button" id="back-documents" type="button">
+          <Icon name="arrow-left" size={18} />
+          All documents
+        </button>
+        <div class="history__heading history__heading--timeline">
+          <div>
+            <h1 class="title" id="document-name" tabindex="-1">
+              Document timeline
+            </h1>
+            <p id="document-meta"></p>
+          </div>
+          <button type="button" class="btn btn--secondary" id="download-document">
+            <Icon name="download" size={18} />
+            Download document
+          </button>
+        </div>
+        <p id="download-status" class="history__download-status" role="status" hidden></p>
+        <div class="history__toolbar">
+          <label class="history__search">
+            <span class="visually-hidden">Search checkpoints</span>
+            <Icon name="search" size={18} />
+            <input
+              type="search"
+              id="checkpoint-search"
+              placeholder="Search changes and decisions…"
+              maxlength="300"
+              autocomplete="off"
+            />
+          </label>
+          <span class="history__count label" id="checkpoint-count" aria-live="polite"></span>
+          <button type="button" class="btn btn--secondary btn--sm" id="timeline-refresh">
+            <Icon name="refresh" size={16} />
+            Refresh
+          </button>
+        </div>
+        <button type="button" class="history__updates" id="history-updates" hidden>
+          Updates are available. Refresh this timeline.
+        </button>
+        <div id="timeline-error" class="history__notice" role="alert" hidden></div>
+        <div class="history__timeline">
+          <div class="history__activity">
+            <h2 class="label history__list-heading">Checkpoints</h2>
+            <div id="checkpoint-list" aria-busy="true"></div>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm history__load-more"
+              id="load-checkpoints"
+              hidden
+            >
+              Load earlier checkpoints
+            </button>
+          </div>
+          <article
+            id="checkpoint-detail"
+            class="history__detail"
+            aria-label="Checkpoint details"
+            aria-busy="false"
+          ></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="viewport-dialog" class="history__dialog" aria-labelledby="viewport-title">
+    <div class="history__dialog-bar">
+      <h2 class="label" id="viewport-title">
+        Captured viewport
+      </h2>
+      <button type="button" id="close-viewport" class="btn btn--secondary btn--sm">
+        Close
+      </button>
+    </div>
+    <img id="viewport-image" alt="" />
+  </dialog>
+  <script src="../scripts/history.ts"></script>
+</Base>
