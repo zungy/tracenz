@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Placeholder mark until the Trace logo is supplied. -->
+  <!-- Placeholder mark until the Trace logo is supplied; matches LogoPlaceholder.astro. -->
   <style>
-    rect, path { stroke: #243f8f; }
-    @media (prefers-color-scheme: dark) { rect, path { stroke: #e9ebf3; } }
+    rect { fill: #192c64; }
+    @media (prefers-color-scheme: dark) { rect { fill: #e9ebf3; } }
   </style>
-  <rect x="3" y="3" width="26" height="26" rx="2" fill="none" stroke-width="2.5" stroke-dasharray="5 3.5"/>
-  <path d="M3 3 29 29M29 3 3 29" stroke-width="1.5" opacity="0.6"/>
+  <rect x="4" y="4" width="24" height="24" rx="2"/>
 </svg>

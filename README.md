@@ -21,27 +21,26 @@ npm run format    # format with Prettier
 
 ## Pages
 
-| Route      | Source                    | Contents                                                                         |
-| ---------- | ------------------------- | -------------------------------------------------------------------------------- |
-| `/`        | `src/pages/index.astro`   | Hero with a live log-to-document demo, how it works, features, pricing, download |
-| `/pricing` | `src/pages/pricing.astro` | Plans with a monthly/yearly switch, Enterprise, comparison table, FAQ            |
-| `/login`   | `src/pages/login.astro`   | Log in form                                                                      |
-| `/signup`  | `src/pages/signup.astro`  | Sign up form; `?plan=pro` or `?plan=team` notes the chosen plan                  |
-| 404        | `src/pages/404.astro`     | Not-found page                                                                   |
+| Route      | Source                    | Contents                                                                        |
+| ---------- | ------------------------- | ------------------------------------------------------------------------------- |
+| `/`        | `src/pages/index.astro`   | Hero with a model-to-log-to-document demo, the design document, plans, download |
+| `/pricing` | `src/pages/pricing.astro` | Plans with a monthly/yearly switch, Enterprise, comparison table, FAQ           |
+| `/login`   | `src/pages/login.astro`   | Log in form                                                                     |
+| `/signup`  | `src/pages/signup.astro`  | Sign up form; `?plan=pro` or `?plan=team` notes the chosen plan                 |
+| 404        | `src/pages/404.astro`     | Not-found page                                                                  |
 
 ## Before launch: placeholders to replace
 
-| What                           | Where                                                                     |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| Trace logo                     | `src/components/Brand.astro` (header and footer) and `public/favicon.svg` |
-| CAD tool logos                 | `src/components/home/WorksWith.astro`                                     |
-| Google / Microsoft sign-in     | `src/components/auth/AuthForm.astro` (logo slots and links)               |
-| Download URLs                  | `downloads` in `src/config/site.ts`                                       |
-| Log in / sign up endpoints     | `auth` in `src/config/site.ts`; forms POST there once set                 |
-| Sales email                    | `salesEmail` in `src/config/site.ts`                                      |
-| Plans, prices, FAQ             | `src/config/pricing.ts`                                                   |
-| Terms, privacy, password reset | Links in `src/components/auth/AuthForm.astro`                             |
-| Production URL                 | Set `site` in `astro.config.mjs` once the domain is known                 |
+| What                           | Where                                                           |
+| ------------------------------ | --------------------------------------------------------------- |
+| Trace logo                     | `src/components/LogoPlaceholder.astro` and `public/favicon.svg` |
+| Google / Microsoft sign-in     | `src/components/auth/AuthForm.astro` (logo slots and links)     |
+| Download URLs                  | `downloads` in `src/config/site.ts`                             |
+| Log in / sign up endpoints     | `auth` in `src/config/site.ts`; forms POST there once set       |
+| Sales email                    | `salesEmail` in `src/config/site.ts`                            |
+| Plans, prices, FAQ             | `src/config/pricing.ts`                                         |
+| Terms, privacy, password reset | Links in `src/components/auth/AuthForm.astro`                   |
+| Production URL                 | Set `site` in `astro.config.mjs` once the domain is known       |
 
 Until a download URL or auth endpoint is set, the buttons and forms still work as UI but tell
 the visitor that the download or sign-in isn't available yet, instead of linking nowhere.
@@ -50,29 +49,35 @@ All copy is a first draft, and the example project (an orbital sander housing) i
 
 ## Design system
 
-Each page is treated as a sheet in a drawing set. The footer is a drawing title block that names
-the sheet, and drawings use real drafting conventions: centerlines, leaders, revision clouds and
-revision triangles.
+Each page is treated as a sheet in a drawing set. On desktop a fixed ISO-style border with zone
+numbers and letters frames the page (`SheetFrame.astro`), and the footer is the sheet's title
+block: it names the sheet, links the three sheets and holds the Paper / Blueprint switch.
+Drawings follow drafting conventions: ISO line weights, centerlines, hatched sections, leaders,
+revision clouds and revision triangles.
 
-- **Color:** five colors only, defined in `src/styles/tokens.css`: Ink `#192C64`,
-  Cobalt `#243F8F`, Vellum `#BDC5DD`, Film `#E9EBF3`, Paper `#FFFFFF`. Tints are alpha
-  versions of these. Error states use weight and an icon rather than a new hue.
+- **Color:** the five palette colors, defined in `src/styles/tokens.css`: Ink `#192C64`,
+  Cobalt `#243F8F`, Vellum `#BDC5DD`, Film `#E9EBF3`, Paper `#FFFFFF`. The page is a light film
+  tint so paper-white panels sit on it; other tints are alpha versions of the palette. One extra
+  color, redline (`#D2401F`, `#FF7A59` on dark), is reserved for the change being traced: its
+  revision cloud, delta tag, new value and trace line. It is never used for text or buttons,
+  and every other change mark is drawn in ink.
 - **Themes:** "Paper" (light) and "Blueprint" (dark). They follow the system setting, and
-  visitors can override it in the footer. Components use semantic tokens (`--bg`, `--text`,
-  `--accent`, ...) so both themes stay in sync. `.scheme-blueprint` and `.scheme-paper` pin a
-  section to one theme.
-- **Type:** Archivo (wide, heavy) for headlines; Atkinson Hyperlegible Next for text and
-  Atkinson Hyperlegible Mono for data and labels. Both are designed to keep lookalike characters
-  such as 0/O, 1/l/I and 8/B distinct, which matters for part numbers and dimensions. Fonts are
-  self-hosted through Fontsource.
+  visitors can override it in the footer's title block (and the mobile menu). Components use
+  semantic tokens (`--bg`, `--text`, `--accent`, ...) so both themes stay in sync.
+  `.scheme-blueprint` and `.scheme-paper` pin a section to one theme.
+- **Type:** one family, IBM Plex: Plex Sans for headings and text (headings at weight 500) and
+  Plex Mono for values, labels and part numbers, with a dotted zero that keeps 0 and O apart.
+  Fonts are self-hosted through Fontsource.
 - **Scale and spacing:** type steps by a ratio of 2^(1/4), so every second step is ×√2, the ISO
   paper ratio. Spacing uses an 8px unit in steps of 1, 2, 3, 5, 8 and 13.
-- **Grid:** 16 columns on desktop, 8 on tablet and 4 on mobile (`.grid`). `Guides.astro` draws the
-  column lines as construction lines.
+- **Grid:** 16 columns on desktop, 8 on tablet and 4 on mobile (`.grid`). On desktop each pair of
+  columns fills one of the border's eight zones, with the gutter centered on the zone line.
+- **Lines:** a 2px border and table outlines, 1px ink panel outlines and 1px vellum rules.
 - **Icons:** [Tabler Icons](https://tabler.io/icons), inlined at build time by
   `src/components/Icon.astro`.
-- **Motion:** the hero plays once on load and can be replayed. With reduced motion or without
-  JavaScript, every element shows its finished state.
+- **Motion:** the hero plays once on load and can be replayed; pointing at a change traces it
+  through the drawing, the log and the document. With reduced motion or without JavaScript,
+  every element shows its finished state.
 
 ## Deploying
 
