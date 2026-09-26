@@ -1,11 +1,6 @@
 ---
-/**
- * Log in / sign up form. Validates in the browser, then posts to the endpoint
- * in src/config/site.ts. While that endpoint is null, it says so instead of
- * pretending to sign the visitor in.
- */
+/** Email account access for the same Supabase project as Trace desktop. */
 import Icon from '../Icon.astro';
-import LogoPlaceholder from '../LogoPlaceholder.astro';
 
 interface Props {
   mode: 'login' | 'signup';
@@ -13,7 +8,6 @@ interface Props {
 
 const { mode } = Astro.props;
 const isLogin = mode === 'login';
-const providers = ['Google', 'Microsoft'];
 ---
 
 <div class="auth">
@@ -28,26 +22,12 @@ const providers = ['Google', 'Microsoft'];
 
   <div class="auth__intro">
     <h1>{isLogin ? 'Log in to Trace' : 'Create your Trace account'}</h1>
-    <p>{isLogin ? 'Pick up where your log left off.' : 'Free for one project. No card needed.'}</p>
-    {!isLogin && <p class="auth__plan" data-plan-note hidden />}
+    <p>
+      {isLogin
+        ? 'View the traces saved by your desktop app.'
+        : 'One account for Trace on your desktop and the web.'}
+    </p>
   </div>
-
-  <div class="sso">
-    {providers.map((name) => (
-      <a
-        class="btn btn--secondary btn--block"
-        href="#"
-        data-pending={`${name} sign-in isn't connected yet.`}
-      >
-        <LogoPlaceholder size={20} label="" />
-        Continue with {name}
-      </a>
-    ))}
-  </div>
-
-  <p class="divider">
-    <span>or with email</span>
-  </p>
 
   <form class="form" novalidate data-auth-form data-mode={mode}>
     {!isLogin && (
@@ -56,6 +36,7 @@ const providers = ['Google', 'Microsoft'];
         <input
           id="name"
           name="name"
+          maxlength="120"
           type="text"
           autocomplete="name"
           required
@@ -66,7 +47,7 @@ const providers = ['Google', 'Microsoft'];
     )}
 
     <div class="field">
-      <label for="email">{isLogin ? 'Email' : 'Work email'}</label>
+      <label for="email">Email</label>
       <input
         id="email"
         name="email"
@@ -84,11 +65,6 @@ const providers = ['Google', 'Microsoft'];
     <div class="field">
       <div class="field__label-row">
         <label for="password">Password</label>
-        {isLogin && (
-          <a href="#" data-pending="Password reset isn't connected yet.">
-            Forgot password?
-          </a>
-        )}
       </div>
       <div class="field__control">
         <input
@@ -122,35 +98,11 @@ const providers = ['Google', 'Microsoft'];
       <p class="field__error" id="password-error" hidden></p>
     </div>
 
-    {isLogin ? (
+    {isLogin && (
       <label class="check" for="remember">
         <input id="remember" name="remember" type="checkbox" />
-        <span>Keep me logged in</span>
+        <span>Keep me logged in on this device</span>
       </label>
-    ) : (
-      <div class="field">
-        <label class="check" for="terms">
-          <input
-            id="terms"
-            name="terms"
-            type="checkbox"
-            required
-            data-missing="Accept the terms to create an account."
-          />
-          <span>
-            I agree to the{' '}
-            <a href="#" data-pending="The terms page isn't published yet.">
-              Terms
-            </a>{' '}
-            and{' '}
-            <a href="#" data-pending="The privacy policy isn't published yet.">
-              Privacy Policy
-            </a>
-            .
-          </span>
-        </label>
-        <p class="field__error" id="terms-error" hidden />
-      </div>
     )}
 
     <noscript>
@@ -163,6 +115,16 @@ const providers = ['Google', 'Microsoft'];
 
     <p class="form__status" role="status" aria-live="polite" data-status></p>
   </form>
+
+  <div class="auth__next" data-signup-next hidden>
+    <p>Return to the Trace desktop app and log in with these details, or view your traces here.</p>
+    <a class="btn btn--primary btn--block" href="/login">
+      Log in on the web
+    </a>
+    <a class="btn btn--secondary btn--block" href="/download">
+      Download Trace for Windows
+    </a>
+  </div>
 
   <p class="auth__switch">
     {isLogin ? (
@@ -223,43 +185,6 @@ const providers = ['Google', 'Microsoft'];
 
   .auth__intro p {
     color: var(--text-muted);
-  }
-
-  .auth__plan {
-    justify-self: start;
-    padding: 0.2rem 0.6rem;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius);
-    font-family: var(--font-mono);
-    font-size: var(--s-2);
-    color: var(--text-strong);
-  }
-
-  .sso {
-    display: grid;
-    gap: var(--sp-1);
-  }
-
-  .sso :global(.logo-placeholder) {
-    color: var(--text-muted);
-  }
-
-  .divider {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: var(--sp-2);
-    font-family: var(--font-mono);
-    font-size: var(--s-2);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .divider::before,
-  .divider::after {
-    content: '';
-    border-top: 1px dashed var(--line-strong);
   }
 
   /* Fields */
@@ -417,6 +342,16 @@ const providers = ['Google', 'Microsoft'];
     color: var(--text-strong);
   }
 
+  .auth__next {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .auth__next[hidden],
+  .form[hidden] {
+    display: none;
+  }
+
   .auth__switch {
     padding-top: var(--sp-3);
     border-top: 1px solid var(--line);
@@ -425,176 +360,5 @@ const providers = ['Google', 'Microsoft'];
 </style>
 
 <script>
-  import { getSupabaseClient } from '../../lib/supabase';
-
-  // Show or hide the password.
-  for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-password-toggle]')) {
-    const input = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
-    if (!(input instanceof HTMLInputElement)) continue;
-    toggle.addEventListener('click', () => {
-      const show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      toggle.setAttribute('aria-pressed', String(show));
-      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    });
-  }
-
-  // Note the plan chosen on the pricing page (?plan=pro or ?plan=team).
-  const planNote = document.querySelector<HTMLElement>('[data-plan-note]');
-  const plan = new URLSearchParams(location.search).get('plan');
-  const planNames: Record<string, string> = { pro: 'Pro', team: 'Team' };
-  if (planNote && plan && planNames[plan]) {
-    planNote.textContent = `Plan: ${planNames[plan]}. Change it anytime.`;
-    planNote.hidden = false;
-  }
-
-  function messageFor(input: HTMLInputElement): string {
-    const v = input.validity;
-    if (v.valueMissing) return input.dataset.missing ?? 'Fill in this field.';
-    if (v.typeMismatch) return input.dataset.invalid ?? 'Check this value.';
-    if (v.tooShort) return input.dataset.short ?? 'This is too short.';
-    return '';
-  }
-
-  function showError(input: HTMLInputElement, message: string) {
-    const error = document.getElementById(`${input.id}-error`);
-    if (!error) return;
-    const hint = input.id === 'password' ? document.getElementById('password-hint') : null;
-    const describedBy = [message ? error.id : null, hint?.id].filter(Boolean).join(' ');
-    error.textContent = message;
-    error.hidden = !message;
-    if (message) input.setAttribute('aria-invalid', 'true');
-    else input.removeAttribute('aria-invalid');
-    if (describedBy) input.setAttribute('aria-describedby', describedBy);
-    else input.removeAttribute('aria-describedby');
-  }
-
-  function authErrorMessage(
-    error: { code?: string; message: string; status?: number },
-    mode: string,
-  ) {
-    if (error.status === 429) {
-      return mode === 'signup'
-        ? 'Supabase is limiting sign-up emails right now. Wait before trying again, or ask your project owner to configure SMTP.'
-        : 'Too many sign-in attempts. Wait a few minutes, then try again.';
-    }
-
-    if (error.code === 'email_address_not_authorized') {
-      return 'Supabase’s built-in email service only sends to authorized project team addresses. Configure SMTP to send to other addresses.';
-    }
-
-    if (error.code === 'email_not_confirmed') {
-      return 'Confirm your email using the link Supabase sent, then log in.';
-    }
-
-    if (mode === 'login') {
-      return 'That email and password could not be verified. Check them and try again.';
-    }
-
-    return 'Supabase could not create this account. Check your details and try again.';
-  }
-
-  for (const form of document.querySelectorAll<HTMLFormElement>('[data-auth-form]')) {
-    const fields = [...form.querySelectorAll<HTMLInputElement>('input[required]')];
-    const status = form.querySelector<HTMLElement>('[data-status]');
-    const submit = form.querySelector<HTMLButtonElement>('[data-auth-submit]');
-    const mode = form.dataset.mode ?? 'login';
-
-    // Keep native form submission disabled: credentials must only go to Supabase.
-    if (submit) submit.disabled = false;
-
-    const supabase = getSupabaseClient();
-
-    if (
-      supabase &&
-      mode === 'login' &&
-      new URLSearchParams(window.location.search).has('confirmed')
-    ) {
-      void supabase.auth.getSession().then(({ data }) => {
-        if (status) {
-          status.textContent = data.session
-            ? 'Your email is confirmed. You are signed in.'
-            : 'Your email is confirmed. Log in with your email and password.';
-        }
-      });
-    }
-
-    // Clear an error as soon as the field becomes valid.
-    for (const input of fields) {
-      input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
-        if (input.getAttribute('aria-invalid') === 'true') showError(input, messageFor(input));
-      });
-    }
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-
-      let firstInvalid: HTMLInputElement | null = null;
-      for (const input of fields) {
-        const message = messageFor(input);
-        showError(input, message);
-        if (message && !firstInvalid) firstInvalid = input;
-      }
-
-      if (firstInvalid) {
-        firstInvalid.focus();
-        if (status) status.textContent = '';
-        return;
-      }
-
-      if (!supabase) {
-        if (status) {
-          status.textContent =
-            'Supabase is not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_PUBLISHABLE_KEY in your local .env.local file and Vercel project settings.';
-        }
-        return;
-      }
-
-      if (!status || !submit) return;
-
-      const formData = new FormData(form);
-      const email = String(formData.get('email') ?? '').trim();
-      const password = String(formData.get('password') ?? '');
-      const originalLabel = submit.textContent;
-      submit.disabled = true;
-      submit.textContent = mode === 'signup' ? 'Creating account…' : 'Signing in…';
-      status.textContent = '';
-
-      try {
-        if (mode === 'signup') {
-          const name = String(formData.get('name') ?? '').trim();
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: { full_name: name },
-              emailRedirectTo: `${window.location.origin}/login?confirmed=1`,
-            },
-          });
-
-          if (error) {
-            status.textContent = authErrorMessage(error, mode);
-          } else if (data.session) {
-            status.textContent = 'Your account is ready and you are signed in.';
-          } else {
-            status.textContent =
-              'Account created. Check your email for the confirmation link, then log in.';
-          }
-        } else {
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-          if (error) {
-            status.textContent = authErrorMessage(error, mode);
-          } else {
-            status.textContent = 'You are signed in.';
-          }
-        }
-      } catch {
-        status.textContent = 'Could not reach Supabase. Check your connection and try again.';
-      } finally {
-        submit.disabled = false;
-        submit.textContent = originalLabel;
-      }
-    });
-  }
+  import '../../scripts/auth';
 </script>
